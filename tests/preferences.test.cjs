@@ -3,6 +3,12 @@ const fixture=require('./server-fixture.cjs')(),{box,props,sheets}=fixture;
 const origin={lat:25.0143,lng:121.4638,name:'板橋車站'},far={lat:25.05,lng:121.52,name:'另一個出發點'};
 const record={name:'葷素測試餐廳',address:'',phone:'',location:{lat:origin.lat,lng:origin.lng},category:'台式',budget:120,covered:'yes',coveredOrigin:origin,diet:'both',mapsUrl:'',weeklyHours:Array.from({length:7},()=>({status:'open',spans:[{from:'10:00',to:'21:00'}]}))};
 const filters={walk:'any',weather:'any',budget:'any',category:'all',diet:'any',rating:'any',open:false,noRepeat:false,from:'12:00',to:'13:00'},context={origin,weather:{rain:false},now:new Date('2026-09-15T04:00Z')};
+for(const budget of [undefined,null,'',' ']){
+ const unknown=Catalog.hydrate({...record,budget});
+ assert.deepEqual(C.reasons(unknown,filters,context),[]);
+ assert(C.reasons(unknown,{...filters,budget:'150'},context).includes('預算未標記'));
+}
+assert(C.reasons(Catalog.hydrate({...record,budget:200}),{...filters,budget:'150'},context).includes('超出預算'));
 for(const diet of ['meat','vegetarian']){
  assert.equal(C.reasons(Catalog.hydrate(record),{...filters,diet},context).length,0);
  assert.equal(C.reasons(Catalog.hydrate({...record,diet}),{...filters,diet},context).length,0);

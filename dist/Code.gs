@@ -36,7 +36,10 @@
   }
   function fingerprint(record){return record.name.replace(/\s+/g,'').toLocaleLowerCase()+'|'+record.location.lat.toFixed(4)+'|'+record.location.lng.toFixed(4);}
   function hydrate(record){
-    const checked=validate(record),days=['日','一','二','三','四','五','六'];
+    // Missing optional values can arrive as omitted properties or blank cells.
+    // Normalize reads only; writes still require a valid number or explicit null.
+    const budget=record.budget==null||(typeof record.budget==='string'&&!record.budget.trim())?null:record.budget;
+    const checked=validate({...record,budget}),days=['日','一','二','三','四','五','六'];
     const periods=checked.weeklyHours.flatMap((day,d)=>day.status==='open'?day.spans.map(span=>{
       const [h,m]=span.from.split(':').map(Number),[ch,cm]=span.to.split(':').map(Number);
       return {open:{day:d,hour:h,minute:m},close:{day:span.to<span.from?(d+1)%7:d,hour:ch,minute:cm}};
@@ -191,7 +194,7 @@ function getBootstrap(){
   const lat=Number(rawLat),lng=Number(rawLng),verified=Boolean(rawLat&&rawLng&&Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180);
   return {origin:verified?{lat,lng}:{lat:25.0143,lng:121.4638},originName:(p.getProperty('ORIGIN_NAME')||'板橋車站・北二門').slice(0,80),originVerified:verified,sharedConfigured:Boolean(p.getProperty('SPREADSHEET_ID')),adminConfigured:Boolean(adminSecret_()),tileUrl:p.getProperty('TILE_URL')||'https://tile.openstreetmap.org/{z}/{x}/{y}.png',tileAttribution:p.getProperty('TILE_ATTRIBUTION')||''};
 }
-function listCandidates(){const lock=LockService.getScriptLock();lock.waitLock(10000);try{return rows_(sheet_());}finally{lock.releaseLock();}}
+function listCandidates(format){const lock=LockService.getScriptLock();lock.waitLock(10000);try{const records=rows_(sheet_());return format==='json'?JSON.stringify(records):records;}finally{lock.releaseLock();}}
 function getSharedHome(format){
   const data={config:{...getBootstrap(),googleLoginConfigured:googleConfig_().configured},records:listCandidates()};
   // A text response crosses Apps Script's browser bridge without nested service types.
@@ -258,8 +261,9 @@ function sheet_(){
 function rows_(sheet){
   const n=sheet.getLastRow()-1;if(n<1)return [];
   return sheet.getRange(2,1,n,FREE_HEADERS_.length).getValues().filter(r=>r[0]).map(r=>{
-    const record={id:String(r[0]),name:readCell_(r[1]),address:readCell_(r[2]),location:{lat:Number(r[3]),lng:Number(r[4])},phone:readCell_(r[5]),category:String(r[6]),budget:r[7]===''?null:Number(r[7]),covered:String(r[8]),weeklyHours:JSON.parse(String(r[9])),mapsUrl:String(r[10]),addedAt:r[11] instanceof Date?r[11].toISOString():String(r[11]),diet:r[12]?String(r[12]):'unknown',coveredOrigin:r[13]?JSON.parse(String(r[13])):null};
-    LunchCatalog.validate(record);return record;
+    const record={id:String(r[0]),name:readCell_(r[1]),address:readCell_(r[2]),location:{lat:Number(r[3]),lng:Number(r[4])},phone:readCell_(r[5]),category:String(r[6]),budget:r[7]==null||String(r[7]).trim()===''?null:Number(r[7]),covered:String(r[8]),weeklyHours:JSON.parse(String(r[9])),mapsUrl:String(r[10]),addedAt:r[11] instanceof Date?r[11].toISOString():String(r[11]),diet:r[12]?String(r[12]):'unknown',coveredOrigin:r[13]?JSON.parse(String(r[13])):null};
+    try{LunchCatalog.validate(record);}catch(error){throw Error('「'+record.name+'」的店家資料需要更正：'+error.message);}
+    return record;
   });
 }
 

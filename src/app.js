@@ -219,9 +219,15 @@
     mapView.on('click',event=>{if(originPicking)openOrigin(event.latlng);else if(canAdd())manualForm(event.latlng);});$('map-placeholder').hidden=true;
   }
   async function fetchPlace(record) {return record.demo?record:Catalog.hydrate(record);}
+  async function readCatalog(){
+    const payload=await rpc('listCandidates','json');
+    let rows;try{rows=typeof payload==='string'?JSON.parse(payload):payload;}catch{throw Error('收到的名單無法讀取，請重新整理後再試。');}
+    if(!Array.isArray(rows))throw Error('名單沒有完整載入，請再試一次。');
+    return rows.map(record=>Catalog.hydrate(record));
+  }
   async function refreshDetails(){
     if(state.mode!=='live')return;
-    const rows=await rpc('listCandidates');state.records=rows.map(r=>Catalog.hydrate(r));
+    state.records=await readCatalog();
     state.selected=new Set([...state.selected].filter(id=>state.records.some(p=>p.id===id)));
   }
   function drawMarkers(places){
@@ -235,7 +241,7 @@
   async function refreshCatalog() {
     if(state.busy)return;lockUI(true);
     try {
-      if(state.mode==='live'){const records=await rpc('listCandidates');state.records=records.map(p=>Catalog.hydrate(p));}
+      if(state.mode==='live')state.records=await readCatalog();
       else {state.records=state.records.map(p=>p.demo?(demoPlaces().find(d=>d.id===p.id)||p):Catalog.hydrate(p));}
       state.selected=new Set([...state.selected].filter(id=>state.records.some(p=>p.id===id)));
       saveLocal();drawMarkers(state.records);message('已更新名單；營業資訊依自行維護的營業時間推估。');
@@ -327,9 +333,13 @@
     } catch(err){if(err.code==='AUTH_REQUIRED')clearAdmin();message(err.message);submit.disabled=false;submit.textContent='再試一次';}
     finally {state.busy=false;render();}
   }
+  function setSpinLabel(title='開吃!',caption='點我抽選 ↗'){
+    $('spin-button').querySelector(':scope > span').textContent=title;
+    $('spin-button').querySelector(':scope > small').textContent=caption;
+  }
   async function spin() {
     if(state.busy||$('spin-button').disabled)return;
-    lockUI(true);$('spin-button').innerHTML='<span>確認中</span><small>更新營業資訊</small>';
+    lockUI(true);setSpinLabel('確認中','更新營業資訊');
     try {
       if(dateKey!==C.taipeiDay()){dateKey=C.taipeiDay();if(state.mode==='demo'){state.records=state.records.map(p=>p.demo?(demoPlaces().find(d=>d.id===p.id)||p):Catalog.hydrate(p));}}
       if(state.mode==='live')await refreshDetails(selectedPlaces());
@@ -338,13 +348,13 @@
       if(!validTime()||choices.length<2||choices.length>20)throw Error('更新後不足 2 間符合條件，請調整條件或增加勾選店家。');
       renderWheel(choices);
       const index=C.randomIndex(choices.length), winner=choices[index], target=C.rotation(index,choices.length,state.rotation);
-      $('spin-button').innerHTML='<span>轉呀轉</span><small>好吃的快來了</small>';$('wheel-title').textContent='美味，正在靠近。';
+      setSpinLabel('轉呀轉','好吃的快來了');$('wheel-title').textContent='美味，正在靠近。';
       const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       await new Promise(resolve=>{requestAnimationFrame(()=>{$('wheel-disc').style.transform='rotate('+target+'deg)';setTimeout(resolve,reduced?120:2500);});});
       state.rotation=target;lockUI(false);
-      $('spin-button').innerHTML='<span>開吃！</span><small>點我抽選 ↗</small>';$('wheel-title').textContent='讓選擇，變成期待。';
+      setSpinLabel();$('wheel-title').textContent='讓選擇，變成期待。';
       showResult(winner,choices.length);
-    } catch(err){lockUI(false);$('spin-button').innerHTML='<span>開吃！</span><small>點我抽選 ↗</small>';message(err.message);render();}
+    } catch(err){lockUI(false);setSpinLabel();message(err.message);render();}
   }
   let resultPlace=null;
   function showResult(p,count) {
@@ -355,7 +365,7 @@
   function enterSource(mode){
     if(state.busy)return;
     const request=++sourceRequest;sourceLoading=true;lockUI(true);state.ready=false;clearAdmin();
-    const trace=(step,extra={})=>console.info('[Lunch Club 6.0.1] shared entry', {request,step,...extra});
+    const trace=(step,extra={})=>console.info('[Lunch Club 6.0.2] shared entry', {request,step,...extra});
     const current=()=>request===sourceRequest&&sourceLoading;
     $('source-page').setAttribute('aria-busy','true');$('cancel-source').hidden=false;$('cancel-source').disabled=false;
     $('source-status').textContent=mode==='live'?'正在打開現有名單，請稍候…':'正在打開你的名單…';

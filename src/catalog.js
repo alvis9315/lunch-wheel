@@ -36,7 +36,10 @@
   }
   function fingerprint(record){return record.name.replace(/\s+/g,'').toLocaleLowerCase()+'|'+record.location.lat.toFixed(4)+'|'+record.location.lng.toFixed(4);}
   function hydrate(record){
-    const checked=validate(record),days=['日','一','二','三','四','五','六'];
+    // Missing optional values can arrive as omitted properties or blank cells.
+    // Normalize reads only; writes still require a valid number or explicit null.
+    const budget=record.budget==null||(typeof record.budget==='string'&&!record.budget.trim())?null:record.budget;
+    const checked=validate({...record,budget}),days=['日','一','二','三','四','五','六'];
     const periods=checked.weeklyHours.flatMap((day,d)=>day.status==='open'?day.spans.map(span=>{
       const [h,m]=span.from.split(':').map(Number),[ch,cm]=span.to.split(':').map(Number);
       return {open:{day:d,hour:h,minute:m},close:{day:span.to<span.from?(d+1)%7:d,hour:ch,minute:cm}};

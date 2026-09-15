@@ -8,6 +8,9 @@ assert.equal(C.opening(Catalog.hydrate({...record,weeklyHours:hours}),'12:00','1
 assert.equal(C.opening(Catalog.hydrate({...record,weeklyHours:hours}),'13:00','18:00',new Date('2026-09-15T04:00Z')).lunch,false);
 hours[2]={status:'unknown',spans:[]};assert.equal(C.opening(Catalog.hydrate({...record,weeklyHours:hours}),'12:00','13:00',new Date('2026-09-15T04:00Z')).today,null);
 for(const bad of [{location:{lat:NaN,lng:1}},{location:{lat:91,lng:1}},{phone:'<script>'},{mapsUrl:'https://www.google.com.evil.test/maps/abc'},{mapsUrl:'javascript:alert(1)'},{budget:'150'},{weeklyHours:[]}])assert.throws(()=>Catalog.validate({...record,...bad}));
+for(const budget of [undefined,null,'',' \t\u00a0 '])assert.equal(Catalog.hydrate({...record,budget}).budget,null);
+for(const budget of [0,-1,10001,12.5,NaN,false,'invalid'])assert.throws(()=>Catalog.hydrate({...record,budget}),/預算/);
+assert.throws(()=>Catalog.validate({...record,budget:undefined}),/預算/);
 assert.equal(Catalog.fingerprint({...record,name:' 測 試食堂 '}),Catalog.fingerprint(record));
 const fixture=require('./server-fixture.cjs')(),{box,data,props,cache}=fixture;
 box.listCandidates();
@@ -24,6 +27,14 @@ assert.equal(typeof homeText,'string');
 assert.deepEqual(JSON.parse(homeText),JSON.parse(JSON.stringify(home)));
 assert.equal(JSON.parse(homeText).records.length,2);
 assert(!homeText.includes(props.get('ADMIN_PASSPHRASE')));
+for(const blank of ['',null,undefined,' \t\u00a0 ']){
+ data[1][7]=blank;
+ assert.equal(box.listCandidates()[0].budget,null);
+ assert.equal(JSON.parse(box.listCandidates('json'))[0].budget,null);
+ assert.equal(data[1][7],blank); // Reading never rewrites the owner's sheet.
+}
+data[1][7]='not-a-budget';assert.throws(()=>box.listCandidates('json'),/「測試食堂」.*預算/);
+data[1][7]=130;
 box.adminLogout(session.token);assert.throws(()=>box.addCandidate(record,session.token),/AUTH_REQUIRED/);
 const expired=box.adminLogin(props.get('ADMIN_PASSPHRASE'));fixture.advance(30*60*1000+1);assert.throws(()=>box.addCandidate(record,expired.token),/AUTH_REQUIRED/);
 const changed=box.adminLogin(props.get('ADMIN_PASSPHRASE'));props.set('ADMIN_PASSPHRASE','new-fixture-only-passphrase-54321');assert.throws(()=>box.addCandidate(record,changed.token),/AUTH_REQUIRED/);
