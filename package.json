@@ -1,0 +1,7 @@
+{
+  "name": "lunch-club-banqiao",
+  "version": "5.0.0",
+  "private": true,
+  "scripts": { "build": "node scripts/build.mjs", "check": "node --check src/core.js && node --check src/catalog.js && node --check src/reviews.js && node --check src/review-ui.js && node --check src/app.js", "test":"npm run check && npm run build && node tests/catalog.test.cjs && node tests/reviews.test.cjs && node tests/preferences.test.cjs" },
+  "engines": { "node": ">=18" }
+}

@@ -1,0 +1,14 @@
+node_modules/
+.local-qa/
+preview/
+docs/plan.md
+docs/acceptance.md
+.env
+.env.*
+.clasp.json
+.clasprc.json
+credentials.json
+script-properties.json
+*.log
+.DS_Store
+Thumbs.db
