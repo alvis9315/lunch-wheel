@@ -26,6 +26,6 @@ const evicted=box.adminLogin(props.get('ADMIN_PASSPHRASE'));cache.clear();assert
 for(let i=0;i<10;i++)assert.throws(()=>box.adminLogin('wrong'),/不正確/);
 assert.throws(()=>box.adminLogin(props.get('ADMIN_PASSPHRASE')),/頻繁/);fixture.advance(10*60*1000+1);assert(box.adminLogin(props.get('ADMIN_PASSPHRASE')).token);
 props.delete('ADMIN_PASSPHRASE');assert.equal(box.getBootstrap().adminConfigured,false);assert.throws(()=>box.adminLogin('anything'),/尚未設定/);assert.throws(()=>box.addCandidate(record,changed.token),/AUTH_REQUIRED/);
-assert.equal(box.getBootstrap().mapsKey,undefined);assert(!/places\.googleapis|maps\.googleapis|MAPS_BROWSER_KEY|PLACES_SERVER_KEY|UrlFetchApp/.test(fs.readFileSync(root+'/dist/Code.gs','utf8')));
-assert(!/script.external_request/.test(fs.readFileSync(root+'/dist/appsscript.json','utf8')));
+assert.equal(box.getBootstrap().mapsKey,undefined);assert(!/places\.googleapis|maps\.googleapis|MAPS_BROWSER_KEY|PLACES_SERVER_KEY/.test(fs.readFileSync(root+'/dist/Code.gs','utf8')));
+assert.deepEqual(JSON.parse(fs.readFileSync(root+'/dist/appsscript.json','utf8')).oauthScopes,['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/script.external_request']);
 console.log('PASS catalog and server: unauthenticated/forged/expired/revoked/rotated/evicted credentials rejected, persistent throttle, no secret disclosure, append-only, dedupe, schedule, formula safety, zero paid API.');

@@ -16,14 +16,14 @@
     {min:200,max:200,label:'好吃到想把戶籍遷過來',tone:'legend'}
   ];
   const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  function id(value,label='識別碼'){if(typeof value!=='string'||!uuid.test(value))throw Error(label+'格式不正確');return value.toLowerCase();}
-  function visitor(value){if(typeof value!=='string'||value.length!==72||!uuid.test(value.slice(0,36))||!uuid.test(value.slice(36)))throw Error('瀏覽器識別碼無效，請重新整理後再試。');return value.toLowerCase();}
+  function id(value,label='內容'){if(typeof value!=='string'||!uuid.test(value))throw Error('無法確認'+label+'，請重新開啟店家後再試。');return value.toLowerCase();}
+  function visitor(value){if(typeof value!=='string'||value.length!==72||!uuid.test(value.slice(0,36))||!uuid.test(value.slice(36)))throw Error('登入資訊無效，請重新整理後再試。');return value.toLowerCase();}
   function score(value){if(typeof value!=='number'||!Number.isInteger(value)||value< -100||value>200)throw Error('分數請填 -100～200 的整數。');return value;}
   function band(value){return typeof value==='number'&&Number.isFinite(value)?bands.find(b=>value>=b.min&&value<=b.max)||null:null;}
   function text(value,max,label){if(typeof value!=='string'||!value.trim()||value.length>max)throw Error(label+'需填 1～'+max+' 字。');return value.trim();}
   function validate(input){
     if(!input||typeof input!=='object')throw Error('評論格式不正確。');
-    return {restaurantId:id(input.restaurantId,'店家識別碼'),requestId:id(input.requestId,'送出識別碼'),item:text(input.item,100,'品項'),feedback:text(input.feedback,1500,'回饋'),score:score(input.score)};
+    return {restaurantId:id(input.restaurantId,'這間店'),requestId:id(input.requestId,'這次送出的評論'),item:text(input.item,100,'品項'),feedback:text(input.feedback,1500,'回饋'),score:score(input.score)};
   }
   function vote(value){if(![0,1,-1].includes(value))throw Error('投票只能是讚、踩或取消。');return value;}
   const api={bands,band,score,validate,vote,id,visitor};root.LunchReviews=api;

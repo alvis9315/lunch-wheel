@@ -1,18 +1,18 @@
 const assert=require('node:assert/strict'),crypto=require('node:crypto'),R=require('../src/reviews.js');
 const fixture=require('./server-fixture.cjs')(),{box,props,sheets}=fixture;
-const uuid=()=>crypto.randomUUID(),visitor=()=>uuid()+uuid(),a=visitor(),b=visitor();
+const uuid=()=>crypto.randomUUID(),visitor=()=>fixture.issueMember().token,a=visitor(),b=visitor();
 for(let score=-100;score<=200;score++){assert(R.band(score));assert.equal(R.bands.filter(b=>score>=b.min&&score<=b.max).length,1);}
 assert.equal(R.band(0).label,'狗幹難吃');assert.equal(R.band(100).label,'頂上人間');
 const record={name:'評論測試店',address:'',phone:'',location:{lat:25.0143,lng:121.4638},category:'台式',budget:null,covered:'unknown',mapsUrl:'',weeklyHours:Array.from({length:7},()=>({status:'unknown',spans:[]}))};
 const token=box.adminLogin(props.get('ADMIN_PASSPHRASE')).token,id=box.addCandidate(record,token).record.id,other=box.addCandidate({...record,name:'另一家'},token).record.id;
 const input={restaurantId:id,item:'雞腿飯',feedback:'便當菜不好吃，雞腿太小隻很盤',score:0,requestId:uuid()};
-assert.equal(box.listReviews(id,a).summary.count,0);assert.equal(sheets.size,3);
+assert.equal(box.listReviews(id,a).summary.count,0);assert.equal(sheets.size,4);
 for(const score of [-101,201,0.5,NaN,Infinity,'100',null])assert.throws(()=>box.addReview({...input,score},a),/分數/);
 for(const bad of [{item:''},{feedback:' '},{item:'x'.repeat(101)},{feedback:'x'.repeat(1501)},{restaurantId:uuid()},{requestId:'bad'}])assert.throws(()=>box.addReview({...input,...bad},a));
 assert.throws(()=>box.addReview(input,'fake'));assert.equal(sheets.get('Reviews').data.length,1);
 const first=box.addReview(input,a);assert.equal(first.review.score,0);assert.equal(first.duplicate,false);
 assert.equal(box.addReview(input,a).duplicate,true);assert.equal(sheets.get('Reviews').data.length,2);
-assert.throws(()=>box.addReview({...input,item:'別的餐'},a),/識別碼已使用/);
+assert.throws(()=>box.addReview({...input,item:'別的餐'},a),/這則評論已送出/);
 const malicious=box.addReview({...input,requestId:uuid(),item:'=IMPORTXML("x")',feedback:'<img src=x onerror=alert(1)>\n=HYPERLINK("x")',score:-100},b);
 assert(sheets.get('Reviews').data[2][2].startsWith("'="));assert.equal(box.listReviews(id,a).reviews[0].item,'=IMPORTXML("x")');
 assert.equal(box.listReviews(other,a).summary.count,0);assert.equal(box.listReviews(id,a).summary.average,-50);

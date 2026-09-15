@@ -37,14 +37,14 @@
     if (!Array.isArray(place.periods)) return {today:null, lunch:null, reason:'營業時間待確認'};
     if(place.manualHours){
       const day=weekday(date),prior=(day+6)%7;
-      if(place.weeklyHours?.[day]?.status==='unknown')return {today:null,lunch:null,reason:'當日例行時段未填寫'};
+      if(place.weeklyHours?.[day]?.status==='unknown')return {today:null,lunch:null,reason:'當日營業時間未填寫'};
       if(place.weeklyHours?.[day]?.status==='closed'&&place.weeklyHours?.[prior]?.status==='unknown')return {today:null,lunch:null,reason:'前一日跨夜時段待確認'};
     }
     const d = weekday(date) * 1440, spans = intervals(place.periods);
     const today = spans.some(p => p.start < d + 1440 && p.end > d);
     const start = d + minutes(from), end = d + minutes(to);
     const lunch = end > start && spans.some(p => p.start <= start && p.end >= end);
-    return {today, lunch, reason:place.manualHours?(!today?'例行時段顯示今日休息':lunch?'例行時段涵蓋午餐':'例行時段未涵蓋午餐'):(!today ? '今日沒營業' : lunch ? '午餐時段營業' : '午餐時段未完整營業')};
+    return {today, lunch, reason:place.manualHours?(!today?'營業時間顯示今日休息':lunch?'營業時間涵蓋午餐':'營業時間未涵蓋午餐'):(!today ? '今日沒營業' : lunch ? '午餐時段營業' : '午餐時段未完整營業')};
   }
   function reasons(place, filters, context) {
     const out = [], km = distance(context.origin, place.location);
