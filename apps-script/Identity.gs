@@ -86,14 +86,15 @@ function requireMember_(token){
 function memberRows_(){const sheet=communitySheet_('Members',MEMBER_HEADERS_),n=sheet.getLastRow()-1;return {sheet,rows:n>0?sheet.getRange(2,1,n,MEMBER_HEADERS_.length).getValues():[]};}
 function upsertMember_(identity,nickname){
   const {sheet,rows}=memberRows_(),storedId='google:'+identity.googleId,index=rows.findIndex(r=>String(r[0])===storedId);
-  const profile={...identity,nickname:nickname===undefined?(index>=0?readCell_(rows[index][3]):''):nickname};
+  const profile={...identity,nickname:nickname===undefined?(index>=0?storedNickname_(rows[index][3]):''):nickname};
   // Prefix numeric Google subjects so Sheets cannot round long IDs as numbers.
   const values=[storedId,safeCell_(profile.email),safeCell_(profile.name),safeCell_(profile.nickname),new Date().toISOString()];
   if(index<0)sheet.appendRow(values);else sheet.getRange(index+2,1,1,MEMBER_HEADERS_.length).setValues([values]);
   return profile;
 }
 function nickname_(value){if(typeof value!=='string'||value.trim().length>32||/[\u0000-\u001f\u007f]/.test(value))throw Error('暱稱最多 32 個字，請勿換行。');return value.trim();}
-function memberProfile_(member){const {rows}=memberRows_(),row=rows.find(r=>String(r[0])==='google:'+member.googleId);return {...member,nickname:row?readCell_(row[3]):''};}
+function storedNickname_(value){try{return nickname_(readCell_(value));}catch{return '';}}
+function memberProfile_(member){const {rows}=memberRows_(),row=rows.find(r=>String(r[0])==='google:'+member.googleId);return {...member,nickname:row?storedNickname_(row[3]):''};}
 function saveMemberNickname(nickname,token){
   const member=requireMember_(token),value=nickname_(nickname),lock=LockService.getScriptLock();lock.waitLock(10000);
   try{const profile=upsertMember_(member,value);return {email:profile.email,name:profile.name,nickname:profile.nickname};}finally{lock.releaseLock();}

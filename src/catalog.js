@@ -2,25 +2,33 @@
   'use strict';
   const categories=['台式','日式','韓式','西式','輕食','其他'];
   const diets={unknown:'葷素未確認',meat:'葷食',vegetarian:'素食',both:'葷素皆有'};
+  const issueLabels={row:'店家內容待確認',id:'店家編號待確認',duplicateId:'店家編號重複，請管理者更正',name:'店名待補',location:'位置待確認',address:'地址未提供',phone:'電話未提供或格式待確認',category:'料理類型待確認',diet:'葷素待確認',budget:'預算待確認',covered:'避雨情況待確認',coveredOrigin:'避雨路線出發點待確認',hours:'營業時間待確認',mapsUrl:'Google Maps 連結待確認'};
+  const blank=v=>v==null||(typeof v==='string'&&!v.trim());
+  const plain=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+  const number=v=>typeof v==='number'?v:typeof v==='string'&&/^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(v.trim())?Number(v):NaN;
+  const point=v=>plain(v)&&!blank(v.lat)&&!blank(v.lng)&&Number.isFinite(number(v.lat))&&Number.isFinite(number(v.lng))&&Math.abs(number(v.lat))<=90&&Math.abs(number(v.lng))<=180?{lat:number(v.lat),lng:number(v.lng)}:null;
+  const unknownHours=()=>Array.from({length:7},()=>({status:'unknown',spans:[]}));
+  const mapsPattern=/^https:\/\/(?:maps\.app\.goo\.gl\/|goo\.gl\/maps(?:\/|\?)|(?:www\.)?google\.(?:com|com\.tw)\/maps(?:\/|\?)|maps\.google\.(?:com|com\.tw)\/(?:maps)?)/i;
   const text=(v,max,label,required=false)=>{
     if(typeof v!=='string'||v.length>max||(required&&!v.trim()))throw Error(label+'格式不正確');
     return v.trim();
   };
   function validate(input){
-    if(!input||typeof input!=='object')throw Error('新增資料格式不正確');
-    const name=text(input.name,100,'店名',true),address=text(input.address||'',250,'地址');
+    if(!plain(input))throw Error('新增資料格式不正確');
+    input={...input,category:blank(input.category)?'unknown':input.category,diet:blank(input.diet)?'unknown':input.diet,covered:blank(input.covered)?'unknown':input.covered,budget:blank(input.budget)?null:input.budget,weeklyHours:blank(input.weeklyHours)?unknownHours():input.weeklyHours,coveredOrigin:blank(input.coveredOrigin)?null:input.coveredOrigin};
+    const name=text(input.name,100,'店名',true),address=text(blank(input.address)?'':input.address,250,'地址');
     const location=input.location;
     if(!location||typeof location.lat!=='number'||typeof location.lng!=='number'||!Number.isFinite(location.lat)||!Number.isFinite(location.lng)||Math.abs(location.lat)>90||Math.abs(location.lng)>180)throw Error('請填寫有效經緯度或點選地圖位置');
-    const phone=text(input.phone||'',40,'電話');
-    if(phone&&!/^[+\d\s()#-]+$/.test(phone))throw Error('電話只接受數字、空白、括號、+、-、#');
-    if(!categories.includes(input.category))throw Error('料理分類不正確');
-    const diet=input.diet||'unknown';if(!Object.prototype.hasOwnProperty.call(diets,diet))throw Error('葷素標記不正確');
+    const phone=text(blank(input.phone)?'':input.phone,40,'電話');
+    if(phone&&!/^\+?[\d\s()#-]*\d[\d\s()#-]*$/.test(phone))throw Error('電話請填數字，可包含空白、括號、開頭的 +、-、#');
+    if(![...categories,'unknown'].includes(input.category))throw Error('料理分類不正確');
+    const diet=input.diet;if(typeof diet!=='string'||!Object.prototype.hasOwnProperty.call(diets,diet))throw Error('葷素標記不正確');
     if(!['yes','no','unknown'].includes(input.covered))throw Error('遮雨標記不正確');
     const coveredOrigin=input.coveredOrigin??null;
     if(coveredOrigin!==null&&(!coveredOrigin||!Number.isFinite(coveredOrigin.lat)||!Number.isFinite(coveredOrigin.lng)||Math.abs(coveredOrigin.lat)>90||Math.abs(coveredOrigin.lng)>180))throw Error('避雨路線出發點不正確');
     if(input.budget!==null&&(!Number.isInteger(input.budget)||input.budget<1||input.budget>10000))throw Error('預算請填 1～10000 整數或留空');
-    const mapsUrl=text(input.mapsUrl||'',1000,'Google Maps 連結');
-    if(mapsUrl&&!/^https:\/\/(?:maps\.app\.goo\.gl\/|goo\.gl\/maps(?:\/|\?)|(?:www\.)?google\.(?:com|com\.tw)\/maps(?:\/|\?)|maps\.google\.(?:com|com\.tw)\/(?:maps)?)/i.test(mapsUrl))throw Error('請貼上有效的 HTTPS Google Maps 分享連結');
+    const mapsUrl=text(blank(input.mapsUrl)?'':input.mapsUrl,1000,'Google Maps 連結');
+    if(mapsUrl&&!mapsPattern.test(mapsUrl))throw Error('請貼上有效的 HTTPS Google Maps 分享連結');
     if(!Array.isArray(input.weeklyHours)||input.weeklyHours.length!==7)throw Error('每週營業資料需包含 7 天');
     const weeklyHours=input.weeklyHours.map(day=>{
       if(!day||!['unknown','closed','open'].includes(day.status))throw Error('營業日狀態不正確');
@@ -34,18 +42,48 @@
     });
     return {name,address,location:{lat:location.lat,lng:location.lng},phone,category:input.category,diet,budget:input.budget,covered:input.covered,coveredOrigin:coveredOrigin?{lat:coveredOrigin.lat,lng:coveredOrigin.lng}:null,mapsUrl,weeklyHours};
   }
-  function fingerprint(record){return record.name.replace(/\s+/g,'').toLocaleLowerCase()+'|'+record.location.lat.toFixed(4)+'|'+record.location.lng.toFixed(4);}
+  function fingerprint(record){const p=point(record.location);return String(record.name||'').replace(/\s+/g,'').toLocaleLowerCase()+'|'+(p?p.lat.toFixed(4)+'|'+p.lng.toFixed(4):'unknown');}
+  function read(record){
+    const issues=new Set();if(!plain(record)){issues.add('row');record={};}
+    if(Array.isArray(record.dataIssues))record.dataIssues.filter(k=>typeof k==='string'&&Object.prototype.hasOwnProperty.call(issueLabels,k)).forEach(k=>issues.add(k));
+    function readText(value,max,key){if(typeof value==='string'&&value.trim()&&value.length<=max)return value.trim();issues.add(key);return '';}
+    function decode(value){if(typeof value!=='string')return value;try{return JSON.parse(value);}catch{return null;}}
+    const name=readText(record.name,100,'name')||'店名待補',address=readText(record.address,250,'address');
+    const location=point(record.location);if(!location)issues.add('location');
+    let phone=readText(record.phone,40,'phone');if(phone&&!/^\+?[\d\s()#-]*\d[\d\s()#-]*$/.test(phone)){issues.add('phone');phone='';}
+    let mapsUrl=blank(record.mapsUrl)?'':readText(record.mapsUrl,1000,'mapsUrl');if(mapsUrl&&!mapsPattern.test(mapsUrl)){issues.add('mapsUrl');mapsUrl='';}
+    const category=categories.includes(record.category)?record.category:'unknown';if(category==='unknown')issues.add('category');
+    const diet=typeof record.diet==='string'&&Object.prototype.hasOwnProperty.call(diets,record.diet)?record.diet:'unknown';if(diet==='unknown')issues.add('diet');
+    const covered=['yes','no'].includes(record.covered)?record.covered:'unknown';if(covered==='unknown')issues.add('covered');
+    const coveredOrigin=point(decode(record.coveredOrigin));if(covered!=='unknown'&&!coveredOrigin)issues.add('coveredOrigin');
+    const amount=blank(record.budget)?NaN:number(record.budget),budget=Number.isInteger(amount)&&amount>=1&&amount<=10000?amount:null;if(budget===null)issues.add('budget');
+    const rawHours=decode(record.weeklyHours),weeklyHours=unknownHours();
+    if(Array.isArray(rawHours)&&rawHours.length===7){rawHours.forEach((day,i)=>{
+      if(day?.status==='closed')weeklyHours[i]={status:'closed',spans:[]};
+      else if(day?.status==='open'&&Array.isArray(day.spans)&&day.spans.length>=1&&day.spans.length<=2&&day.spans.every(s=>s&&typeof s.from==='string'&&typeof s.to==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(s.from)&&/^([01]\d|2[0-3]):[0-5]\d$/.test(s.to)&&s.from!==s.to))weeklyHours[i]={status:'open',spans:day.spans.map(s=>({from:s.from,to:s.to}))};
+      else issues.add('hours');
+    });}else issues.add('hours');
+    const id=typeof record.id==='string'?record.id.trim():'';
+    return {id,name,address,location,phone,category,diet,budget,covered,coveredOrigin,mapsUrl,weeklyHours,addedAt:typeof record.addedAt==='string'?record.addedAt:'',dataIssues:[...issues],unavailable:record.unavailable===true||issues.has('row')||issues.has('name')||issues.has('location')};
+  }
+  function collection(records){
+    if(!Array.isArray(records))throw Error('名單沒有完整載入，請再試一次。');
+    const normalized=records.map(read),counts=new Map();normalized.forEach(r=>counts.set(r.id,(counts.get(r.id)||0)+1));
+    return normalized.map((r,i)=>{
+      if(!/^(?:local-)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(r.id)||counts.get(r.id)>1){
+        r.dataIssues.push(counts.get(r.id)>1&&r.id?'duplicateId':'id');r.id='unavailable-row-'+i;r.unavailable=true;
+      }
+      return r;
+    });
+  }
   function hydrate(record){
-    // Missing optional values can arrive as omitted properties or blank cells.
-    // Normalize reads only; writes still require a valid number or explicit null.
-    const budget=record.budget==null||(typeof record.budget==='string'&&!record.budget.trim())?null:record.budget;
-    const checked=validate({...record,budget}),days=['日','一','二','三','四','五','六'];
+    const checked=read(record),days=['日','一','二','三','四','五','六'];
     const periods=checked.weeklyHours.flatMap((day,d)=>day.status==='open'?day.spans.map(span=>{
       const [h,m]=span.from.split(':').map(Number),[ch,cm]=span.to.split(':').map(Number);
       return {open:{day:d,hour:h,minute:m},close:{day:span.to<span.from?(d+1)%7:d,hour:ch,minute:cm}};
     }):[]);
-    return {...record,...checked,loaded:true,manualHours:true,periods,hoursText:checked.weeklyHours.map((day,i)=>'週'+days[i]+'：'+(day.status==='unknown'?'未填寫':day.status==='closed'?'休息':day.spans.map(s=>s.from+'–'+s.to+(s.to<s.from?'（翌日）':'')).join('、')))};
+    return {...checked,loaded:!checked.unavailable,manualHours:true,periods,hoursText:checked.weeklyHours.map((day,i)=>'週'+days[i]+'：'+(day.status==='unknown'?'未填寫':day.status==='closed'?'休息':day.spans.map(s=>s.from+'–'+s.to+(s.to<s.from?'（翌日）':'')).join('、')))};
   }
-  const api={validate,fingerprint,hydrate,categories,diets};root.LunchCatalog=api;
+  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets};root.LunchCatalog=api;
   if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

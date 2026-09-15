@@ -5,7 +5,7 @@ const VOTE_HEADERS_=['review_id','voter_key','value','updated_at'];
 function doGet(event){if(event&&event.parameter&&(event.parameter.state||event.parameter.code||event.parameter.error))return googleCallbackPage_(event.parameter);return HtmlService.createHtmlOutputFromFile('Index').setTitle('午餐俱樂部 · 今天吃什麼').addMetaTag('viewport','width=device-width, initial-scale=1, viewport-fit=cover');}
 function getBootstrap(){
   const p=PropertiesService.getScriptProperties(),rawLat=p.getProperty('ORIGIN_LAT'),rawLng=p.getProperty('ORIGIN_LNG');
-  const lat=Number(rawLat),lng=Number(rawLng),verified=Boolean(rawLat&&rawLng&&Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180);
+  const point=LunchCatalog.point({lat:rawLat,lng:rawLng}),lat=point?.lat,lng=point?.lng,verified=Boolean(point);
   return {origin:verified?{lat,lng}:{lat:25.0143,lng:121.4638},originName:(p.getProperty('ORIGIN_NAME')||'板橋車站・北二門').slice(0,80),originVerified:verified,sharedConfigured:Boolean(p.getProperty('SPREADSHEET_ID')),adminConfigured:Boolean(adminSecret_()),tileUrl:p.getProperty('TILE_URL')||'https://tile.openstreetmap.org/{z}/{x}/{y}.png',tileAttribution:p.getProperty('TILE_ATTRIBUTION')||''};
 }
 function listCandidates(format){const lock=LockService.getScriptLock();lock.waitLock(10000);try{const records=rows_(sheet_());return format==='json'?JSON.stringify(records):records;}finally{lock.releaseLock();}}
@@ -19,7 +19,7 @@ function addCandidate(input,token){
   try{
     requireAdmin_(token);
     const record=LunchCatalog.validate(input);
-    const sheet=sheet_(),found=rows_(sheet).find(row=>LunchCatalog.fingerprint(row)===LunchCatalog.fingerprint(record));
+    const sheet=sheet_(),found=rows_(sheet).find(row=>!row.unavailable&&LunchCatalog.fingerprint(row)===LunchCatalog.fingerprint(record));
     if(found)return {record:found,duplicate:true};
     record.id=Utilities.getUuid();record.addedAt=new Date().toISOString();
     sheet.appendRow([record.id,safeCell_(record.name),safeCell_(record.address),record.location.lat,record.location.lng,safeCell_(record.phone),record.category,record.budget===null?'':record.budget,record.covered,JSON.stringify(record.weeklyHours),record.mapsUrl,record.addedAt,record.diet,record.coveredOrigin?JSON.stringify(record.coveredOrigin):'']);
@@ -61,7 +61,8 @@ function requireAdmin_(token){
   if(!session||Date.now()>=session.expiresAt||!sameHash_(session.secretHash,hash_(secret)))throw Error('AUTH_REQUIRED: 登入已失效，請重新登入管理員。');
 }
 function safeCell_(value){return /^[=+@\-\t\r\n]/.test(value)?"'"+value:value;}
-function readCell_(value){const text=String(value);return /^'[=+@\-\t\r\n]/.test(text)?text.slice(1):text;}
+function readCell_(value){const text=value==null?'':String(value);return /^'[=+@\-\t\r\n]/.test(text)?text.slice(1):text;}
+function dateCell_(value){const date=value instanceof Date?value:new Date(typeof value==='string'?value:'');return Number.isFinite(date.getTime())?date.toISOString():'';}
 function sheet_(){
   const id=PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');if(!id)throw Error('請在指令碼屬性設定 SPREADSHEET_ID；免費版不需要 API 金鑰。');
   const book=SpreadsheetApp.openById(id);let sheet=book.getSheetByName('RestaurantsFree');if(!sheet)sheet=book.insertSheet('RestaurantsFree');
@@ -74,11 +75,7 @@ function sheet_(){
 }
 function rows_(sheet){
   const n=sheet.getLastRow()-1;if(n<1)return [];
-  return sheet.getRange(2,1,n,FREE_HEADERS_.length).getValues().filter(r=>r[0]).map(r=>{
-    const record={id:String(r[0]),name:readCell_(r[1]),address:readCell_(r[2]),location:{lat:Number(r[3]),lng:Number(r[4])},phone:readCell_(r[5]),category:String(r[6]),budget:r[7]==null||String(r[7]).trim()===''?null:Number(r[7]),covered:String(r[8]),weeklyHours:JSON.parse(String(r[9])),mapsUrl:String(r[10]),addedAt:r[11] instanceof Date?r[11].toISOString():String(r[11]),diet:r[12]?String(r[12]):'unknown',coveredOrigin:r[13]?JSON.parse(String(r[13])):null};
-    try{LunchCatalog.validate(record);}catch(error){throw Error('「'+record.name+'」的店家資料需要更正：'+error.message);}
-    return record;
-  });
+  return LunchCatalog.collection(sheet.getRange(2,1,n,FREE_HEADERS_.length).getValues().filter(r=>r.some(v=>!LunchCatalog.blank(v))).map(r=>({id:readCell_(r[0]),name:readCell_(r[1]),address:readCell_(r[2]),location:{lat:r[3],lng:r[4]},phone:readCell_(r[5]),category:r[6],budget:r[7],covered:r[8],weeklyHours:r[9],mapsUrl:readCell_(r[10]),addedAt:dateCell_(r[11]),diet:r[12],coveredOrigin:r[13]})));
 }
 
 // Public community actions do not grant permission to add restaurants.
@@ -88,11 +85,11 @@ function listReviews(restaurantId,memberToken,cursor){
   const lock=LockService.getScriptLock();lock.waitLock(10000);
   try{
     requireRestaurant_(id);
-    const reviews=reviewRows_().filter(r=>r.restaurantId===id).reverse(),votes=voteRows_();
+    const allReviews=reviewRows_(),reviews=allReviews.filter(r=>r.restaurantId===id).reverse(),votes=voteRows_();
     const start=before?reviews.findIndex(r=>r.id===before)+1:0;
     if(before&&start===0)throw Error('這頁評論已變動，請重新整理評論。');
     const page=reviews.slice(start,start+20);
-    return {reviews:page.map(r=>publicReview_(r,votes,voter)),summary:reviewSummary_(reviews),nextCursor:start+20<reviews.length?page[page.length-1].id:null};
+    return {reviews:page.map(r=>publicReview_(r,votes,voter)),summary:reviewSummary_(reviews),unavailableCount:allReviews.invalidCount+votes.invalidCount,nextCursor:start+20<reviews.length?page[page.length-1].id:null};
   }finally{lock.releaseLock();}
 }
 function addReview(input,memberToken){
@@ -127,7 +124,7 @@ function setReviewVote(reviewId,value,memberToken){
     SpreadsheetApp.flush();return publicReview_(review,votes,voter);
   }finally{lock.releaseLock();}
 }
-function requireRestaurant_(id){if(!rows_(sheet_()).some(r=>r.id===id))throw Error('找不到這間共用店家，請重新整理名單。');}
+function requireRestaurant_(id){if(!rows_(sheet_()).some(r=>r.id===id&&!r.unavailable))throw Error('找不到資料完整的共用店家，請重新整理名單。');}
 function communitySheet_(name,headers){
   const id=PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');if(!id)throw Error('共用試算表尚未設定。');
   const book=SpreadsheetApp.openById(id);let sheet=book.getSheetByName(name);if(!sheet)sheet=book.insertSheet(name);
@@ -140,12 +137,27 @@ function communitySheet_(name,headers){
   return sheet;
 }
 function reviewRows_(){
-  const sheet=communitySheet_('Reviews',REVIEW_HEADERS_),n=sheet.getLastRow()-1;if(n<1)return [];
-  return sheet.getRange(2,1,n,REVIEW_HEADERS_.length).getValues().filter(r=>r[0]).map(r=>({id:String(r[0]),restaurantId:String(r[1]),item:readCell_(r[2]),feedback:readCell_(r[3]),score:LunchReviews.score(Number(r[4])),authorKey:String(r[5]),requestId:String(r[6]),createdAt:r[7] instanceof Date?r[7].toISOString():String(r[7]),authorEmail:r[8]?readCell_(r[8]):'',authorName:r[9]?readCell_(r[9]):'',authorNickname:r[10]?readCell_(r[10]):''}));
+  const sheet=communitySheet_('Reviews',REVIEW_HEADERS_),n=sheet.getLastRow()-1,result=[],counts=new Map();let invalidCount=0;
+  const rows=n>0?sheet.getRange(2,1,n,REVIEW_HEADERS_.length).getValues():[];
+  rows.forEach(r=>{if(!r.some(v=>!LunchCatalog.blank(v)))return;const id=readCell_(r[0]);counts.set(id,(counts.get(id)||0)+1);
+    try{
+      const restaurantId=LunchReviews.id(readCell_(r[1])),item=readCell_(r[2]).trim(),feedback=readCell_(r[3]).trim();LunchReviews.id(id);
+      if(!item||item.length>100||!feedback||feedback.length>1500)throw Error('invalid review');
+      const score=LunchReviews.score(LunchCatalog.blank(r[4])?NaN:LunchCatalog.number(r[4]));
+      result.push({id,restaurantId,item,feedback,score,authorKey:readCell_(r[5]),requestId:readCell_(r[6]),createdAt:dateCell_(r[7]),authorEmail:readCell_(r[8]),authorName:readCell_(r[9]),authorNickname:readCell_(r[10])});
+    }catch{invalidCount++;}
+  });
+  const valid=result.filter(r=>{if(counts.get(r.id)>1){invalidCount++;return false;}return true;});valid.invalidCount=invalidCount;return valid;
 }
 function voteRows_(){
-  const sheet=communitySheet_('ReviewVotes',VOTE_HEADERS_),n=sheet.getLastRow()-1;if(n<1)return [];
-  return sheet.getRange(2,1,n,VOTE_HEADERS_.length).getValues().map((r,i)=>({reviewId:String(r[0]),voterKey:String(r[1]),value:LunchReviews.vote(Number(r[2])),rowNumber:i+2})).filter(r=>r.reviewId);
+  const sheet=communitySheet_('ReviewVotes',VOTE_HEADERS_),n=sheet.getLastRow()-1,unique=new Map();let invalidCount=0;
+  (n>0?sheet.getRange(2,1,n,VOTE_HEADERS_.length).getValues():[]).forEach((r,i)=>{
+    if(!r.some(v=>!LunchCatalog.blank(v)))return;
+    try{const reviewId=LunchReviews.id(readCell_(r[0])),voterKey=readCell_(r[1]);if(!voterKey||voterKey.length>255||LunchCatalog.blank(r[2]))throw Error('invalid vote');
+      const value=LunchReviews.vote(LunchCatalog.number(r[2])),key=reviewId+'|'+voterKey;if(unique.has(key))invalidCount++;
+      unique.set(key,{reviewId,voterKey,value,rowNumber:i+2});
+    }catch{invalidCount++;}
+  });const valid=[...unique.values()];valid.invalidCount=invalidCount;return valid;
 }
 function publicReview_(r,votes,voter){
   const related=votes.filter(v=>v.reviewId===r.id),mine=related.find(v=>v.voterKey===voter);

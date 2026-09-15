@@ -8,7 +8,7 @@
   function weekday(date = new Date()) { return new Date(taipeiDay(date) + 'T12:00:00Z').getUTCDay(); }
   function minutes(time) { const [h, m] = time.split(':').map(Number); return h * 60 + m; }
   function distance(a, b) {
-    if (!a || !b || ![a.lat, a.lng, b.lat, b.lng].every(Number.isFinite)) return null;
+    if (!a || !b || ![a.lat, a.lng, b.lat, b.lng].every(Number.isFinite)||Math.abs(a.lat)>90||Math.abs(b.lat)>90||Math.abs(a.lng)>180||Math.abs(b.lng)>180) return null;
     const r = Math.PI / 180, dlat = (b.lat-a.lat)*r, dlng = (b.lng-a.lng)*r;
     const q = Math.sin(dlat/2)**2 + Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dlng/2)**2;
     return 6371 * 2 * Math.atan2(Math.sqrt(q), Math.sqrt(Math.max(0, 1-q)));
@@ -19,9 +19,20 @@
     return {lat:input.lat,lng:input.lng,name:input.name.trim()};
   }
   function coveredFrom(place,origin){const km=distance(place.coveredOrigin,origin);return km!==null&&km<=0.01;}
+  function rainProbability(data,day,from,to){
+    if(typeof day!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(day)||![from,to].every(t=>typeof t==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t)))return null;
+    const start=minutes(from),end=minutes(to),hourly=data?.hourly;if(end<=start||!Array.isArray(hourly?.time)||!Array.isArray(hourly?.precipitation_probability))return null;
+    const values=[];
+    for(let h=Math.floor(start/60)+1;h<=Math.ceil(end/60);h++){
+      const date=new Date(day+'T00:00:00Z');if(!Number.isFinite(date.getTime()))return null;date.setUTCHours(h);
+      const key=date.toISOString().slice(0,16),indices=[];hourly.time.forEach((t,i)=>{if(t===key)indices.push(i);});
+      if(indices.length!==1)return null;const value=hourly.precipitation_probability[indices[0]];if(!Number.isFinite(value)||value<0||value>100)return null;values.push(value);
+    }
+    return values.length?Math.max(...values):null;
+  }
   function intervals(periods) {
-    return periods.flatMap(p => {
-      if (!p.open) return [];
+    return (Array.isArray(periods)?periods:[]).flatMap(p => {
+      if (!p?.open) return [];
       const point = v => v.day * 1440 + v.hour * 60 + v.minute;
       const start = point(p.open);
       if (!Number.isFinite(start)) return [];
@@ -48,13 +59,13 @@
   }
   function reasons(place, filters, context) {
     const out = [], km = distance(context.origin, place.location);
-    if (!place.loaded) out.push('店家資訊尚未取得');
+    if (!place.loaded||place.unavailable) out.push('店家必要資料待補，暫不抽選');
     const status = opening(place, filters.from, filters.to, context.now);
     if (place.businessStatus && place.businessStatus !== 'OPERATIONAL') out.push(status.reason);
     if (filters.open && status.lunch !== true) out.push(status.reason);
     if (filters.walk !== 'any') {
       const ranges = {near:[0,.5],medium:[0,1],far:[.5,2]};
-      const [min,max] = ranges[filters.walk];
+      const [min,max] = ranges[filters.walk]||[Infinity,-Infinity];
       if (km === null) out.push('距離未知');
       else if (km < min || km > max) out.push('距離不符合');
     }
@@ -79,7 +90,7 @@
     const target = (360 - (index + .5) * 360/count) % 360;
     return current + 360*6 + ((target - current%360 + 360) % 360);
   }
-  const api = {taipeiDay,weekday,minutes,distance,validateOrigin,coveredFrom,opening,reasons,randomIndex,rotation};
+  const api = {taipeiDay,weekday,minutes,distance,validateOrigin,coveredFrom,rainProbability,opening,reasons,randomIndex,rotation};
   root.LunchCore = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : window);

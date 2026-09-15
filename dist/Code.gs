@@ -2,25 +2,33 @@
   'use strict';
   const categories=['台式','日式','韓式','西式','輕食','其他'];
   const diets={unknown:'葷素未確認',meat:'葷食',vegetarian:'素食',both:'葷素皆有'};
+  const issueLabels={row:'店家內容待確認',id:'店家編號待確認',duplicateId:'店家編號重複，請管理者更正',name:'店名待補',location:'位置待確認',address:'地址未提供',phone:'電話未提供或格式待確認',category:'料理類型待確認',diet:'葷素待確認',budget:'預算待確認',covered:'避雨情況待確認',coveredOrigin:'避雨路線出發點待確認',hours:'營業時間待確認',mapsUrl:'Google Maps 連結待確認'};
+  const blank=v=>v==null||(typeof v==='string'&&!v.trim());
+  const plain=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+  const number=v=>typeof v==='number'?v:typeof v==='string'&&/^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(v.trim())?Number(v):NaN;
+  const point=v=>plain(v)&&!blank(v.lat)&&!blank(v.lng)&&Number.isFinite(number(v.lat))&&Number.isFinite(number(v.lng))&&Math.abs(number(v.lat))<=90&&Math.abs(number(v.lng))<=180?{lat:number(v.lat),lng:number(v.lng)}:null;
+  const unknownHours=()=>Array.from({length:7},()=>({status:'unknown',spans:[]}));
+  const mapsPattern=/^https:\/\/(?:maps\.app\.goo\.gl\/|goo\.gl\/maps(?:\/|\?)|(?:www\.)?google\.(?:com|com\.tw)\/maps(?:\/|\?)|maps\.google\.(?:com|com\.tw)\/(?:maps)?)/i;
   const text=(v,max,label,required=false)=>{
     if(typeof v!=='string'||v.length>max||(required&&!v.trim()))throw Error(label+'格式不正確');
     return v.trim();
   };
   function validate(input){
-    if(!input||typeof input!=='object')throw Error('新增資料格式不正確');
-    const name=text(input.name,100,'店名',true),address=text(input.address||'',250,'地址');
+    if(!plain(input))throw Error('新增資料格式不正確');
+    input={...input,category:blank(input.category)?'unknown':input.category,diet:blank(input.diet)?'unknown':input.diet,covered:blank(input.covered)?'unknown':input.covered,budget:blank(input.budget)?null:input.budget,weeklyHours:blank(input.weeklyHours)?unknownHours():input.weeklyHours,coveredOrigin:blank(input.coveredOrigin)?null:input.coveredOrigin};
+    const name=text(input.name,100,'店名',true),address=text(blank(input.address)?'':input.address,250,'地址');
     const location=input.location;
     if(!location||typeof location.lat!=='number'||typeof location.lng!=='number'||!Number.isFinite(location.lat)||!Number.isFinite(location.lng)||Math.abs(location.lat)>90||Math.abs(location.lng)>180)throw Error('請填寫有效經緯度或點選地圖位置');
-    const phone=text(input.phone||'',40,'電話');
-    if(phone&&!/^[+\d\s()#-]+$/.test(phone))throw Error('電話只接受數字、空白、括號、+、-、#');
-    if(!categories.includes(input.category))throw Error('料理分類不正確');
-    const diet=input.diet||'unknown';if(!Object.prototype.hasOwnProperty.call(diets,diet))throw Error('葷素標記不正確');
+    const phone=text(blank(input.phone)?'':input.phone,40,'電話');
+    if(phone&&!/^\+?[\d\s()#-]*\d[\d\s()#-]*$/.test(phone))throw Error('電話請填數字，可包含空白、括號、開頭的 +、-、#');
+    if(![...categories,'unknown'].includes(input.category))throw Error('料理分類不正確');
+    const diet=input.diet;if(typeof diet!=='string'||!Object.prototype.hasOwnProperty.call(diets,diet))throw Error('葷素標記不正確');
     if(!['yes','no','unknown'].includes(input.covered))throw Error('遮雨標記不正確');
     const coveredOrigin=input.coveredOrigin??null;
     if(coveredOrigin!==null&&(!coveredOrigin||!Number.isFinite(coveredOrigin.lat)||!Number.isFinite(coveredOrigin.lng)||Math.abs(coveredOrigin.lat)>90||Math.abs(coveredOrigin.lng)>180))throw Error('避雨路線出發點不正確');
     if(input.budget!==null&&(!Number.isInteger(input.budget)||input.budget<1||input.budget>10000))throw Error('預算請填 1～10000 整數或留空');
-    const mapsUrl=text(input.mapsUrl||'',1000,'Google Maps 連結');
-    if(mapsUrl&&!/^https:\/\/(?:maps\.app\.goo\.gl\/|goo\.gl\/maps(?:\/|\?)|(?:www\.)?google\.(?:com|com\.tw)\/maps(?:\/|\?)|maps\.google\.(?:com|com\.tw)\/(?:maps)?)/i.test(mapsUrl))throw Error('請貼上有效的 HTTPS Google Maps 分享連結');
+    const mapsUrl=text(blank(input.mapsUrl)?'':input.mapsUrl,1000,'Google Maps 連結');
+    if(mapsUrl&&!mapsPattern.test(mapsUrl))throw Error('請貼上有效的 HTTPS Google Maps 分享連結');
     if(!Array.isArray(input.weeklyHours)||input.weeklyHours.length!==7)throw Error('每週營業資料需包含 7 天');
     const weeklyHours=input.weeklyHours.map(day=>{
       if(!day||!['unknown','closed','open'].includes(day.status))throw Error('營業日狀態不正確');
@@ -34,19 +42,49 @@
     });
     return {name,address,location:{lat:location.lat,lng:location.lng},phone,category:input.category,diet,budget:input.budget,covered:input.covered,coveredOrigin:coveredOrigin?{lat:coveredOrigin.lat,lng:coveredOrigin.lng}:null,mapsUrl,weeklyHours};
   }
-  function fingerprint(record){return record.name.replace(/\s+/g,'').toLocaleLowerCase()+'|'+record.location.lat.toFixed(4)+'|'+record.location.lng.toFixed(4);}
+  function fingerprint(record){const p=point(record.location);return String(record.name||'').replace(/\s+/g,'').toLocaleLowerCase()+'|'+(p?p.lat.toFixed(4)+'|'+p.lng.toFixed(4):'unknown');}
+  function read(record){
+    const issues=new Set();if(!plain(record)){issues.add('row');record={};}
+    if(Array.isArray(record.dataIssues))record.dataIssues.filter(k=>typeof k==='string'&&Object.prototype.hasOwnProperty.call(issueLabels,k)).forEach(k=>issues.add(k));
+    function readText(value,max,key){if(typeof value==='string'&&value.trim()&&value.length<=max)return value.trim();issues.add(key);return '';}
+    function decode(value){if(typeof value!=='string')return value;try{return JSON.parse(value);}catch{return null;}}
+    const name=readText(record.name,100,'name')||'店名待補',address=readText(record.address,250,'address');
+    const location=point(record.location);if(!location)issues.add('location');
+    let phone=readText(record.phone,40,'phone');if(phone&&!/^\+?[\d\s()#-]*\d[\d\s()#-]*$/.test(phone)){issues.add('phone');phone='';}
+    let mapsUrl=blank(record.mapsUrl)?'':readText(record.mapsUrl,1000,'mapsUrl');if(mapsUrl&&!mapsPattern.test(mapsUrl)){issues.add('mapsUrl');mapsUrl='';}
+    const category=categories.includes(record.category)?record.category:'unknown';if(category==='unknown')issues.add('category');
+    const diet=typeof record.diet==='string'&&Object.prototype.hasOwnProperty.call(diets,record.diet)?record.diet:'unknown';if(diet==='unknown')issues.add('diet');
+    const covered=['yes','no'].includes(record.covered)?record.covered:'unknown';if(covered==='unknown')issues.add('covered');
+    const coveredOrigin=point(decode(record.coveredOrigin));if(covered!=='unknown'&&!coveredOrigin)issues.add('coveredOrigin');
+    const amount=blank(record.budget)?NaN:number(record.budget),budget=Number.isInteger(amount)&&amount>=1&&amount<=10000?amount:null;if(budget===null)issues.add('budget');
+    const rawHours=decode(record.weeklyHours),weeklyHours=unknownHours();
+    if(Array.isArray(rawHours)&&rawHours.length===7){rawHours.forEach((day,i)=>{
+      if(day?.status==='closed')weeklyHours[i]={status:'closed',spans:[]};
+      else if(day?.status==='open'&&Array.isArray(day.spans)&&day.spans.length>=1&&day.spans.length<=2&&day.spans.every(s=>s&&typeof s.from==='string'&&typeof s.to==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(s.from)&&/^([01]\d|2[0-3]):[0-5]\d$/.test(s.to)&&s.from!==s.to))weeklyHours[i]={status:'open',spans:day.spans.map(s=>({from:s.from,to:s.to}))};
+      else issues.add('hours');
+    });}else issues.add('hours');
+    const id=typeof record.id==='string'?record.id.trim():'';
+    return {id,name,address,location,phone,category,diet,budget,covered,coveredOrigin,mapsUrl,weeklyHours,addedAt:typeof record.addedAt==='string'?record.addedAt:'',dataIssues:[...issues],unavailable:record.unavailable===true||issues.has('row')||issues.has('name')||issues.has('location')};
+  }
+  function collection(records){
+    if(!Array.isArray(records))throw Error('名單沒有完整載入，請再試一次。');
+    const normalized=records.map(read),counts=new Map();normalized.forEach(r=>counts.set(r.id,(counts.get(r.id)||0)+1));
+    return normalized.map((r,i)=>{
+      if(!/^(?:local-)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(r.id)||counts.get(r.id)>1){
+        r.dataIssues.push(counts.get(r.id)>1&&r.id?'duplicateId':'id');r.id='unavailable-row-'+i;r.unavailable=true;
+      }
+      return r;
+    });
+  }
   function hydrate(record){
-    // Missing optional values can arrive as omitted properties or blank cells.
-    // Normalize reads only; writes still require a valid number or explicit null.
-    const budget=record.budget==null||(typeof record.budget==='string'&&!record.budget.trim())?null:record.budget;
-    const checked=validate({...record,budget}),days=['日','一','二','三','四','五','六'];
+    const checked=read(record),days=['日','一','二','三','四','五','六'];
     const periods=checked.weeklyHours.flatMap((day,d)=>day.status==='open'?day.spans.map(span=>{
       const [h,m]=span.from.split(':').map(Number),[ch,cm]=span.to.split(':').map(Number);
       return {open:{day:d,hour:h,minute:m},close:{day:span.to<span.from?(d+1)%7:d,hour:ch,minute:cm}};
     }):[]);
-    return {...record,...checked,loaded:true,manualHours:true,periods,hoursText:checked.weeklyHours.map((day,i)=>'週'+days[i]+'：'+(day.status==='unknown'?'未填寫':day.status==='closed'?'休息':day.spans.map(s=>s.from+'–'+s.to+(s.to<s.from?'（翌日）':'')).join('、')))};
+    return {...checked,loaded:!checked.unavailable,manualHours:true,periods,hoursText:checked.weeklyHours.map((day,i)=>'週'+days[i]+'：'+(day.status==='unknown'?'未填寫':day.status==='closed'?'休息':day.spans.map(s=>s.from+'–'+s.to+(s.to<s.from?'（翌日）':'')).join('、')))};
   }
-  const api={validate,fingerprint,hydrate,categories,diets};root.LunchCatalog=api;
+  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets};root.LunchCatalog=api;
   if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
 
@@ -170,14 +208,15 @@ function requireMember_(token){
 function memberRows_(){const sheet=communitySheet_('Members',MEMBER_HEADERS_),n=sheet.getLastRow()-1;return {sheet,rows:n>0?sheet.getRange(2,1,n,MEMBER_HEADERS_.length).getValues():[]};}
 function upsertMember_(identity,nickname){
   const {sheet,rows}=memberRows_(),storedId='google:'+identity.googleId,index=rows.findIndex(r=>String(r[0])===storedId);
-  const profile={...identity,nickname:nickname===undefined?(index>=0?readCell_(rows[index][3]):''):nickname};
+  const profile={...identity,nickname:nickname===undefined?(index>=0?storedNickname_(rows[index][3]):''):nickname};
   // Prefix numeric Google subjects so Sheets cannot round long IDs as numbers.
   const values=[storedId,safeCell_(profile.email),safeCell_(profile.name),safeCell_(profile.nickname),new Date().toISOString()];
   if(index<0)sheet.appendRow(values);else sheet.getRange(index+2,1,1,MEMBER_HEADERS_.length).setValues([values]);
   return profile;
 }
 function nickname_(value){if(typeof value!=='string'||value.trim().length>32||/[\u0000-\u001f\u007f]/.test(value))throw Error('暱稱最多 32 個字，請勿換行。');return value.trim();}
-function memberProfile_(member){const {rows}=memberRows_(),row=rows.find(r=>String(r[0])==='google:'+member.googleId);return {...member,nickname:row?readCell_(row[3]):''};}
+function storedNickname_(value){try{return nickname_(readCell_(value));}catch{return '';}}
+function memberProfile_(member){const {rows}=memberRows_(),row=rows.find(r=>String(r[0])==='google:'+member.googleId);return {...member,nickname:row?storedNickname_(row[3]):''};}
 function saveMemberNickname(nickname,token){
   const member=requireMember_(token),value=nickname_(nickname),lock=LockService.getScriptLock();lock.waitLock(10000);
   try{const profile=upsertMember_(member,value);return {email:profile.email,name:profile.name,nickname:profile.nickname};}finally{lock.releaseLock();}
@@ -191,7 +230,7 @@ const VOTE_HEADERS_=['review_id','voter_key','value','updated_at'];
 function doGet(event){if(event&&event.parameter&&(event.parameter.state||event.parameter.code||event.parameter.error))return googleCallbackPage_(event.parameter);return HtmlService.createHtmlOutputFromFile('Index').setTitle('午餐俱樂部 · 今天吃什麼').addMetaTag('viewport','width=device-width, initial-scale=1, viewport-fit=cover');}
 function getBootstrap(){
   const p=PropertiesService.getScriptProperties(),rawLat=p.getProperty('ORIGIN_LAT'),rawLng=p.getProperty('ORIGIN_LNG');
-  const lat=Number(rawLat),lng=Number(rawLng),verified=Boolean(rawLat&&rawLng&&Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180);
+  const point=LunchCatalog.point({lat:rawLat,lng:rawLng}),lat=point?.lat,lng=point?.lng,verified=Boolean(point);
   return {origin:verified?{lat,lng}:{lat:25.0143,lng:121.4638},originName:(p.getProperty('ORIGIN_NAME')||'板橋車站・北二門').slice(0,80),originVerified:verified,sharedConfigured:Boolean(p.getProperty('SPREADSHEET_ID')),adminConfigured:Boolean(adminSecret_()),tileUrl:p.getProperty('TILE_URL')||'https://tile.openstreetmap.org/{z}/{x}/{y}.png',tileAttribution:p.getProperty('TILE_ATTRIBUTION')||''};
 }
 function listCandidates(format){const lock=LockService.getScriptLock();lock.waitLock(10000);try{const records=rows_(sheet_());return format==='json'?JSON.stringify(records):records;}finally{lock.releaseLock();}}
@@ -205,7 +244,7 @@ function addCandidate(input,token){
   try{
     requireAdmin_(token);
     const record=LunchCatalog.validate(input);
-    const sheet=sheet_(),found=rows_(sheet).find(row=>LunchCatalog.fingerprint(row)===LunchCatalog.fingerprint(record));
+    const sheet=sheet_(),found=rows_(sheet).find(row=>!row.unavailable&&LunchCatalog.fingerprint(row)===LunchCatalog.fingerprint(record));
     if(found)return {record:found,duplicate:true};
     record.id=Utilities.getUuid();record.addedAt=new Date().toISOString();
     sheet.appendRow([record.id,safeCell_(record.name),safeCell_(record.address),record.location.lat,record.location.lng,safeCell_(record.phone),record.category,record.budget===null?'':record.budget,record.covered,JSON.stringify(record.weeklyHours),record.mapsUrl,record.addedAt,record.diet,record.coveredOrigin?JSON.stringify(record.coveredOrigin):'']);
@@ -247,7 +286,8 @@ function requireAdmin_(token){
   if(!session||Date.now()>=session.expiresAt||!sameHash_(session.secretHash,hash_(secret)))throw Error('AUTH_REQUIRED: 登入已失效，請重新登入管理員。');
 }
 function safeCell_(value){return /^[=+@\-\t\r\n]/.test(value)?"'"+value:value;}
-function readCell_(value){const text=String(value);return /^'[=+@\-\t\r\n]/.test(text)?text.slice(1):text;}
+function readCell_(value){const text=value==null?'':String(value);return /^'[=+@\-\t\r\n]/.test(text)?text.slice(1):text;}
+function dateCell_(value){const date=value instanceof Date?value:new Date(typeof value==='string'?value:'');return Number.isFinite(date.getTime())?date.toISOString():'';}
 function sheet_(){
   const id=PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');if(!id)throw Error('請在指令碼屬性設定 SPREADSHEET_ID；免費版不需要 API 金鑰。');
   const book=SpreadsheetApp.openById(id);let sheet=book.getSheetByName('RestaurantsFree');if(!sheet)sheet=book.insertSheet('RestaurantsFree');
@@ -260,11 +300,7 @@ function sheet_(){
 }
 function rows_(sheet){
   const n=sheet.getLastRow()-1;if(n<1)return [];
-  return sheet.getRange(2,1,n,FREE_HEADERS_.length).getValues().filter(r=>r[0]).map(r=>{
-    const record={id:String(r[0]),name:readCell_(r[1]),address:readCell_(r[2]),location:{lat:Number(r[3]),lng:Number(r[4])},phone:readCell_(r[5]),category:String(r[6]),budget:r[7]==null||String(r[7]).trim()===''?null:Number(r[7]),covered:String(r[8]),weeklyHours:JSON.parse(String(r[9])),mapsUrl:String(r[10]),addedAt:r[11] instanceof Date?r[11].toISOString():String(r[11]),diet:r[12]?String(r[12]):'unknown',coveredOrigin:r[13]?JSON.parse(String(r[13])):null};
-    try{LunchCatalog.validate(record);}catch(error){throw Error('「'+record.name+'」的店家資料需要更正：'+error.message);}
-    return record;
-  });
+  return LunchCatalog.collection(sheet.getRange(2,1,n,FREE_HEADERS_.length).getValues().filter(r=>r.some(v=>!LunchCatalog.blank(v))).map(r=>({id:readCell_(r[0]),name:readCell_(r[1]),address:readCell_(r[2]),location:{lat:r[3],lng:r[4]},phone:readCell_(r[5]),category:r[6],budget:r[7],covered:r[8],weeklyHours:r[9],mapsUrl:readCell_(r[10]),addedAt:dateCell_(r[11]),diet:r[12],coveredOrigin:r[13]})));
 }
 
 // Public community actions do not grant permission to add restaurants.
@@ -274,11 +310,11 @@ function listReviews(restaurantId,memberToken,cursor){
   const lock=LockService.getScriptLock();lock.waitLock(10000);
   try{
     requireRestaurant_(id);
-    const reviews=reviewRows_().filter(r=>r.restaurantId===id).reverse(),votes=voteRows_();
+    const allReviews=reviewRows_(),reviews=allReviews.filter(r=>r.restaurantId===id).reverse(),votes=voteRows_();
     const start=before?reviews.findIndex(r=>r.id===before)+1:0;
     if(before&&start===0)throw Error('這頁評論已變動，請重新整理評論。');
     const page=reviews.slice(start,start+20);
-    return {reviews:page.map(r=>publicReview_(r,votes,voter)),summary:reviewSummary_(reviews),nextCursor:start+20<reviews.length?page[page.length-1].id:null};
+    return {reviews:page.map(r=>publicReview_(r,votes,voter)),summary:reviewSummary_(reviews),unavailableCount:allReviews.invalidCount+votes.invalidCount,nextCursor:start+20<reviews.length?page[page.length-1].id:null};
   }finally{lock.releaseLock();}
 }
 function addReview(input,memberToken){
@@ -313,7 +349,7 @@ function setReviewVote(reviewId,value,memberToken){
     SpreadsheetApp.flush();return publicReview_(review,votes,voter);
   }finally{lock.releaseLock();}
 }
-function requireRestaurant_(id){if(!rows_(sheet_()).some(r=>r.id===id))throw Error('找不到這間共用店家，請重新整理名單。');}
+function requireRestaurant_(id){if(!rows_(sheet_()).some(r=>r.id===id&&!r.unavailable))throw Error('找不到資料完整的共用店家，請重新整理名單。');}
 function communitySheet_(name,headers){
   const id=PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');if(!id)throw Error('共用試算表尚未設定。');
   const book=SpreadsheetApp.openById(id);let sheet=book.getSheetByName(name);if(!sheet)sheet=book.insertSheet(name);
@@ -326,12 +362,27 @@ function communitySheet_(name,headers){
   return sheet;
 }
 function reviewRows_(){
-  const sheet=communitySheet_('Reviews',REVIEW_HEADERS_),n=sheet.getLastRow()-1;if(n<1)return [];
-  return sheet.getRange(2,1,n,REVIEW_HEADERS_.length).getValues().filter(r=>r[0]).map(r=>({id:String(r[0]),restaurantId:String(r[1]),item:readCell_(r[2]),feedback:readCell_(r[3]),score:LunchReviews.score(Number(r[4])),authorKey:String(r[5]),requestId:String(r[6]),createdAt:r[7] instanceof Date?r[7].toISOString():String(r[7]),authorEmail:r[8]?readCell_(r[8]):'',authorName:r[9]?readCell_(r[9]):'',authorNickname:r[10]?readCell_(r[10]):''}));
+  const sheet=communitySheet_('Reviews',REVIEW_HEADERS_),n=sheet.getLastRow()-1,result=[],counts=new Map();let invalidCount=0;
+  const rows=n>0?sheet.getRange(2,1,n,REVIEW_HEADERS_.length).getValues():[];
+  rows.forEach(r=>{if(!r.some(v=>!LunchCatalog.blank(v)))return;const id=readCell_(r[0]);counts.set(id,(counts.get(id)||0)+1);
+    try{
+      const restaurantId=LunchReviews.id(readCell_(r[1])),item=readCell_(r[2]).trim(),feedback=readCell_(r[3]).trim();LunchReviews.id(id);
+      if(!item||item.length>100||!feedback||feedback.length>1500)throw Error('invalid review');
+      const score=LunchReviews.score(LunchCatalog.blank(r[4])?NaN:LunchCatalog.number(r[4]));
+      result.push({id,restaurantId,item,feedback,score,authorKey:readCell_(r[5]),requestId:readCell_(r[6]),createdAt:dateCell_(r[7]),authorEmail:readCell_(r[8]),authorName:readCell_(r[9]),authorNickname:readCell_(r[10])});
+    }catch{invalidCount++;}
+  });
+  const valid=result.filter(r=>{if(counts.get(r.id)>1){invalidCount++;return false;}return true;});valid.invalidCount=invalidCount;return valid;
 }
 function voteRows_(){
-  const sheet=communitySheet_('ReviewVotes',VOTE_HEADERS_),n=sheet.getLastRow()-1;if(n<1)return [];
-  return sheet.getRange(2,1,n,VOTE_HEADERS_.length).getValues().map((r,i)=>({reviewId:String(r[0]),voterKey:String(r[1]),value:LunchReviews.vote(Number(r[2])),rowNumber:i+2})).filter(r=>r.reviewId);
+  const sheet=communitySheet_('ReviewVotes',VOTE_HEADERS_),n=sheet.getLastRow()-1,unique=new Map();let invalidCount=0;
+  (n>0?sheet.getRange(2,1,n,VOTE_HEADERS_.length).getValues():[]).forEach((r,i)=>{
+    if(!r.some(v=>!LunchCatalog.blank(v)))return;
+    try{const reviewId=LunchReviews.id(readCell_(r[0])),voterKey=readCell_(r[1]);if(!voterKey||voterKey.length>255||LunchCatalog.blank(r[2]))throw Error('invalid vote');
+      const value=LunchReviews.vote(LunchCatalog.number(r[2])),key=reviewId+'|'+voterKey;if(unique.has(key))invalidCount++;
+      unique.set(key,{reviewId,voterKey,value,rowNumber:i+2});
+    }catch{invalidCount++;}
+  });const valid=[...unique.values()];valid.invalidCount=invalidCount;return valid;
 }
 function publicReview_(r,votes,voter){
   const related=votes.filter(v=>v.reviewId===r.id),mine=related.find(v=>v.voterKey===voter);

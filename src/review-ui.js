@@ -49,10 +49,12 @@
         try{
           const data=await rpc('listReviews',restaurantId,token,more?cursor:null);
           if(!alive()||epoch!==loadEpoch)return;
+          if(!data||!Array.isArray(data.reviews)||!data.summary||!Number.isInteger(data.summary.count)||data.summary.count<0||(data.summary.count>0&&!Number.isFinite(data.summary.average)))throw Error('收到的評論不完整，請稍後重新整理。');
           reviews=more?[...reviews,...data.reviews.filter(r=>!reviews.some(old=>old.id===r.id))]:data.reviews;cursor=data.nextCursor;
           const s=data.summary;find('.review-summary').innerHTML=s.count?'<strong>'+s.average.toFixed(1)+'<small> 分</small></strong><span>'+s.count+' 則品項心得的平均<br><b>'+e(R.band(Math.round(s.average))?.label||'')+'</b></span>':'<span>尚未有人評分，等你開第一槍。</span>';
           cards();
-        }catch(err){if(alive()){find('.review-summary').textContent='評論暫時讀取失敗';notice(err.message,true);}}
+          if(data.unavailableCount>0)notice('有部分心得或投票資料不完整，暫未計入，請名單管理者確認。',true);
+        }catch(err){if(err.code==='MEMBER_REQUIRED')account.invalidate();if(alive()){find('.review-summary').textContent='評論暫時讀取失敗';notice(err.message,true);}}
         finally{if(alive()){loading=false;find('.review-refresh').disabled=false;find('.review-more').disabled=false;find('.review-submit').disabled=posting||!account.current();}}
       }
       form.addEventListener('submit',async event=>{

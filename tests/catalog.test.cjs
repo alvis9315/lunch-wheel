@@ -9,8 +9,8 @@ assert.equal(C.opening(Catalog.hydrate({...record,weeklyHours:hours}),'13:00','1
 hours[2]={status:'unknown',spans:[]};assert.equal(C.opening(Catalog.hydrate({...record,weeklyHours:hours}),'12:00','13:00',new Date('2026-09-15T04:00Z')).today,null);
 for(const bad of [{location:{lat:NaN,lng:1}},{location:{lat:91,lng:1}},{phone:'<script>'},{mapsUrl:'https://www.google.com.evil.test/maps/abc'},{mapsUrl:'javascript:alert(1)'},{budget:'150'},{weeklyHours:[]}])assert.throws(()=>Catalog.validate({...record,...bad}));
 for(const budget of [undefined,null,'',' \t\u00a0 '])assert.equal(Catalog.hydrate({...record,budget}).budget,null);
-for(const budget of [0,-1,10001,12.5,NaN,false,'invalid'])assert.throws(()=>Catalog.hydrate({...record,budget}),/預算/);
-assert.throws(()=>Catalog.validate({...record,budget:undefined}),/預算/);
+for(const budget of [0,-1,10001,12.5,NaN,false,'invalid']){assert.equal(Catalog.hydrate({...record,budget}).budget,null);assert.throws(()=>Catalog.validate({...record,budget}),/預算/);}
+assert.equal(Catalog.validate({...record,budget:undefined}).budget,null);
 assert.equal(Catalog.fingerprint({...record,name:' 測 試食堂 '}),Catalog.fingerprint(record));
 const fixture=require('./server-fixture.cjs')(),{box,data,props,cache}=fixture;
 box.listCandidates();
@@ -33,7 +33,7 @@ for(const blank of ['',null,undefined,' \t\u00a0 ']){
  assert.equal(JSON.parse(box.listCandidates('json'))[0].budget,null);
  assert.equal(data[1][7],blank); // Reading never rewrites the owner's sheet.
 }
-data[1][7]='not-a-budget';assert.throws(()=>box.listCandidates('json'),/「測試食堂」.*預算/);
+data[1][7]='not-a-budget';assert.equal(JSON.parse(box.listCandidates('json'))[0].budget,null);assert(JSON.parse(box.listCandidates('json'))[0].dataIssues.includes('budget'));
 data[1][7]=130;
 box.adminLogout(session.token);assert.throws(()=>box.addCandidate(record,session.token),/AUTH_REQUIRED/);
 const expired=box.adminLogin(props.get('ADMIN_PASSPHRASE'));fixture.advance(30*60*1000+1);assert.throws(()=>box.addCandidate(record,expired.token),/AUTH_REQUIRED/);
