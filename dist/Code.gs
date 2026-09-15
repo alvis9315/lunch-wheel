@@ -192,7 +192,11 @@ function getBootstrap(){
   return {origin:verified?{lat,lng}:{lat:25.0143,lng:121.4638},originName:(p.getProperty('ORIGIN_NAME')||'板橋車站・北二門').slice(0,80),originVerified:verified,sharedConfigured:Boolean(p.getProperty('SPREADSHEET_ID')),adminConfigured:Boolean(adminSecret_()),tileUrl:p.getProperty('TILE_URL')||'https://tile.openstreetmap.org/{z}/{x}/{y}.png',tileAttribution:p.getProperty('TILE_ATTRIBUTION')||''};
 }
 function listCandidates(){const lock=LockService.getScriptLock();lock.waitLock(10000);try{return rows_(sheet_());}finally{lock.releaseLock();}}
-function getSharedHome(){return {config:{...getBootstrap(),googleLoginConfigured:googleConfig_().configured},records:listCandidates()};}
+function getSharedHome(format){
+  const data={config:{...getBootstrap(),googleLoginConfigured:googleConfig_().configured},records:listCandidates()};
+  // A text response crosses Apps Script's browser bridge without nested service types.
+  return format==='json'?JSON.stringify(data):data;
+}
 function addCandidate(input,token){
   const lock=LockService.getScriptLock();lock.waitLock(10000);
   try{

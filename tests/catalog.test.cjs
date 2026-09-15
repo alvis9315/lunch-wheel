@@ -19,6 +19,11 @@ assert.equal(box.addCandidate(record,session.token).duplicate,false);assert.equa
 box.addCandidate({...record,name:'=IMPORTXML("bad")'},session.token);assert(data[2][1].startsWith("'="));assert.equal(box.listCandidates()[1].name,'=IMPORTXML("bad")');assert.equal(fixture.held(),false);
 assert(!JSON.stringify(box.getBootstrap()).includes(props.get('ADMIN_PASSPHRASE')));
 assert(!JSON.stringify(box.listCandidates()).includes(session.token));
+const home=box.getSharedHome(),homeText=box.getSharedHome('json');
+assert.equal(typeof homeText,'string');
+assert.deepEqual(JSON.parse(homeText),JSON.parse(JSON.stringify(home)));
+assert.equal(JSON.parse(homeText).records.length,2);
+assert(!homeText.includes(props.get('ADMIN_PASSPHRASE')));
 box.adminLogout(session.token);assert.throws(()=>box.addCandidate(record,session.token),/AUTH_REQUIRED/);
 const expired=box.adminLogin(props.get('ADMIN_PASSPHRASE'));fixture.advance(30*60*1000+1);assert.throws(()=>box.addCandidate(record,expired.token),/AUTH_REQUIRED/);
 const changed=box.adminLogin(props.get('ADMIN_PASSPHRASE'));props.set('ADMIN_PASSPHRASE','new-fixture-only-passphrase-54321');assert.throws(()=>box.addCandidate(record,changed.token),/AUTH_REQUIRED/);

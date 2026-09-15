@@ -11,7 +11,7 @@
   let state = {mode:'loading',records:[],selected:new Set(),filters:{...DEFAULT_FILTERS},weather:{rain:null},origin:{lat:25.0143,lng:121.4638},lastId:null,rotation:0,busy:false,ready:false,detail:null};
   let toastTimer, weatherRequest = 0, detailRequest = 0, searchRequest = 0, mapView, markerLayer, originMarker, dateKey = C.taipeiDay();
   const e = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  let sourceRequest=0,sourceLoading=false;
+  let sourceRequest=0,sourceLoading=false,sourceTimer=null;
   const accountUI=window.createLunchAccountUI({rpc,onChange(){renderAccess();if($('detail-dialog').open&&state.detail&&state.mode==='live'){const host=$('detail-content').querySelector('.restaurant-reviews');if(host)reviewUI.mount(host,state.detail.id);}}});
   const reviewUI=window.createLunchReviewUI({rpc,escape:e,account:accountUI});
   function readOrigin(){try{const raw=localStorage.getItem(ORIGIN_STORAGE);return raw?C.validateOrigin(JSON.parse(raw)):null;}catch{return null;}}
@@ -352,47 +352,72 @@
     $('result-content').innerHTML='<h3>'+e(p.name)+'</h3><p>'+e(p.category||'未分類')+' · '+(p.budget==null?'預算未標記':'NT$ '+p.budget)+' · 直線 '+kmText(p)+'</p><p>'+e(p.address)+'</p><p class="field-note">'+count+' 間店每間機會相同'+(p.demo?' · 虛構示範結果':' · 營業時段由名單維護，臨時異動請致電確認')+'</p><div class="result-actions"><button id="confirm-lunch" class="primary">今天就吃這家 ✓</button>'+(link?'<a class="secondary" target="_blank" rel="noopener" href="'+e(link)+'">步行導航 ↗</a>':'')+'</div>'+phoneHtml(p)+'<button id="spin-again" class="text-button">還想轉一次</button>';
     $('result-dialog').showModal();
   }
-  async function enterSource(mode){
+  function enterSource(mode){
     if(state.busy)return;
     const request=++sourceRequest;sourceLoading=true;lockUI(true);state.ready=false;clearAdmin();
+    const trace=(step,extra={})=>console.info('[Lunch Club 6.0.1] shared entry', {request,step,...extra});
+    const current=()=>request===sourceRequest&&sourceLoading;
     $('source-page').setAttribute('aria-busy','true');$('cancel-source').hidden=false;$('cancel-source').disabled=false;
     $('source-status').textContent=mode==='live'?'正在打開現有名單，請稍候…':'正在打開你的名單…';
-    try{
-      let config={},records;
-      if(mode==='live'){
-        if(!window.google?.script?.run)throw Error('請從正式網站開啟現有名單；這裡可以先選「自己建立」。');
-        const data=await rpc('getSharedHome');if(request!==sourceRequest)return;
-        if(!data||!data.config||!Array.isArray(data.records))throw Error('名單沒有完整載入，請再試一次。');
-        config=data.config;records=data.records.map(r=>Catalog.hydrate(r));
-        defaultOrigin={...config.origin,name:config.originName||'板橋車站・北二門'};defaultOriginVerified=config.originVerified;adminConfigured=config.adminConfigured;
-        accountUI.configure(config.googleLoginConfigured);
-      }else{
-        const personal=getLocal('local');records=Array.isArray(personal.localRecords)?personal.localRecords.map(p=>Catalog.hydrate(p)):[];
-      }
-      if(request!==sourceRequest)return;
-      const customOrigin=readOrigin();state.origin=customOrigin||{...defaultOrigin};originCustom=Boolean(customOrigin);
-      state.records=records;state.mode=mode;state.filters={...DEFAULT_FILTERS};state.detail=null;resultPlace=null;
-      const local=getLocal(mode);state.lastId=typeof local.lastId==='string'?local.lastId:null;
-      const selected=Array.isArray(local.selected)?local.selected:records.slice(0,6).map(p=>p.id);
-      state.selected=new Set(selected.filter(id=>records.some(p=>p.id===id)).slice(0,20));state.ready=true;
-      $('list-search').value='';$('map-query').value='';$('search-results').hidden=true;searchPlaces=[];
-      // Commit navigation only after the complete list is validated. The map is optional.
-      $('source-page').hidden=true;$('source-workspace').hidden=false;$('main-nav').hidden=false;
-      try{if(!mapView)loadMaps(config);updateOriginView();drawMarkers(records);}
-      catch{try{mapView?.remove();}catch{}mapView=null;originMarker=null;markerLayer=null;$('map-placeholder').hidden=false;message('地圖暫時無法開啟，仍可從口袋名單挑選午餐。');}
-      saveLocal();
-    }catch(err){
-      if(request!==sourceRequest)return;
+    function unlock(){
+      clearTimeout(sourceTimer);sourceTimer=null;sourceLoading=false;
+      $('source-page').removeAttribute('aria-busy');$('cancel-source').hidden=true;lockUI(false);
+    }
+    function failed(error){
+      if(!current())return;
+      const raw=typeof error?.message==='string'?error.message:typeof error==='string'?error:'';
+      const messageText=!raw?'名單暫時無法開啟，請再試一次。':/SPREADSHEET_ID|表頭|JSON|Unexpected|TypeError|ReferenceError|Script function|伺服器函式|Authorization|授權|permission/i.test(raw)?'名單暫時無法開啟，請聯絡名單管理者確認設定後再試。':raw.replace(/^(?:Error: |Exception: )/,'');
+      trace('failed',{message:messageText});
       state.ready=false;state.mode='loading';state.records=[];state.selected=new Set();
       $('source-page').hidden=false;$('source-workspace').hidden=true;$('main-nav').hidden=true;
-      $('source-status').textContent=err.message;$('choose-shared').focus();
-    }finally{
-      if(request===sourceRequest){sourceLoading=false;$('source-page').removeAttribute('aria-busy');$('cancel-source').hidden=true;lockUI(false);render();if(state.ready){resetFilters();page(state.records.length?'wheel':'map');}}
+      $('source-status').textContent=messageText;
+      unlock();$('choose-shared').focus();
     }
+    function received(payload){
+      if(!current())return;
+      trace('received',{kind:typeof payload});
+      $('source-status').textContent='名單已收到，正在整理店家…';
+      try{
+        let config={},records;
+        if(mode==='live'){
+          // Accept the old object response while deployments are being updated.
+          let data;try{data=typeof payload==='string'?JSON.parse(payload):payload;}catch{throw Error('收到的名單無法讀取，請重新開啟網站後再試。');}
+          if(!data||!data.config||!Array.isArray(data.records))throw Error('名單沒有完整載入，請再試一次。');
+          config=data.config;records=data.records.map(r=>Catalog.hydrate(r));
+          defaultOrigin={...config.origin,name:config.originName||'板橋車站・北二門'};defaultOriginVerified=config.originVerified;adminConfigured=config.adminConfigured;
+          accountUI.configure(config.googleLoginConfigured);
+        }else{
+          const personal=getLocal('local');records=Array.isArray(personal.localRecords)?personal.localRecords.map(p=>Catalog.hydrate(p)):[];
+        }
+        trace('prepared',{count:records.length});
+        const customOrigin=readOrigin();state.origin=customOrigin||{...defaultOrigin};originCustom=Boolean(customOrigin);
+        state.records=records;state.mode=mode;state.filters={...DEFAULT_FILTERS};state.detail=null;resultPlace=null;
+        const local=getLocal(mode);state.lastId=typeof local.lastId==='string'?local.lastId:null;
+        const selected=Array.isArray(local.selected)?local.selected:records.slice(0,6).map(p=>p.id);
+        state.selected=new Set(selected.filter(id=>records.some(p=>p.id===id)).slice(0,20));state.ready=true;
+        $('list-search').value='';$('map-query').value='';$('search-results').hidden=true;searchPlaces=[];
+        $('source-status').textContent='正在顯示今天的午餐名單…';
+        $('source-page').hidden=true;$('source-workspace').hidden=false;$('main-nav').hidden=false;
+        try{if(!mapView)loadMaps(config);updateOriginView();drawMarkers(records);}
+        catch{try{mapView?.remove();}catch{}mapView=null;originMarker=null;markerLayer=null;$('map-placeholder').hidden=false;message('地圖暫時無法開啟，仍可從口袋名單挑選午餐。');}
+        saveLocal();lockUI(false);resetFilters();page(state.records.length?'wheel':'map');
+        unlock();trace('visible',{count:records.length});
+      }catch(error){failed(error);}
+    }
+    trace('request');
+    // Keep this watchdog until the screen is ready, not just until Google replies.
+    clearTimeout(sourceTimer);sourceTimer=setTimeout(()=>{if(current()){trace('timeout');failed(Error('等待時間較久，請再試一次。'));}},20000);
+    try{
+      if(mode==='live'){
+        if(!window.google?.script?.run)throw Error('請從正式網站開啟現有名單；這裡可以先選「自己建立」。');
+        // The Google callback directly completes navigation; no Promise wrapper in this path.
+        google.script.run.withSuccessHandler(received).withFailureHandler(failed).getSharedHome('json');
+      }else received(null);
+    }catch(error){failed(error);}
   }
   function switchSource(){
     if(state.busy&&!sourceLoading)return;
-    sourceRequest++;sourceLoading=false;saveLocal();const token=adminSession?.token;clearAdmin();
+    sourceRequest++;clearTimeout(sourceTimer);sourceTimer=null;sourceLoading=false;saveLocal();const token=adminSession?.token;clearAdmin();
     if(token)rpc('adminLogout',token).catch(()=>{});
     weatherRequest++;originPicking=false;$('origin-pick-panel').hidden=true;state.ready=false;state.mode='loading';state.records=[];state.selected=new Set();
     document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());reviewUI.dispose();state.detail=null;
