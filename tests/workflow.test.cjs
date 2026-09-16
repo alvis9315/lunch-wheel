@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),crypto=require('node:crypto');
 const Catalog=require('../src/catalog.js'),fixture=require('./server-fixture.cjs');
 const f=fixture();f.box.listCandidates();
-const types=['正餐','咖啡廳','甜點','冰品'];
+const types=['正餐','咖啡廳','甜點','冰店'];
 const originals=[['原編號','店名','Google Maps 網址','地址（原文）','店家類型','葷素（原文）','店家簡介（原文）','系統店家 ID','緯度','經度','座標依據：分享連結轉址']];
 for(let i=0;i<4;i++){
  const id=crypto.randomUUID();
@@ -14,7 +14,7 @@ f.makeSheet('原始清單',originals);
 let rows=JSON.parse(f.box.listCandidates('json'));
 assert.deepEqual(rows.map(r=>r.category),types);
 assert.equal(JSON.stringify(f.data),snapshot,'reading legacy types never rewrites RestaurantsFree');
-assert.deepEqual(Catalog.typeOptions(rows).map(t=>[t.label,t.count]),[['不限',4],['咖啡廳',1],['甜點',1],['冰品',1],['尚未分類',1]]);
+assert.deepEqual(Catalog.typeOptions(rows).map(t=>[t.label,t.count]),[['不限',4],['咖啡廳',1],['冰店',1],['甜點',1],['尚未分類',1]]);
 assert.equal(Catalog.typeOptions(rows)[0].count,4);
 assert(Catalog.matchesType(rows[1],'咖啡廳'));assert(!Catalog.matchesType(rows[0],'咖啡廳'));
 // Owner's explicit category always wins, and duplicate legacy IDs are not trusted.

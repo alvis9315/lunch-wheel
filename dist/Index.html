@@ -730,7 +730,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
 
 </style>
 </head>
-<body data-version="6.6.0">
+<body data-version="6.7.0">
   <a class="skip" href="#main">跳到主要內容</a>
   <header class="header"><a class="brand" id="brand-home" href="#home" aria-label="午餐俱樂部首頁"><span class="brand-icon">✳</span><span>午餐俱樂部<small>LUNCH CLUB</small></span></a>
     <nav class="section-nav" aria-label="主要功能"><button id="lunch-entry" data-section="lunch">抽午餐</button><button id="library-entry" data-section="library">店家與食評</button></nav>
@@ -796,7 +796,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   <dialog id="origin-dialog" aria-labelledby="origin-title"><button class="dialog-close" data-close aria-label="關閉出發點設定">×</button><p class="eyebrow">WHERE WE BEGIN</p><h2 id="origin-title">午餐，從這裡出發。</h2><p>這是你自己的出發點。換個地方吃，距離與天氣也跟著更新。</p><form id="origin-form"><div class="detail-form"><label class="wide">出發點名稱<input id="origin-input-name" required maxlength="80" placeholder="例如：公司、家裡、板橋車站"></label><details class="wide origin-advanced"><summary>需要更精準的位置？手動調整</summary><p class="field-note">通常用下方「使用目前位置」或「在地圖選位置」就可以。</p><label>緯度<input id="origin-lat" type="number" step="any" min="-90" max="90" required></label><label>經度<input id="origin-lng" type="number" step="any" min="-180" max="180" required></label></details></div><div class="origin-actions"><button class="secondary" type="button" id="origin-pick-map">在地圖選位置</button><button class="secondary" type="button" id="origin-geolocate">使用目前位置</button></div><p id="origin-feedback" class="field-note" role="status">出發點儲存在這台裝置，只影響你自己的距離與天氣條件。</p><div class="origin-actions"><button type="submit" class="primary">使用這個出發點 ↗</button><button type="button" class="text-button" id="origin-reset">恢復預設出發點</button></div></form></dialog>
   <dialog id="admin-dialog" aria-labelledby="admin-title"><button class="dialog-close" data-close aria-label="關閉團長登入">×</button><p class="eyebrow">FOR THE CURATOR</p><h2 id="admin-title">管理你的好店名單</h2><p>輸入團長通關密語，即可查看店家投稿、整理名單及確認留言者帳號。</p><form id="admin-form"><label class="admin-field">通關密語<input id="admin-passphrase" type="password" autocomplete="current-password" required maxlength="256"></label><p id="admin-feedback" class="field-note" role="status">登入有效 30 分鐘，關閉或重新整理頁面後需重新登入。</p><button class="primary" type="submit">登入團長</button></form></dialog>
   <dialog id="result-dialog" aria-labelledby="result-title"><button class="dialog-close" data-close aria-label="關閉抽選結果">×</button><div class="result-art" aria-hidden="true">✦ <span>🍽</span> ✦</div><p class="eyebrow">YOUR LUNCH IS CALLING</p><h2 id="result-title">今天就吃這一家！</h2><div id="result-content"></div></dialog>
-  <dialog id="about-dialog" aria-labelledby="about-title"><button class="dialog-close" data-close aria-label="關閉使用說明">×</button><p class="eyebrow">A SEAT AT THE TABLE</p><h2 id="about-title">一起，解決午餐選擇困難。</h2><p class="field-note">版本 6.6.0</p><p>先選餐點，再篩選並勾選 2～20 間店，按「確認名單」進入轉盤。符合條件的店家每間機會相同，轉盤約 2.5 秒後揭曉。</p><h3>今天的午餐，三步決定</h3><p>先選餐點，再搭配距離、預算、葷素等條件，挑出今天想吃的店。確認後進入獨立轉盤；想換店可以返回調整。「現有名單」由團長整理，取消勾選不會刪除店家。「自己建立」暫時不開放，之前儲存的名單會保留。</p><h3>讓食友認識你</h3><p>瀏覽店家、看心得與抽午餐不用登入。用 Google 帳戶登入後，就能分享品項、回饋與 -100～200 分的評價。每則評論可選匿名或自訂暱稱；匿名顯示「匿名食友」，選暱稱時需填名稱。Google 名稱和帳號不會自動公開；匿名只對其他食友隱藏，團長仍可查看帳號與留言時填寫的暱稱。</p><p>每個帳號都能對一則評論按讚或按爛，改變心意時可改票或取消。評論分數只供參考，不會改變抽中的機會。以前的匿名評論會保留。</p><h3>營業與路線提醒</h3><p>營業時間、電話和預算由團長整理，沒有填寫的資訊不會自動當成符合條件。臨時公休或假日營業可能不同，出發前請向店家確認。</p><p>地圖顯示的是直線距離，實際走路可能更遠。下雨時能否全程避雨，也需要從你的出發點重新確認。天氣預報只供參考，可以自己切換天氣條件。</p><h3>地圖與天氣來源</h3><p>地圖來自 OpenStreetMap，天氣來自 Open-Meteo。Google Maps 可另開分頁找店與導航。這些服務暫時無法使用時，仍可從已有名單挑選午餐。</p><p><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 隱私權政策</a></p></dialog>
+  <dialog id="about-dialog" aria-labelledby="about-title"><button class="dialog-close" data-close aria-label="關閉使用說明">×</button><p class="eyebrow">A SEAT AT THE TABLE</p><h2 id="about-title">一起，解決午餐選擇困難。</h2><p class="field-note">版本 6.7.0</p><p>先選餐點，再篩選並勾選 2～20 間店，按「確認名單」進入轉盤。符合條件的店家每間機會相同，轉盤約 2.5 秒後揭曉。</p><h3>今天的午餐，三步決定</h3><p>先選餐點，再搭配距離、預算、葷素等條件，挑出今天想吃的店。確認後進入獨立轉盤；想換店可以返回調整。「現有名單」由團長整理，取消勾選不會刪除店家。「自己建立」暫時不開放，之前儲存的名單會保留。</p><h3>讓食友認識你</h3><p>瀏覽店家、看心得與抽午餐不用登入。用 Google 帳戶登入後，就能分享品項、回饋與 -100～200 分的評價。每則評論可選匿名或自訂暱稱；匿名顯示「匿名食友」，選暱稱時需填名稱。Google 名稱和帳號不會自動公開；匿名只對其他食友隱藏，團長仍可查看帳號與留言時填寫的暱稱。</p><p>每個帳號都能對一則評論按讚或按爛，改變心意時可改票或取消。評論分數只供參考，不會改變抽中的機會。以前的匿名評論會保留。</p><h3>營業與路線提醒</h3><p>營業時間、電話和預算由團長整理，沒有填寫的資訊不會自動當成符合條件。臨時公休或假日營業可能不同，出發前請向店家確認。</p><p>地圖顯示的是直線距離，實際走路可能更遠。下雨時能否全程避雨，也需要從你的出發點重新確認。天氣預報只供參考，可以自己切換天氣條件。</p><h3>地圖與天氣來源</h3><p>地圖來自 OpenStreetMap，天氣來自 Open-Meteo。Google Maps 可另開分頁找店與導航。這些服務暫時無法使用時，仍可從已有名單挑選午餐。</p><p><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 隱私權政策</a></p></dialog>
   <dialog id="account-dialog" aria-labelledby="account-title"><button class="dialog-close" data-close aria-label="關閉帳號設定">×</button><p class="eyebrow">HELLO, FOOD FRIEND.</p><h2 id="account-title">讓食友認識你。</h2><div id="account-login-panel"><p>用 Google 帳戶登入，留下你的用餐心得。你可以選擇匿名或自訂暱稱。Google 帳號只供團長查閱，其他食友不會看到。</p><button id="account-google-login" class="primary" type="button">使用 Google 帳戶登入</button></div><div id="account-pending" hidden><p>如果沒有開啟新分頁，請按下方連結。</p><a id="account-login-link" class="secondary" target="_blank" rel="noopener noreferrer">前往 Google 登入 ↗</a><div class="account-actions"><button id="account-check" class="text-button" type="button">我已完成登入</button><button id="account-cancel" class="text-button" type="button">取消登入</button></div></div><form id="account-profile" hidden><p class="field-note">Google 名稱：<strong id="account-name"></strong><br>你的帳號：<span id="account-email"></span></p><fieldset class="display-choice"><legend>新評論預設怎麼顯示？</legend><label><input id="account-mode-anonymous" type="radio" name="account-display" value="anonymous" checked> 匿名</label><label><input id="account-mode-nickname" type="radio" name="account-display" value="nickname"> 自訂暱稱</label></fieldset><label id="account-nickname-label" class="admin-field" hidden>顯示的暱稱<input id="account-nickname" maxlength="32" autocomplete="nickname" placeholder="食友要怎麼稱呼你？"></label><p class="field-note">選擇匿名時，其他食友只會看到「匿名食友」。團長仍可查看帳號與留言時填寫的暱稱。每則評論可另選顯示方式，既有評論不會跟著更名。</p><div class="account-actions"><button id="account-save" class="primary" type="submit">儲存顯示方式</button><button id="account-logout" class="text-button" type="button">登出</button></div></form><p id="account-feedback" class="field-note" role="status"></p></dialog>
   <div id="toast" class="toast" role="status" hidden></div>
   <script>
@@ -906,12 +906,14 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
 
 (function(root){
   'use strict';
-  // These are curator shortcuts/order preferences, never a whitelist or empty entry cards.
-  const foodCategories=['速食','咖哩','拉麵','早餐店','早午餐','牛肉麵','牛排','小吃店','快餐便當','咖啡廳','輕食咖啡廳','韓式料理','鍋物','烏龍麵','素食','冰店','甜點','粥店','港式','台式'];
+  // Single category master: names, order and icons. Build embeds this same file in BOTH deployment files.
+  const categoryDefinitions=[['速食','🍔'],['咖哩','🍛'],['拉麵','🍜'],['烏龍麵','🍜'],['早餐店','🍳'],['早午餐','🍳'],['牛肉麵','🍜'],['牛排','🥩'],['小吃店','🥟'],['快餐便當','🍱'],['咖啡廳','☕'],['輕食咖啡廳','🥗'],['韓式','🍲'],['鍋物','🍲'],['素食','🥬'],['冰店','🍧'],['甜點','🍰'],['粥店','🥣'],['港式','🥟'],['台式','🍚'],['飯糰飯捲','🍙'],['鵝肉專賣','🍗'],['燒臘','🍖'],['義式','🍝'],['壽司','🍣'],['泰式','🍛'],['日式定食','🍱']];
+  const foodCategories=categoryDefinitions.map(([name])=>name);
+  const categoryIcon=value=>categoryDefinitions.find(([name])=>name===normalizeCategory(value))?.[1]||'🍽';
   const categories=foodCategories;
   const uncategorized=new Set(['unknown','其他','正餐','尚未分類']);
-  function normalizeCategory(value){return typeof value==='string'?value.trim().replace(/\//g,'／'):'';}
-  function validCategory(value){return value.length<=32&&!['all','unclassified','不限','__proto__','constructor','prototype'].includes(value)&&/^[\p{L}\p{N}][\p{L}\p{N} ／＆&()（）·・.-]*$/u.test(value);}
+  function normalizeCategory(value){const name=typeof value==='string'?value.trim().replace(/\//g,'／'):'';return name==='韓式料理'?'韓式':name;}
+  function validCategory(value){return foodCategories.includes(value)||uncategorized.has(value);}
   function parseCategories(value){
     if(value==null||value==='')return {values:[],foodTypes:[],valid:true};
     const source=Array.isArray(value)?value:[value];
@@ -925,7 +927,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   const typeName=value=>parseCategories(value).foodTypes.join('、')||'尚未分類';
   function typeOptions(records){
     const counts=new Map();let unknown=0;records.forEach(r=>{const types=foodTypesFor(r);if(!types.length)unknown++;types.forEach(type=>counts.set(type,(counts.get(type)||0)+1));});
-    const present=[...counts.keys()].sort((a,b)=>{const ai=foodCategories.indexOf(a),bi=foodCategories.indexOf(b);return (ai<0?999:ai)-(bi<0?999:bi)||a.localeCompare(b,'zh-Hant');});
+    const present=foodCategories.filter(name=>counts.has(name));
     return [{value:'all',label:'不限',count:records.length},...present.map(c=>({value:c,label:c,count:counts.get(c)})),...(unknown?[{value:'unclassified',label:'尚未分類',count:unknown}]:[])];
   }
   const matchesType=(record,value)=>value==='all'||(value==='unclassified'?!foodTypesFor(record).length:foodTypesFor(record).includes(normalizeCategory(value)));
@@ -1020,7 +1022,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     }):[]);
     return {...checked,loaded:!checked.unavailable,manualHours:true,periods,hoursText:checked.weeklyHours.map((day,i)=>'週'+days[i]+'：'+(day.status==='unknown'?'未填寫':day.status==='closed'?'休息':day.spans.map(s=>s.from+'–'+s.to+(s.to<s.from?'（翌日）':'')).join('、')))};
   }
-  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets,typeName,typeOptions,matchesType,normalizeCategory,qualitySummary,foodCategories,parseCategories,foodTypesFor};root.LunchCatalog=api;
+  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets,typeName,typeOptions,matchesType,normalizeCategory,qualitySummary,foodCategories,categoryIcon,parseCategories,foodTypesFor};root.LunchCatalog=api;
   if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
 
@@ -1300,9 +1302,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   const e = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let sourceRequest=0,sourceLoading=false,sourceTimer=null,localSourceRecords=[];
   let stage='type',lastLunchStage='type',chosenType=null,confirmedIds=null;
-  const typeIcons={'早餐／早午餐':'🍳','便當':'🍱','牛肉麵':'🍜','其他麵食':'🍜','小吃':'🥟','拉麵':'🍜','牛排':'🥩','火鍋':'🍲','咖哩':'🍛','義大利麵':'🍝','輕食':'🥗','咖啡／甜點':'☕','冰品':'🍧'};
-  Object.assign(typeIcons,{'速食':'🍔','早餐店':'🍳','早午餐':'🍳','小吃店':'🥟','快餐便當':'🍱','咖啡廳':'☕','輕食咖啡廳':'🥗','韓式料理':'🍲','鍋物':'🍲','烏龍麵':'🍜','素食':'🥬','冰店':'🍧','甜點':'🍰','粥店':'🥣','港式':'🥟','台式':'🍚'});
-  const foodIcon=p=>typeIcons[Catalog.foodTypesFor(p)[0]]||'🍽';
+  const foodIcon=p=>Catalog.categoryIcon(Catalog.foodTypesFor(p)[0]);
   const accountUI=window.createLunchAccountUI({rpc,onChange(){renderAccess();if($('detail-dialog').open&&state.detail&&state.mode==='live'){const host=$('detail-content').querySelector('.restaurant-reviews');if(host)reviewUI.mount(host,state.detail.id);}}});
   const reviewUI=window.createLunchReviewUI({rpc,escape:e,account:accountUI,admin:{current:()=>adminSession&&Date.now()<adminSession.expiresAt?adminSession:null,invalidate:clearAdmin}});
   const suggestionsUI=window.createLunchSuggestionsUI({rpc,account:accountUI,admin:{current:()=>adminSession&&Date.now()<adminSession.expiresAt?adminSession:null,invalidate:clearAdmin},escape:e});
@@ -1417,13 +1417,13 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   function wheelPlaces(){return eligible().filter(p=>confirmedIds?.has(p.id));}
   function visiblePlaces(){const query=$('pick-search').value.trim().toLowerCase();return state.records.filter(p=>inType(p)&&(p.name+' '+p.address).toLowerCase().includes(query)&&C.reasons(p,state.filters,context()).length===0);}
   function renderTypes(){
-    $('type-options').innerHTML=Catalog.typeOptions(state.records).map(t=>'<button class="type-card" data-type="'+e(t.value)+'" '+(state.busy||(t.value!=='all'&&!t.count)?'disabled':'')+'><span aria-hidden="true">'+(t.value==='all'?'✳':typeIcons[t.value]||'🍽')+'</span><strong>'+e(t.label)+'</strong><small>'+t.count+' 間店'+(!t.count&&t.value!=='all'?' · 尚無分類資料':'')+'</small>'+(t.count||t.value==='all'?'<b aria-hidden="true">↗</b>':'')+'</button>').join('');
+    $('type-options').innerHTML=Catalog.typeOptions(state.records).map(t=>'<button class="type-card" data-type="'+e(t.value)+'" '+(state.busy||(t.value!=='all'&&!t.count)?'disabled':'')+'><span aria-hidden="true">'+(t.value==='all'?'✳':Catalog.categoryIcon(t.value))+'</span><strong>'+e(t.label)+'</strong><small>'+t.count+' 間店'+(!t.count&&t.value!=='all'?' · 尚無分類資料':'')+'</small>'+(t.count||t.value==='all'?'<b aria-hidden="true">↗</b>':'')+'</button>').join('');
     const unknown=state.records.filter(p=>Catalog.typeName(p.category)==='尚未分類').length;
     $('type-note').textContent=!state.records.length?'名單還沒有店家，請聯絡團長加入。':(unknown?unknown+' 間店還沒確認類別，仍可從「不限」或「尚未分類」挑選。 ':'')+'一間店可以有多種類別，選「不限」就能一起挑。';
   }
   function categoryPicker(p){
     const selected=Catalog.foodTypesFor(p);
-    return '<fieldset id="add-categories" class="category-picker wide"><legend>餐點類別（可複選）</legend><div class="category-checks">'+[...new Set([...Catalog.foodCategories,...state.records.flatMap(Catalog.foodTypesFor),...selected])].map(c=>'<label><input type="checkbox" value="'+e(c)+'" '+(selected.includes(c)?'checked':'')+'><span>'+e(c)+'</span></label>').join('')+'</div><p class="field-note">只勾選確認有提供的餐點；還不確定可以先留空。</p></fieldset>';
+    return '<fieldset id="add-categories" class="category-picker wide"><legend>餐點類別（可複選）</legend><div class="category-checks">'+Catalog.foodCategories.map(c=>'<label><input type="checkbox" value="'+e(c)+'" '+(selected.includes(c)?'checked':'')+'><span>'+e(c)+'</span></label>').join('')+'</div><p class="field-note">只勾選確認有提供的餐點；還不確定可以先留空。</p></fieldset>';
   }
   function renderLibrary(){
     const current=$('library-type').value||'all',options=Catalog.typeOptions(state.records);
@@ -1737,7 +1737,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     if(mode!=='live'){message('「自己建立」正在調整，請先使用現有名單。');return;}
     if(state.busy)return;
     const request=++sourceRequest;sourceLoading=true;lockUI(true);state.ready=false;clearAdmin();
-    const trace=(step,extra={})=>console.info('[Lunch Club 6.6.0] shared entry', {request,step,...extra});
+    const trace=(step,extra={})=>console.info('[Lunch Club 6.7.0] shared entry', {request,step,...extra});
     const current=()=>request===sourceRequest&&sourceLoading;
     $('source-page').setAttribute('aria-busy','true');$('cancel-source').hidden=false;$('cancel-source').disabled=false;
     $('source-status').textContent=mode==='live'?'正在打開現有名單，請稍候…':'正在打開你的名單…';

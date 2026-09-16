@@ -1,11 +1,13 @@
 (function(root){
   'use strict';
-  // These are curator shortcuts/order preferences, never a whitelist or empty entry cards.
-  const foodCategories=['速食','咖哩','拉麵','早餐店','早午餐','牛肉麵','牛排','小吃店','快餐便當','咖啡廳','輕食咖啡廳','韓式料理','鍋物','烏龍麵','素食','冰店','甜點','粥店','港式','台式'];
+  // Single category master: names, order and icons. Build embeds this same file in BOTH deployment files.
+  const categoryDefinitions=[['速食','🍔'],['咖哩','🍛'],['拉麵','🍜'],['烏龍麵','🍜'],['早餐店','🍳'],['早午餐','🍳'],['牛肉麵','🍜'],['牛排','🥩'],['小吃店','🥟'],['快餐便當','🍱'],['咖啡廳','☕'],['輕食咖啡廳','🥗'],['韓式','🍲'],['鍋物','🍲'],['素食','🥬'],['冰店','🍧'],['甜點','🍰'],['粥店','🥣'],['港式','🥟'],['台式','🍚'],['飯糰飯捲','🍙'],['鵝肉專賣','🍗'],['燒臘','🍖'],['義式','🍝'],['壽司','🍣'],['泰式','🍛'],['日式定食','🍱']];
+  const foodCategories=categoryDefinitions.map(([name])=>name);
+  const categoryIcon=value=>categoryDefinitions.find(([name])=>name===normalizeCategory(value))?.[1]||'🍽';
   const categories=foodCategories;
   const uncategorized=new Set(['unknown','其他','正餐','尚未分類']);
-  function normalizeCategory(value){return typeof value==='string'?value.trim().replace(/\//g,'／'):'';}
-  function validCategory(value){return value.length<=32&&!['all','unclassified','不限','__proto__','constructor','prototype'].includes(value)&&/^[\p{L}\p{N}][\p{L}\p{N} ／＆&()（）·・.-]*$/u.test(value);}
+  function normalizeCategory(value){const name=typeof value==='string'?value.trim().replace(/\//g,'／'):'';return name==='韓式料理'?'韓式':name;}
+  function validCategory(value){return foodCategories.includes(value)||uncategorized.has(value);}
   function parseCategories(value){
     if(value==null||value==='')return {values:[],foodTypes:[],valid:true};
     const source=Array.isArray(value)?value:[value];
@@ -19,7 +21,7 @@
   const typeName=value=>parseCategories(value).foodTypes.join('、')||'尚未分類';
   function typeOptions(records){
     const counts=new Map();let unknown=0;records.forEach(r=>{const types=foodTypesFor(r);if(!types.length)unknown++;types.forEach(type=>counts.set(type,(counts.get(type)||0)+1));});
-    const present=[...counts.keys()].sort((a,b)=>{const ai=foodCategories.indexOf(a),bi=foodCategories.indexOf(b);return (ai<0?999:ai)-(bi<0?999:bi)||a.localeCompare(b,'zh-Hant');});
+    const present=foodCategories.filter(name=>counts.has(name));
     return [{value:'all',label:'不限',count:records.length},...present.map(c=>({value:c,label:c,count:counts.get(c)})),...(unknown?[{value:'unclassified',label:'尚未分類',count:unknown}]:[])];
   }
   const matchesType=(record,value)=>value==='all'||(value==='unclassified'?!foodTypesFor(record).length:foodTypesFor(record).includes(normalizeCategory(value)));
@@ -114,7 +116,7 @@
     }):[]);
     return {...checked,loaded:!checked.unavailable,manualHours:true,periods,hoursText:checked.weeklyHours.map((day,i)=>'週'+days[i]+'：'+(day.status==='unknown'?'未填寫':day.status==='closed'?'休息':day.spans.map(s=>s.from+'–'+s.to+(s.to<s.from?'（翌日）':'')).join('、')))};
   }
-  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets,typeName,typeOptions,matchesType,normalizeCategory,qualitySummary,foodCategories,parseCategories,foodTypesFor};root.LunchCatalog=api;
+  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets,typeName,typeOptions,matchesType,normalizeCategory,qualitySummary,foodCategories,categoryIcon,parseCategories,foodTypesFor};root.LunchCatalog=api;
   if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
 
