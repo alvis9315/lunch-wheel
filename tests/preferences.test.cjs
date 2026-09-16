@@ -6,13 +6,13 @@ const filters={walk:'any',weather:'any',budget:'any',category:'all',diet:'any',r
 for(const budget of [undefined,null,'',' ']){
  const unknown=Catalog.hydrate({...record,budget});
  assert.deepEqual(C.reasons(unknown,filters,context),[]);
- assert(C.reasons(unknown,{...filters,budget:'150'},context).includes('預算未標記'));
+ assert(C.reasons(unknown,{...filters,budget:'150'},context).includes('預算還沒確認'));
 }
 assert(C.reasons(Catalog.hydrate({...record,budget:200}),{...filters,budget:'150'},context).includes('超出預算'));
 for(const diet of ['meat','vegetarian']){
  assert.equal(C.reasons(Catalog.hydrate(record),{...filters,diet},context).length,0);
  assert.equal(C.reasons(Catalog.hydrate({...record,diet}),{...filters,diet},context).length,0);
- assert(C.reasons(Catalog.hydrate({...record,diet:'unknown'}),{...filters,diet},context).includes('葷素未標記'));
+ assert(C.reasons(Catalog.hydrate({...record,diet:'unknown'}),{...filters,diet},context).includes('葷素還沒確認'));
  assert(C.reasons(Catalog.hydrate({...record,diet:diet==='meat'?'vegetarian':'meat'}),{...filters,diet},context).length);
 }
 assert.throws(()=>Catalog.validate({...record,diet:'veganish'}));assert.throws(()=>Catalog.validate({...record,coveredOrigin:{lat:91,lng:121}}));

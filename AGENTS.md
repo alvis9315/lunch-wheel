@@ -1,6 +1,7 @@
 # Lunch Club — 私人 Side Project
 
 此專案與 IISI／RDSS 工作專案無關。
+- v6.6 優先：入口分類直接取 RestaurantsFree.category 的實際值；使用者指定「台式」，不合併早餐店／早午餐、咖啡廳／輕食咖啡廳／甜點。foodCategories 只作常用排序與團長輸入捷徑，不得作白名單或顯示無店家的類別。Suggestions 只存投稿，Google 登入後才能送出、團長才可讀與標記已處理；不得自動寫入店家名單。介面使用「團長」，一般訪客不看資料表維護細節。詳見 docs/suggestions-and-categories.md。
 - v6.5：匿名／自訂暱稱二選一，新會員預設匿名；公開評論不得回傳 Google 名稱、信箱或匿名時的暱稱。getReviewAuthor 每次驗證管理者，關閉／登出清除私人 DOM 且忽略遲到回應。Reviews 追加 author_display_mode、Members 追加 display_mode；升級只補表頭。公開瀏覽使用「我／任何人」，留言／投票須 Google 登入。OAuth 瀏覽器確認資訊短暫存放，會員／管理者憑證不得持久儲存。詳見 docs/review-privacy.md。
 - v6.4 分類以具體餐點為準，同店可有多個類別；沿用 RestaurantsFree.category（G 欄）以頓號分隔，不新增欄位。舊正餐／國別料理等大類不猜成特定餐點，仍包含在不限／尚未分類。類別重複與跨類別不得增加轉盤機率。新類別及別名以 src/catalog.js 為準。
 - v6.3 頂端「店家與食評」是獨立入口，不依賴午餐類型或勾選；切換區塊保留進行中的午餐選擇。資料提醒區分基本資料與選填缺漏，填寫指南在 docs/fill-restaurant-data.md。

@@ -15,7 +15,7 @@
       host.innerHTML='<div class="review-heading"><div><p class="eyebrow">NO FILTER. JUST FLAVOR.</p><h3>吃過的人，出來說兩句。</h3></div><span class="review-stamp" aria-hidden="true">食後<br>有感</span></div>'+
         '<div class="review-summary" role="status">正在讀取大家的真心話…</div><p class="field-note">本站食友的品項心得，分數不是 Google 評分。符合條件的每間店，抽中的機會都相同。</p>'+
         '<details class="review-compose"><summary>＋ 我吃過，讓我說</summary><form class="review-form">'+
-        '<div class="review-identity">'+(member?'<fieldset class="display-choice"><legend>這則評論怎麼顯示？</legend><label><input type="radio" name="displayMode" value="anonymous" '+(draft.mode!=='nickname'?'checked':'')+'> 匿名</label><label><input type="radio" name="displayMode" value="nickname" '+(draft.mode==='nickname'?'checked':'')+'> 自訂暱稱</label></fieldset><label class="review-nickname-label">顯示的暱稱<input name="nickname" maxlength="32" placeholder="食友要怎麼稱呼你？" value="'+e(draft.nickname)+'"></label><p class="field-note">匿名時，其他食友只會看到「匿名食友」。名單管理者仍可查看你的 Google 帳號與這則留言填寫的暱稱。</p>':'<p>瀏覽心得不用登入；想分享、按讚或按爛時再登入即可。</p><button type="button" class="secondary review-login">使用 Google 帳戶登入</button>')+'</div>'+
+        '<div class="review-identity">'+(member?'<fieldset class="display-choice"><legend>這則評論怎麼顯示？</legend><label><input type="radio" name="displayMode" value="anonymous" '+(draft.mode!=='nickname'?'checked':'')+'> 匿名</label><label><input type="radio" name="displayMode" value="nickname" '+(draft.mode==='nickname'?'checked':'')+'> 自訂暱稱</label></fieldset><label class="review-nickname-label">顯示的暱稱<input name="nickname" maxlength="32" placeholder="食友要怎麼稱呼你？" value="'+e(draft.nickname)+'"></label><p class="field-note">匿名時，其他食友只會看到「匿名食友」。團長仍可查看你的 Google 帳號與這則留言填寫的暱稱。</p>':'<p>瀏覽心得不用登入；想分享、按讚或按爛時再登入即可。</p><button type="button" class="secondary review-login">使用 Google 帳戶登入</button>')+'</div>'+
         '<label>01 · 品項<input name="item" required maxlength="100" placeholder="例如：雞腿飯" value="'+e(draft.item)+'"></label>'+
         '<label>02 · 回饋<textarea name="feedback" required maxlength="1500" rows="3" placeholder="便當菜不好吃，雞腿太小隻很盤">'+e(draft.feedback)+'</textarea><small class="review-char-count"></small></label>'+
         '<fieldset class="review-score-editor"><legend>03 · 分數</legend><div class="score-readout"><span class="score-mood" aria-live="polite"></span><label class="score-number-label">直接輸入<input name="score" type="number" min="-100" max="200" step="1" required value="'+e(draft.score)+'" aria-label="直接輸入分數"></label></div>'+
@@ -44,7 +44,7 @@
         if(!alive())return;
         find('.review-list').innerHTML=reviews.map(r=>{
           const band=R.band(r.score),label=band?.label||'分數待確認';
-          return '<article class="review-card" data-review="'+e(r.id)+'"><div class="review-card-top"><h4>'+e(r.item)+'</h4><div class="review-score" data-tone="'+e(band?.tone||'neutral')+'"><strong>'+r.score+'<small> 分</small></strong><span>'+e(label)+'</span></div></div><p class="review-body">'+e(r.feedback)+'</p><div class="review-card-bottom"><small>'+e(r.authorLabel||'匿名食友')+' · '+e(dateText(r.createdAt))+'</small><div class="review-votes" aria-label="評論投票"><button type="button" data-vote="1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===1)+'" aria-label="讚這則評論'+(r.myVote===1?'，再按取消':'')+'">👍 讚 <b>'+r.likes+'</b></button><button type="button" data-vote="-1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===-1)+'" aria-label="爛這則評論'+(r.myVote===-1?'，再按取消':'')+'">👎 爛 <b>'+r.dislikes+'</b></button></div></div>'+(admin?.current()?'<section class="review-admin"><button type="button" class="text-button" data-author="'+e(r.id)+'" aria-expanded="false">查看留言者帳號（管理者）</button><div class="review-author" hidden></div></section>':'')+'</article>';
+          return '<article class="review-card" data-review="'+e(r.id)+'"><div class="review-card-top"><h4>'+e(r.item)+'</h4><div class="review-score" data-tone="'+e(band?.tone||'neutral')+'"><strong>'+r.score+'<small> 分</small></strong><span>'+e(label)+'</span></div></div><p class="review-body">'+e(r.feedback)+'</p><div class="review-card-bottom"><small>'+e(r.authorLabel||'匿名食友')+' · '+e(dateText(r.createdAt))+'</small><div class="review-votes" aria-label="評論投票"><button type="button" data-vote="1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===1)+'" aria-label="讚這則評論'+(r.myVote===1?'，再按取消':'')+'">👍 讚 <b>'+r.likes+'</b></button><button type="button" data-vote="-1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===-1)+'" aria-label="爛這則評論'+(r.myVote===-1?'，再按取消':'')+'">👎 爛 <b>'+r.dislikes+'</b></button></div></div>'+(admin?.current()?'<section class="review-admin"><button type="button" class="text-button" data-author="'+e(r.id)+'" aria-expanded="false">查看留言者帳號（團長）</button><div class="review-author" hidden></div></section>':'')+'</article>';
         }).join('')||'<div class="empty-state">這間還沒有評論。<br>吃過什麼？你的第一口情報很重要。</div>';
         find('.review-more').hidden=!cursor;
       }
@@ -57,10 +57,10 @@
         try{
           const author=await rpc('getReviewAuthor',button.dataset.author,current.token);
           if(!alive()||!button.isConnected||admin.current()?.token!==current.token)return;
-          panel.innerHTML='<p><strong>僅管理者可見</strong></p><p>公開名稱：'+e(author.publicName)+'</p><p>填寫暱稱：'+e(author.nickname||'未填寫')+'</p><p>Google 帳號：'+e(author.email||'舊匿名評論，未留存帳號')+'</p>';
+          panel.innerHTML='<p><strong>僅團長可見</strong></p><p>其他食友看到的名稱：'+e(author.publicName)+'</p><p>填寫暱稱：'+e(author.nickname||'未填寫')+'</p><p>Google 帳號：'+e(author.email||'舊匿名評論，未留存帳號')+'</p>';
           panel.hidden=false;button.setAttribute('aria-expanded','true');
         }catch(err){if(err.code==='AUTH_REQUIRED')admin.invalidate();notice(err.message,true);}
-        finally{if(button.isConnected){button.disabled=false;button.textContent='查看留言者帳號（管理者）';}}
+        finally{if(button.isConnected){button.disabled=false;button.textContent='查看留言者帳號（團長）';}}
       });
       async function load(more=false){
         if(!alive()||loading||voting)return;loading=true;const epoch=++loadEpoch;
@@ -69,11 +69,11 @@
         try{
           const data=await rpc('listReviews',restaurantId,token,more?cursor:null);
           if(!alive()||epoch!==loadEpoch)return;
-          if(!data||!Array.isArray(data.reviews)||!data.summary||!Number.isInteger(data.summary.count)||data.summary.count<0||(data.summary.count>0&&!Number.isFinite(data.summary.average)))throw Error('收到的評論不完整，請稍後重新整理。');
+          if(!data||!Array.isArray(data.reviews)||!data.summary||!Number.isInteger(data.summary.count)||data.summary.count<0||(data.summary.count>0&&!Number.isFinite(data.summary.average)))throw Error('這次沒有讀取到完整的心得，請再試一次。');
           reviews=more?[...reviews,...data.reviews.filter(r=>!reviews.some(old=>old.id===r.id))]:data.reviews;cursor=data.nextCursor;
           const s=data.summary;find('.review-summary').innerHTML=s.count?'<strong>'+s.average.toFixed(1)+'<small> 分</small></strong><span>'+s.count+' 則品項心得的平均<br><b>'+e(R.band(Math.round(s.average))?.label||'')+'</b></span>':'<span>尚未有人評分，等你開第一槍。</span>';
           cards();
-          if(data.unavailableCount>0)notice('有部分心得或投票資料不完整，暫未計入，請名單管理者確認。',true);
+          if(data.unavailableCount>0)notice('有部分心得或投票資料不完整，暫未計入，請團長確認。',true);
         }catch(err){if(err.code==='MEMBER_REQUIRED')account.invalidate();if(alive()){find('.review-summary').textContent='評論暫時讀取失敗';notice(err.message,true);}}
         finally{if(alive()){loading=false;find('.review-refresh').disabled=false;find('.review-more').disabled=false;find('.review-submit').disabled=posting||!account.current();}}
       }

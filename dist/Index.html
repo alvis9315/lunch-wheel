@@ -726,10 +726,11 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
 @media(max-width:800px){#main-nav .nav{gap:10px;padding:14px 12px}#main-nav .step-label{font-size:17px}.data-notice{align-items:flex-start;flex-direction:column;gap:4px}}
 @media(max-width:640px){.header{height:auto;min-height:80px;flex-wrap:wrap;gap:12px;padding-top:16px;padding-bottom:14px}.header .brand{font-size:17px}.header .section-nav{width:100%;margin:0;gap:6px}.section-nav button{flex:1;font-size:15px;min-height:46px;padding:10px}.source-options{grid-template-columns:1fr}#main-nav{gap:8px;margin-top:18px}#main-nav .nav{flex-direction:column;gap:8px;min-height:90px;padding:12px 6px;text-align:center}#main-nav .step-label{font-size:16px}#main-nav .step-number{display:grid;width:30px;height:30px;font-size:16px}#main-nav .step-label small{display:none}.library-tools{align-items:stretch;flex-direction:column;gap:12px}.library-type-label{justify-content:space-between}.library-type-label select{flex:1;width:auto;font-size:16px}.library-grid{gap:18px}.library-grid .restaurant-info strong{font-size:18px}.data-notice{padding:12px 14px}.data-notice .text-button{white-space:normal;text-align:left}.library-grid .restaurant-info{min-height:190px}}
 @media(prefers-reduced-motion:reduce){#library-page[aria-busy=true] #library-refresh:before{animation:none}}
+.suggest-callout{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px 24px;margin:0 0 24px;background:#f1e8d6;border:1px solid #e4d8c1;border-radius:16px}.suggest-callout strong{font-size:17px}.suggest-callout p{margin:6px 0 0;font-size:13px;line-height:1.8}.suggest-callout button{flex:none}#suggest-form label{display:block;font-size:14px;font-weight:600;margin:18px 0 8px}#suggest-form input,#suggest-form textarea{display:block;width:100%;margin-top:8px;padding:12px 14px;min-height:48px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink);font:inherit;font-size:16px;font-weight:400}#suggest-form textarea{min-height:110px;resize:vertical}#suggest-form textarea:focus-visible{outline:3px solid var(--orange);outline-offset:4px}#suggest-feedback{font-size:14px;line-height:1.8}#suggest-inbox{width:min(700px,calc(100% - 30px))}.suggest-card{padding:18px;border:1px solid var(--line);border-radius:12px;margin:14px 0;overflow-wrap:anywhere}.suggest-card h3{margin:0 0 10px}.suggest-card small{display:block;margin:12px 0}.suggest-note{white-space:pre-wrap}.origin-advanced{font-size:13px}.origin-advanced summary{cursor:pointer}.origin-advanced label{margin:12px 0;display:block}@media(max-width:640px){.suggest-callout{display:block;padding:18px}.suggest-callout button{margin-top:12px;width:100%}.source-toolbar>div{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}}
 
 </style>
 </head>
-<body data-version="6.5.0">
+<body data-version="6.6.0">
   <a class="skip" href="#main">跳到主要內容</a>
   <header class="header"><a class="brand" id="brand-home" href="#home" aria-label="午餐俱樂部首頁"><span class="brand-icon">✳</span><span>午餐俱樂部<small>LUNCH CLUB</small></span></a>
     <nav class="section-nav" aria-label="主要功能"><button id="lunch-entry" data-section="lunch">抽午餐</button><button id="library-entry" data-section="library">店家與食評</button></nav>
@@ -738,28 +739,28 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   <main id="main">
     <section id="source-page" class="source-page" aria-labelledby="source-title">
       <p class="eyebrow">A GOOD LUNCH STARTS HERE</p><h1 id="source-title">今天想吃，<br><em>哪一種好味道？</em></h1><p class="intro-copy">選餐點、挑店家，再讓轉盤決定今天的午餐。</p>
-      <div class="source-options"><button class="source-card shared-source" id="choose-shared"><span class="source-art" aria-hidden="true">🍽</span><small>THE NEIGHBORHOOD LIST</small><strong>抽午餐</strong><span>管理者整理好店，你來決定今天的口味。</span><b>開始選餐點 ↗</b></button><button class="source-card" id="choose-library"><span class="source-art" aria-hidden="true">☕</span><small>THE FOOD FRIENDS’ CORNER</small><strong>店家與食評</strong><span>逛逛大家的愛店，看看食友吃過怎麼說。</span><b>瀏覽店家與心得 ↗</b></button></div>
+      <div class="source-options"><button class="source-card shared-source" id="choose-shared"><span class="source-art" aria-hidden="true">🍽</span><small>THE NEIGHBORHOOD LIST</small><strong>抽午餐</strong><span>團長整理好店，你來決定今天的口味。</span><b>開始選餐點 ↗</b></button><button class="source-card" id="choose-library"><span class="source-art" aria-hidden="true">☕</span><small>THE FOOD FRIENDS’ CORNER</small><strong>店家與食評</strong><span>逛逛大家的愛店，看看食友吃過怎麼說。</span><b>瀏覽店家與心得 ↗</b></button></div>
       <p class="field-note">「自己建立」正在調整，暫時不開放；之前儲存的名單會保留。</p>
       <p id="source-status" class="field-note" role="status">正在準備現有名單…</p><button id="cancel-source" class="text-button" hidden>取消讀取</button>
     </section>
     <div id="source-workspace" hidden>
     <nav id="main-nav" aria-label="午餐步驟" hidden><button class="nav" data-page="type"><span class="step-number">1</span><span class="step-label">選餐點<small>今天想吃什麼</small></span></button><button class="nav" data-page="pick" title="先選餐點，再挑店家"><span class="step-number">2</span><span class="step-label">挑店家<small>篩選並確認名單</small></span></button><button class="nav" data-page="wheel" disabled title="確認名單後就能抽午餐"><span class="step-number">3</span><span class="step-label">抽午餐<small>轉出今天的午餐</small></span></button><span id="nav-count" hidden>0</span></nav>
-    <div class="source-toolbar"><span id="source-label" class="pill"></span><div><button id="account-button" class="text-button" hidden>Google 登入</button><button id="admin-button" class="text-button" hidden>管理員登入</button><button id="switch-source" class="text-button">回到首頁 ↗</button></div></div>
+    <div class="source-toolbar"><span id="source-label" class="pill"></span><div><button id="account-button" class="text-button" hidden>Google 登入</button><button id="suggest-inbox-button" class="text-button" hidden>查看店家投稿</button><button id="admin-button" class="text-button" hidden>團長登入</button><button id="switch-source" class="text-button">回到首頁 ↗</button></div></div>
     <div class="context"><div class="origin-context"><span><span class="location-dot"></span> <span id="origin-name">板橋車站・北二門</span> 出發 <span class="muted" id="origin-note">／請確認出發位置</span></span><button class="text-button" id="change-origin">更換出發點 ↗</button></div><span id="weather-status" role="status">☁ 正在讀取午餐天氣…</span></div>
     <div id="data-status" class="data-notice" hidden></div><div id="mode-banner" class="mode-banner" role="status">正在連接美食名單…</div>
     <section id="library-page" hidden aria-labelledby="library-title">
       <div class="page-intro"><div><p class="eyebrow">GOOD FOOD. HONEST WORDS.</p><h1 id="library-title" tabindex="-1">逛好店，<em>看真心話。</em></h1><p class="intro-copy">不用先抽午餐。點一間店，看心得、評價吃過的品項，或替食友按個讚。</p></div><button class="secondary" id="library-refresh">重新整理店家</button></div>
-      <div class="library-tools"><label class="search-label"><span>⌕</span><input id="library-search" type="search" placeholder="搜尋店名或地址" aria-label="搜尋所有店家"></label><label class="library-type-label">餐點類別<select id="library-type"><option value="all">不限</option></select></label></div>
+      <aside class="suggest-callout"><div><strong>找不到你喜歡的店家？</strong><p>把愛店推薦給團長，確認後就有機會加入午餐名單。</p></div><button class="secondary" data-suggest>我要推薦店家 ＋</button></aside><div class="library-tools"><label class="search-label"><span>⌕</span><input id="library-search" type="search" placeholder="搜尋店名或地址" aria-label="搜尋所有店家"></label><label class="library-type-label">餐點類別<select id="library-type"><option value="all">不限</option></select></label></div>
       <p id="library-count" class="library-count" role="status"></p><div id="library-cards" class="restaurant-grid library-grid"></div>
       <p class="field-note">閱讀心得不必登入。留下評論、按讚或按爛前，請先使用 Google 帳戶登入。</p>
     </section>
     <section id="type-page" hidden aria-labelledby="type-title">
       <div class="page-intro"><div><p class="eyebrow">01 / FIND YOUR CRAVING</p><h1 id="type-title" tabindex="-1">今天，<em>想吃什麼？</em></h1><p class="intro-copy">同一家店可以有多種類別。還沒想法就選「不限」，下一步再慢慢挑。</p></div></div>
-      <p id="type-note" class="notice"></p><div id="type-options" class="type-grid"></div>
+      <aside class="suggest-callout"><div><strong>找不到你喜歡的店家？</strong><p>把愛店推薦給團長，確認後就有機會加入午餐名單。</p></div><button class="secondary" data-suggest>我要推薦店家 ＋</button></aside><p id="type-note" class="notice"></p><div id="type-options" class="type-grid"></div>
     </section>
     <section id="pick-page" hidden aria-labelledby="pick-title">
       <div class="pick-heading"><div><p class="eyebrow">02 / MAKE TODAY’S SHORTLIST</p><h1 id="pick-title" tabindex="-1">挑幾間，<em>今天想吃的。</em></h1><p id="type-summary" class="intro-copy"></p><button class="text-button" data-page="type">重新選餐點</button></div><div class="confirm-area"><button id="confirm-selection" class="primary" disabled>確認名單，去抽午餐 ↗</button><span id="confirm-note" role="status">請勾選 2–20 間店</span></div></div>
-      <div class="pick-layout">
+      <aside class="suggest-callout"><div><strong>找不到你喜歡的店家？</strong><p>把愛店推薦給團長，確認後就有機會加入午餐名單。</p></div><button class="secondary" data-suggest>我要推薦店家 ＋</button></aside><div class="pick-layout">
         <button id="toggle-filters" class="secondary" aria-expanded="false" aria-controls="pick-filters">篩選條件 · 展開</button>
         <aside id="pick-filters" class="filter-panel"><div class="panel-heading"><h2>縮小今天的選擇</h2><button class="text-button" id="reset-filters">重設</button></div>
           <fieldset><legend><span>01</span> 今天想走多遠？</legend><div class="choice-grid" id="walk-choices"><button data-walk="any" class="choice active" aria-pressed="true">隨心走走<small>距離不限</small></button><button data-walk="near" class="choice" aria-pressed="false">就近解決<small>0.5 km 內</small></button><button data-walk="medium" class="choice" aria-pressed="false">散個小步<small>1 km 內</small></button><button data-walk="far" class="choice" aria-pressed="false">多走一點<small>0.5–2 km</small></button></div><p class="field-note">依直線距離篩選，實際步行以導航為準。</p></fieldset>
@@ -790,13 +791,13 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     </div>
   </main>
   <footer><span class="footer-brand">✳ 午餐俱樂部</span><span>少一點猶豫，多一點好好吃飯。</span><button class="text-button" id="privacy-button">使用說明</button></footer>
-  <dialog id="data-help-dialog" aria-labelledby="data-help-title"><button class="dialog-close" data-close aria-label="關閉資料說明">×</button><p class="eyebrow">A LITTLE MORE ABOUT OUR LIST</p><h2 id="data-help-title">哪些資料還沒確認？</h2><div id="data-help-content"></div><h3>管理者可以怎麼補？</h3><p>先補餐點類別、葷素與每人預算，再逐步確認電話、營業時間與避雨路線。不確定就先留白，別把未知當作零元或公休。</p><p>請由名單管理者在原本的試算表逐間補上，保留原店家編號與欄位名稱，不用重新匯入整份名單。補好後按「重新整理店家」，網站就會讀取更新。</p><p class="field-note">一般訪客可向管理者提供資訊；留言與投票不會改動店家的基本資料。</p></dialog>
+  <dialog id="data-help-dialog" aria-labelledby="data-help-title"><button class="dialog-close" data-close aria-label="關閉資料說明">×</button><p class="eyebrow">A LITTLE MORE ABOUT OUR LIST</p><h2 id="data-help-title">哪些資料還沒確認？</h2><div id="data-help-content"></div><h3>團長可以怎麼補？</h3><p>先補餐點類別、葷素與每人預算，再逐步確認電話、營業時間與避雨路線。不確定就先留白，別把未知當作零元或公休。</p><p>團長確認資訊後會更新名單。你可以稍後按「重新整理店家」，查看最新內容。</p><p class="field-note">有愛店想加入？按「我要推薦店家」，把店名和 Google Maps 連結交給團長。</p></dialog>
   <dialog id="detail-dialog" aria-labelledby="detail-title"><div class="detail-toolbar"><button class="dialog-close" data-close aria-label="關閉店家資訊">×</button></div><div id="detail-content"></div></dialog>
-  <dialog id="origin-dialog" aria-labelledby="origin-title"><button class="dialog-close" data-close aria-label="關閉出發點設定">×</button><p class="eyebrow">WHERE WE BEGIN</p><h2 id="origin-title">午餐，從這裡出發。</h2><p>這是你自己的出發點。換個地方吃，距離與天氣也跟著更新。</p><form id="origin-form"><div class="detail-form"><label class="wide">出發點名稱<input id="origin-input-name" required maxlength="80" placeholder="例如：公司、家裡、板橋車站"></label><label>緯度<input id="origin-lat" type="number" step="any" min="-90" max="90" required></label><label>經度<input id="origin-lng" type="number" step="any" min="-180" max="180" required></label></div><div class="origin-actions"><button class="secondary" type="button" id="origin-pick-map">在地圖選位置</button><button class="secondary" type="button" id="origin-geolocate">使用目前位置</button></div><p id="origin-feedback" class="field-note" role="status">出發點儲存在這台裝置，只影響你自己的距離與天氣條件。</p><div class="origin-actions"><button type="submit" class="primary">使用這個出發點 ↗</button><button type="button" class="text-button" id="origin-reset">恢復預設出發點</button></div></form></dialog>
-  <dialog id="admin-dialog" aria-labelledby="admin-title"><button class="dialog-close" data-close aria-label="關閉管理員登入">×</button><p class="eyebrow">FOR THE CURATOR</p><h2 id="admin-title">管理你的好店名單</h2><p>輸入管理者通關密語，即可新增名單中的店家。</p><form id="admin-form"><label class="admin-field">通關密語<input id="admin-passphrase" type="password" autocomplete="current-password" required maxlength="256"></label><p id="admin-feedback" class="field-note" role="status">登入有效 30 分鐘，關閉或重新整理頁面後需重新登入。</p><button class="primary" type="submit">登入管理員</button></form></dialog>
+  <dialog id="origin-dialog" aria-labelledby="origin-title"><button class="dialog-close" data-close aria-label="關閉出發點設定">×</button><p class="eyebrow">WHERE WE BEGIN</p><h2 id="origin-title">午餐，從這裡出發。</h2><p>這是你自己的出發點。換個地方吃，距離與天氣也跟著更新。</p><form id="origin-form"><div class="detail-form"><label class="wide">出發點名稱<input id="origin-input-name" required maxlength="80" placeholder="例如：公司、家裡、板橋車站"></label><details class="wide origin-advanced"><summary>需要更精準的位置？手動調整</summary><p class="field-note">通常用下方「使用目前位置」或「在地圖選位置」就可以。</p><label>緯度<input id="origin-lat" type="number" step="any" min="-90" max="90" required></label><label>經度<input id="origin-lng" type="number" step="any" min="-180" max="180" required></label></details></div><div class="origin-actions"><button class="secondary" type="button" id="origin-pick-map">在地圖選位置</button><button class="secondary" type="button" id="origin-geolocate">使用目前位置</button></div><p id="origin-feedback" class="field-note" role="status">出發點儲存在這台裝置，只影響你自己的距離與天氣條件。</p><div class="origin-actions"><button type="submit" class="primary">使用這個出發點 ↗</button><button type="button" class="text-button" id="origin-reset">恢復預設出發點</button></div></form></dialog>
+  <dialog id="admin-dialog" aria-labelledby="admin-title"><button class="dialog-close" data-close aria-label="關閉團長登入">×</button><p class="eyebrow">FOR THE CURATOR</p><h2 id="admin-title">管理你的好店名單</h2><p>輸入團長通關密語，即可查看店家投稿、整理名單及確認留言者帳號。</p><form id="admin-form"><label class="admin-field">通關密語<input id="admin-passphrase" type="password" autocomplete="current-password" required maxlength="256"></label><p id="admin-feedback" class="field-note" role="status">登入有效 30 分鐘，關閉或重新整理頁面後需重新登入。</p><button class="primary" type="submit">登入團長</button></form></dialog>
   <dialog id="result-dialog" aria-labelledby="result-title"><button class="dialog-close" data-close aria-label="關閉抽選結果">×</button><div class="result-art" aria-hidden="true">✦ <span>🍽</span> ✦</div><p class="eyebrow">YOUR LUNCH IS CALLING</p><h2 id="result-title">今天就吃這一家！</h2><div id="result-content"></div></dialog>
-  <dialog id="about-dialog" aria-labelledby="about-title"><button class="dialog-close" data-close aria-label="關閉使用說明">×</button><p class="eyebrow">A SEAT AT THE TABLE</p><h2 id="about-title">一起，解決午餐選擇困難。</h2><p class="field-note">版本 6.5.0</p><p>先選餐點，再篩選並勾選 2～20 間店，按「確認名單」進入轉盤。符合條件的店家每間機會相同，轉盤約 2.5 秒後揭曉。</p><h3>今天的午餐，三步決定</h3><p>先選餐點，再搭配距離、預算、葷素等條件，挑出今天想吃的店。確認後進入獨立轉盤；想換店可以返回調整。「現有名單」由管理者整理，取消勾選不會刪除店家。「自己建立」暫時不開放，之前儲存的名單會保留。</p><h3>讓食友認識你</h3><p>瀏覽店家、看心得與抽午餐不用登入。用 Google 帳戶登入後，就能分享品項、回饋與 -100～200 分的評價。每則評論可選匿名或自訂暱稱；匿名顯示「匿名食友」，選暱稱時需填名稱。Google 名稱和帳號不會自動公開；匿名只對其他食友隱藏，管理者仍可查看帳號與留言時填寫的暱稱。</p><p>每個帳號都能對一則評論按讚或按爛，改變心意時可改票或取消。評論分數只供參考，不會改變抽中的機會。以前的匿名評論會保留。</p><h3>營業與路線提醒</h3><p>營業時間、電話和預算由名單管理者整理，沒有填寫的資訊不會自動當成符合條件。臨時公休或假日營業可能不同，出發前請向店家確認。</p><p>地圖顯示的是直線距離，實際走路可能更遠。下雨時能否全程避雨，也需要從你的出發點重新確認。天氣預報只供參考，可以自己切換天氣條件。</p><h3>地圖與天氣來源</h3><p>地圖來自 OpenStreetMap，天氣來自 Open-Meteo。Google Maps 可另開分頁找店與導航。這些服務暫時無法使用時，仍可從已有名單挑選午餐。</p><p><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 隱私權政策</a></p></dialog>
-  <dialog id="account-dialog" aria-labelledby="account-title"><button class="dialog-close" data-close aria-label="關閉帳號設定">×</button><p class="eyebrow">HELLO, FOOD FRIEND.</p><h2 id="account-title">讓食友認識你。</h2><div id="account-login-panel"><p>用 Google 帳戶登入，留下你的用餐心得。你可以選擇匿名或自訂暱稱。Google 帳號只供名單管理者查閱，其他食友不會看到。</p><button id="account-google-login" class="primary" type="button">使用 Google 帳戶登入</button></div><div id="account-pending" hidden><p>如果沒有開啟新分頁，請按下方連結。</p><a id="account-login-link" class="secondary" target="_blank" rel="noopener noreferrer">前往 Google 登入 ↗</a><div class="account-actions"><button id="account-check" class="text-button" type="button">我已完成登入</button><button id="account-cancel" class="text-button" type="button">取消登入</button></div></div><form id="account-profile" hidden><p class="field-note">Google 名稱：<strong id="account-name"></strong><br>你的帳號：<span id="account-email"></span></p><fieldset class="display-choice"><legend>新評論預設怎麼顯示？</legend><label><input id="account-mode-anonymous" type="radio" name="account-display" value="anonymous" checked> 匿名</label><label><input id="account-mode-nickname" type="radio" name="account-display" value="nickname"> 自訂暱稱</label></fieldset><label id="account-nickname-label" class="admin-field" hidden>顯示的暱稱<input id="account-nickname" maxlength="32" autocomplete="nickname" placeholder="食友要怎麼稱呼你？"></label><p class="field-note">選擇匿名時，其他食友只會看到「匿名食友」。管理者仍可查看帳號與留言時填寫的暱稱。每則評論可另選顯示方式，既有評論不會跟著更名。</p><div class="account-actions"><button id="account-save" class="primary" type="submit">儲存顯示方式</button><button id="account-logout" class="text-button" type="button">登出</button></div></form><p id="account-feedback" class="field-note" role="status"></p></dialog>
+  <dialog id="about-dialog" aria-labelledby="about-title"><button class="dialog-close" data-close aria-label="關閉使用說明">×</button><p class="eyebrow">A SEAT AT THE TABLE</p><h2 id="about-title">一起，解決午餐選擇困難。</h2><p class="field-note">版本 6.6.0</p><p>先選餐點，再篩選並勾選 2～20 間店，按「確認名單」進入轉盤。符合條件的店家每間機會相同，轉盤約 2.5 秒後揭曉。</p><h3>今天的午餐，三步決定</h3><p>先選餐點，再搭配距離、預算、葷素等條件，挑出今天想吃的店。確認後進入獨立轉盤；想換店可以返回調整。「現有名單」由團長整理，取消勾選不會刪除店家。「自己建立」暫時不開放，之前儲存的名單會保留。</p><h3>讓食友認識你</h3><p>瀏覽店家、看心得與抽午餐不用登入。用 Google 帳戶登入後，就能分享品項、回饋與 -100～200 分的評價。每則評論可選匿名或自訂暱稱；匿名顯示「匿名食友」，選暱稱時需填名稱。Google 名稱和帳號不會自動公開；匿名只對其他食友隱藏，團長仍可查看帳號與留言時填寫的暱稱。</p><p>每個帳號都能對一則評論按讚或按爛，改變心意時可改票或取消。評論分數只供參考，不會改變抽中的機會。以前的匿名評論會保留。</p><h3>營業與路線提醒</h3><p>營業時間、電話和預算由團長整理，沒有填寫的資訊不會自動當成符合條件。臨時公休或假日營業可能不同，出發前請向店家確認。</p><p>地圖顯示的是直線距離，實際走路可能更遠。下雨時能否全程避雨，也需要從你的出發點重新確認。天氣預報只供參考，可以自己切換天氣條件。</p><h3>地圖與天氣來源</h3><p>地圖來自 OpenStreetMap，天氣來自 Open-Meteo。Google Maps 可另開分頁找店與導航。這些服務暫時無法使用時，仍可從已有名單挑選午餐。</p><p><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 隱私權政策</a></p></dialog>
+  <dialog id="account-dialog" aria-labelledby="account-title"><button class="dialog-close" data-close aria-label="關閉帳號設定">×</button><p class="eyebrow">HELLO, FOOD FRIEND.</p><h2 id="account-title">讓食友認識你。</h2><div id="account-login-panel"><p>用 Google 帳戶登入，留下你的用餐心得。你可以選擇匿名或自訂暱稱。Google 帳號只供團長查閱，其他食友不會看到。</p><button id="account-google-login" class="primary" type="button">使用 Google 帳戶登入</button></div><div id="account-pending" hidden><p>如果沒有開啟新分頁，請按下方連結。</p><a id="account-login-link" class="secondary" target="_blank" rel="noopener noreferrer">前往 Google 登入 ↗</a><div class="account-actions"><button id="account-check" class="text-button" type="button">我已完成登入</button><button id="account-cancel" class="text-button" type="button">取消登入</button></div></div><form id="account-profile" hidden><p class="field-note">Google 名稱：<strong id="account-name"></strong><br>你的帳號：<span id="account-email"></span></p><fieldset class="display-choice"><legend>新評論預設怎麼顯示？</legend><label><input id="account-mode-anonymous" type="radio" name="account-display" value="anonymous" checked> 匿名</label><label><input id="account-mode-nickname" type="radio" name="account-display" value="nickname"> 自訂暱稱</label></fieldset><label id="account-nickname-label" class="admin-field" hidden>顯示的暱稱<input id="account-nickname" maxlength="32" autocomplete="nickname" placeholder="食友要怎麼稱呼你？"></label><p class="field-note">選擇匿名時，其他食友只會看到「匿名食友」。團長仍可查看帳號與留言時填寫的暱稱。每則評論可另選顯示方式，既有評論不會跟著更名。</p><div class="account-actions"><button id="account-save" class="primary" type="submit">儲存顯示方式</button><button id="account-logout" class="text-button" type="button">登出</button></div></form><p id="account-feedback" class="field-note" role="status"></p></dialog>
   <div id="toast" class="toast" role="status" hidden></div>
   <script>
 /* @preserve
@@ -867,7 +868,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   }
   function reasons(place, filters, context) {
     const out = [], km = distance(context.origin, place.location);
-    if (!place.loaded||place.unavailable) out.push('店家必要資料待補，暫不抽選');
+    if (!place.loaded||place.unavailable) out.push('店名或位置尚待確認，暫時不能抽選');
     const status = opening(place, filters.from, filters.to, context.now);
     if (place.businessStatus && place.businessStatus !== 'OPERATIONAL') out.push(status.reason);
     if (filters.open && status.lunch !== true) out.push(status.reason);
@@ -881,9 +882,9 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     if (filters.weather === 'auto' && context.weather.rain === null) out.push('天氣未知，請手選天氣');
     if (rain && place.covered !== 'yes') out.push('未確認全程可避雨');
     else if(rain&&!coveredFrom(place,context.origin))out.push('此出發點的避雨路線待確認');
-    if (filters.budget !== 'any' && !(Number.isFinite(place.budget) && place.budget <= Number(filters.budget))) out.push(place.budget == null ? '預算未標記' : '超出預算');
+    if (filters.budget !== 'any' && !(Number.isFinite(place.budget) && place.budget <= Number(filters.budget))) out.push(place.budget == null ? '預算還沒確認' : '超出預算');
     if (filters.category !== 'all' && !(root.LunchCatalog?root.LunchCatalog.matchesType(place,filters.category):place.category===filters.category)) out.push('餐點類別不符合');
-    if(filters.diet&&filters.diet!=='any'&&place.diet!==filters.diet&&place.diet!=='both')out.push(!place.diet||place.diet==='unknown'?'葷素未標記':filters.diet==='vegetarian'?'未標記提供素食':'未標記提供葷食');
+    if(filters.diet&&filters.diet!=='any'&&place.diet!==filters.diet&&place.diet!=='both')out.push(!place.diet||place.diet==='unknown'?'葷素還沒確認':filters.diet==='vegetarian'?'尚未確認有素食餐點':'尚未確認有葷食餐點');
     if (filters.rating !== 'any' && !(typeof place.rating === 'number' && place.rating >= Number(filters.rating))) out.push('評分不足或未知');
     if (filters.noRepeat && context.lastId === place.id) out.push('上次已吃過');
     return [...new Set(out)];
@@ -905,28 +906,29 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
 
 (function(root){
   'use strict';
-  const foodCategories=['早餐／早午餐','便當','牛肉麵','拉麵','其他麵食','牛排','火鍋','咖哩','義大利麵','小吃','輕食','咖啡／甜點','冰品'];
-  // Retain coarse legacy labels on reads/writes; they do not imply any specific meal.
-  const categories=[...new Set([...foodCategories,'正餐','早餐店','便當／快餐','麵食','咖啡廳','甜點','台式','日式','韓式','西式','其他'])];
-  const aliases=new Map([['冰店','冰品'],['咖啡店','咖啡廳'],['小吃店','小吃'],['便當店','便當'],['快餐店','便當／快餐'],['早餐','早餐／早午餐'],['早午餐','早餐／早午餐'],['咖啡','咖啡／甜點']]);
-  const foodAliases=new Map([['早餐店','早餐／早午餐'],['咖啡廳','咖啡／甜點'],['甜點','咖啡／甜點']]);
-  function normalizeCategory(value){const text=typeof value==='string'?value.trim().replace(/\//g,'／'):'';return aliases.get(text)||text;}
+  // These are curator shortcuts/order preferences, never a whitelist or empty entry cards.
+  const foodCategories=['速食','咖哩','拉麵','早餐店','早午餐','牛肉麵','牛排','小吃店','快餐便當','咖啡廳','輕食咖啡廳','韓式料理','鍋物','烏龍麵','素食','冰店','甜點','粥店','港式','台式'];
+  const categories=foodCategories;
+  const uncategorized=new Set(['unknown','其他','正餐','尚未分類']);
+  function normalizeCategory(value){return typeof value==='string'?value.trim().replace(/\//g,'／'):'';}
+  function validCategory(value){return value.length<=32&&!['all','unclassified','不限','__proto__','constructor','prototype'].includes(value)&&/^[\p{L}\p{N}][\p{L}\p{N} ／＆&()（）·・.-]*$/u.test(value);}
   function parseCategories(value){
     if(value==null||value==='')return {values:[],foodTypes:[],valid:true};
     const source=Array.isArray(value)?value:[value];
     if(source.length>50||source.some(v=>typeof v!=='string')||source.reduce((n,v)=>n+v.length,0)>500)return {values:[],foodTypes:[],valid:false};
     const tokens=source.flatMap(v=>v.split(/[,，、;；|\r\n]+/)).map(normalizeCategory).filter(Boolean);
-    const values=[...new Set(tokens.filter(v=>v==='unknown'||categories.includes(v)))];
-    const foodTypes=[...new Set(values.map(v=>foodAliases.get(v)||v).filter(v=>foodCategories.includes(v)))];
-    return {values,foodTypes,valid:tokens.every(v=>v==='unknown'||categories.includes(v))};
+    const values=[...new Set(tokens.filter(validCategory))];
+    const foodTypes=values.filter(v=>!uncategorized.has(v));
+    return {values,foodTypes,valid:tokens.every(validCategory)};
   }
   const foodTypesFor=record=>parseCategories(record?.category).foodTypes;
   const typeName=value=>parseCategories(value).foodTypes.join('、')||'尚未分類';
-  function typeOptions(records,{includeEmpty=false}={}){
+  function typeOptions(records){
     const counts=new Map();let unknown=0;records.forEach(r=>{const types=foodTypesFor(r);if(!types.length)unknown++;types.forEach(type=>counts.set(type,(counts.get(type)||0)+1));});
-    return [{value:'all',label:'不限',count:records.length},...foodCategories.map(c=>({value:c,label:c,count:counts.get(c)||0})).filter(c=>includeEmpty||c.count),...(unknown?[{value:'unclassified',label:'尚未分類',count:unknown}]:[])];
+    const present=[...counts.keys()].sort((a,b)=>{const ai=foodCategories.indexOf(a),bi=foodCategories.indexOf(b);return (ai<0?999:ai)-(bi<0?999:bi)||a.localeCompare(b,'zh-Hant');});
+    return [{value:'all',label:'不限',count:records.length},...present.map(c=>({value:c,label:c,count:counts.get(c)})),...(unknown?[{value:'unclassified',label:'尚未分類',count:unknown}]:[])];
   }
-  const matchesType=(record,value)=>value==='all'||(value==='unclassified'?!foodTypesFor(record).length:foodTypesFor(record).includes(foodAliases.get(normalizeCategory(value))||normalizeCategory(value)));
+  const matchesType=(record,value)=>value==='all'||(value==='unclassified'?!foodTypesFor(record).length:foodTypesFor(record).includes(normalizeCategory(value)));
   function qualitySummary(records){
     const filters=[['category','餐點類別'],['diet','葷素'],['budget','每人預算'],['hours','營業時間'],['covered','避雨情況'],['coveredOrigin','避雨出發點']];
     const general=[['phone','電話'],['address','地址'],['mapsUrl','地圖連結']];
@@ -962,7 +964,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     if(coveredOrigin!==null&&(!coveredOrigin||!Number.isFinite(coveredOrigin.lat)||!Number.isFinite(coveredOrigin.lng)||Math.abs(coveredOrigin.lat)>90||Math.abs(coveredOrigin.lng)>180))throw Error('避雨路線出發點不正確');
     if(input.budget!==null&&(!Number.isInteger(input.budget)||input.budget<1||input.budget>10000))throw Error('預算請填 1～10000 整數或留空');
     const mapsUrl=text(blank(input.mapsUrl)?'':input.mapsUrl,1000,'Google Maps 連結');
-    if(mapsUrl&&!mapsPattern.test(mapsUrl))throw Error('請貼上有效的 HTTPS Google Maps 分享連結');
+    if(mapsUrl&&!mapsPattern.test(mapsUrl))throw Error('請到 Google Maps 店家頁按「分享」，複製連結後貼上');
     if(!Array.isArray(input.weeklyHours)||input.weeklyHours.length!==7)throw Error('每週營業資料需包含 7 天');
     const weeklyHours=input.weeklyHours.map(day=>{
       if(!day||!['unknown','closed','open'].includes(day.status))throw Error('營業日狀態不正確');
@@ -1077,7 +1079,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
       try{Object.keys(localStorage).filter(key=>key.startsWith('lunch-club-signin-')).forEach(key=>{let saved;try{saved=JSON.parse(localStorage.getItem(key));}catch{}if(!saved||Date.now()>=saved.expiresAt)localStorage.removeItem(key);});}catch{}
       render();
     }
-    function open(){render();feedback(member?'這是新評論的預設顯示方式；每次留言都能另選匿名或暱稱。':configured?'瀏覽與抽午餐不用登入；留言、按讚或按爛前，請先用 Google 登入。':'Google 登入尚未準備好，請聯絡名單管理者。');if(!dialog.open)dialog.showModal();if(flow)check();}
+    function open(){render();feedback(member?'這是新評論的預設顯示方式；每次留言都能另選匿名或暱稱。':configured?'瀏覽與抽午餐不用登入；留言、推薦店家、按讚或按爛前，請先用 Google 登入。':'Google 登入尚未準備好，請聯絡團長。');if(!dialog.open)dialog.showModal();if(flow)check();}
     function expire(){member=null;clearTimeout(expiryTimer);feedback('登入已到期，請重新用 Google 登入。');notify();}
     async function check(){
       clearTimeout(pollTimer);if(!flow||checking||!dialog.open)return;
@@ -1147,7 +1149,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
       host.innerHTML='<div class="review-heading"><div><p class="eyebrow">NO FILTER. JUST FLAVOR.</p><h3>吃過的人，出來說兩句。</h3></div><span class="review-stamp" aria-hidden="true">食後<br>有感</span></div>'+
         '<div class="review-summary" role="status">正在讀取大家的真心話…</div><p class="field-note">本站食友的品項心得，分數不是 Google 評分。符合條件的每間店，抽中的機會都相同。</p>'+
         '<details class="review-compose"><summary>＋ 我吃過，讓我說</summary><form class="review-form">'+
-        '<div class="review-identity">'+(member?'<fieldset class="display-choice"><legend>這則評論怎麼顯示？</legend><label><input type="radio" name="displayMode" value="anonymous" '+(draft.mode!=='nickname'?'checked':'')+'> 匿名</label><label><input type="radio" name="displayMode" value="nickname" '+(draft.mode==='nickname'?'checked':'')+'> 自訂暱稱</label></fieldset><label class="review-nickname-label">顯示的暱稱<input name="nickname" maxlength="32" placeholder="食友要怎麼稱呼你？" value="'+e(draft.nickname)+'"></label><p class="field-note">匿名時，其他食友只會看到「匿名食友」。名單管理者仍可查看你的 Google 帳號與這則留言填寫的暱稱。</p>':'<p>瀏覽心得不用登入；想分享、按讚或按爛時再登入即可。</p><button type="button" class="secondary review-login">使用 Google 帳戶登入</button>')+'</div>'+
+        '<div class="review-identity">'+(member?'<fieldset class="display-choice"><legend>這則評論怎麼顯示？</legend><label><input type="radio" name="displayMode" value="anonymous" '+(draft.mode!=='nickname'?'checked':'')+'> 匿名</label><label><input type="radio" name="displayMode" value="nickname" '+(draft.mode==='nickname'?'checked':'')+'> 自訂暱稱</label></fieldset><label class="review-nickname-label">顯示的暱稱<input name="nickname" maxlength="32" placeholder="食友要怎麼稱呼你？" value="'+e(draft.nickname)+'"></label><p class="field-note">匿名時，其他食友只會看到「匿名食友」。團長仍可查看你的 Google 帳號與這則留言填寫的暱稱。</p>':'<p>瀏覽心得不用登入；想分享、按讚或按爛時再登入即可。</p><button type="button" class="secondary review-login">使用 Google 帳戶登入</button>')+'</div>'+
         '<label>01 · 品項<input name="item" required maxlength="100" placeholder="例如：雞腿飯" value="'+e(draft.item)+'"></label>'+
         '<label>02 · 回饋<textarea name="feedback" required maxlength="1500" rows="3" placeholder="便當菜不好吃，雞腿太小隻很盤">'+e(draft.feedback)+'</textarea><small class="review-char-count"></small></label>'+
         '<fieldset class="review-score-editor"><legend>03 · 分數</legend><div class="score-readout"><span class="score-mood" aria-live="polite"></span><label class="score-number-label">直接輸入<input name="score" type="number" min="-100" max="200" step="1" required value="'+e(draft.score)+'" aria-label="直接輸入分數"></label></div>'+
@@ -1176,7 +1178,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
         if(!alive())return;
         find('.review-list').innerHTML=reviews.map(r=>{
           const band=R.band(r.score),label=band?.label||'分數待確認';
-          return '<article class="review-card" data-review="'+e(r.id)+'"><div class="review-card-top"><h4>'+e(r.item)+'</h4><div class="review-score" data-tone="'+e(band?.tone||'neutral')+'"><strong>'+r.score+'<small> 分</small></strong><span>'+e(label)+'</span></div></div><p class="review-body">'+e(r.feedback)+'</p><div class="review-card-bottom"><small>'+e(r.authorLabel||'匿名食友')+' · '+e(dateText(r.createdAt))+'</small><div class="review-votes" aria-label="評論投票"><button type="button" data-vote="1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===1)+'" aria-label="讚這則評論'+(r.myVote===1?'，再按取消':'')+'">👍 讚 <b>'+r.likes+'</b></button><button type="button" data-vote="-1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===-1)+'" aria-label="爛這則評論'+(r.myVote===-1?'，再按取消':'')+'">👎 爛 <b>'+r.dislikes+'</b></button></div></div>'+(admin?.current()?'<section class="review-admin"><button type="button" class="text-button" data-author="'+e(r.id)+'" aria-expanded="false">查看留言者帳號（管理者）</button><div class="review-author" hidden></div></section>':'')+'</article>';
+          return '<article class="review-card" data-review="'+e(r.id)+'"><div class="review-card-top"><h4>'+e(r.item)+'</h4><div class="review-score" data-tone="'+e(band?.tone||'neutral')+'"><strong>'+r.score+'<small> 分</small></strong><span>'+e(label)+'</span></div></div><p class="review-body">'+e(r.feedback)+'</p><div class="review-card-bottom"><small>'+e(r.authorLabel||'匿名食友')+' · '+e(dateText(r.createdAt))+'</small><div class="review-votes" aria-label="評論投票"><button type="button" data-vote="1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===1)+'" aria-label="讚這則評論'+(r.myVote===1?'，再按取消':'')+'">👍 讚 <b>'+r.likes+'</b></button><button type="button" data-vote="-1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===-1)+'" aria-label="爛這則評論'+(r.myVote===-1?'，再按取消':'')+'">👎 爛 <b>'+r.dislikes+'</b></button></div></div>'+(admin?.current()?'<section class="review-admin"><button type="button" class="text-button" data-author="'+e(r.id)+'" aria-expanded="false">查看留言者帳號（團長）</button><div class="review-author" hidden></div></section>':'')+'</article>';
         }).join('')||'<div class="empty-state">這間還沒有評論。<br>吃過什麼？你的第一口情報很重要。</div>';
         find('.review-more').hidden=!cursor;
       }
@@ -1189,10 +1191,10 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
         try{
           const author=await rpc('getReviewAuthor',button.dataset.author,current.token);
           if(!alive()||!button.isConnected||admin.current()?.token!==current.token)return;
-          panel.innerHTML='<p><strong>僅管理者可見</strong></p><p>公開名稱：'+e(author.publicName)+'</p><p>填寫暱稱：'+e(author.nickname||'未填寫')+'</p><p>Google 帳號：'+e(author.email||'舊匿名評論，未留存帳號')+'</p>';
+          panel.innerHTML='<p><strong>僅團長可見</strong></p><p>其他食友看到的名稱：'+e(author.publicName)+'</p><p>填寫暱稱：'+e(author.nickname||'未填寫')+'</p><p>Google 帳號：'+e(author.email||'舊匿名評論，未留存帳號')+'</p>';
           panel.hidden=false;button.setAttribute('aria-expanded','true');
         }catch(err){if(err.code==='AUTH_REQUIRED')admin.invalidate();notice(err.message,true);}
-        finally{if(button.isConnected){button.disabled=false;button.textContent='查看留言者帳號（管理者）';}}
+        finally{if(button.isConnected){button.disabled=false;button.textContent='查看留言者帳號（團長）';}}
       });
       async function load(more=false){
         if(!alive()||loading||voting)return;loading=true;const epoch=++loadEpoch;
@@ -1201,11 +1203,11 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
         try{
           const data=await rpc('listReviews',restaurantId,token,more?cursor:null);
           if(!alive()||epoch!==loadEpoch)return;
-          if(!data||!Array.isArray(data.reviews)||!data.summary||!Number.isInteger(data.summary.count)||data.summary.count<0||(data.summary.count>0&&!Number.isFinite(data.summary.average)))throw Error('收到的評論不完整，請稍後重新整理。');
+          if(!data||!Array.isArray(data.reviews)||!data.summary||!Number.isInteger(data.summary.count)||data.summary.count<0||(data.summary.count>0&&!Number.isFinite(data.summary.average)))throw Error('這次沒有讀取到完整的心得，請再試一次。');
           reviews=more?[...reviews,...data.reviews.filter(r=>!reviews.some(old=>old.id===r.id))]:data.reviews;cursor=data.nextCursor;
           const s=data.summary;find('.review-summary').innerHTML=s.count?'<strong>'+s.average.toFixed(1)+'<small> 分</small></strong><span>'+s.count+' 則品項心得的平均<br><b>'+e(R.band(Math.round(s.average))?.label||'')+'</b></span>':'<span>尚未有人評分，等你開第一槍。</span>';
           cards();
-          if(data.unavailableCount>0)notice('有部分心得或投票資料不完整，暫未計入，請名單管理者確認。',true);
+          if(data.unavailableCount>0)notice('有部分心得或投票資料不完整，暫未計入，請團長確認。',true);
         }catch(err){if(err.code==='MEMBER_REQUIRED')account.invalidate();if(alive()){find('.review-summary').textContent='評論暫時讀取失敗';notice(err.message,true);}}
         finally{if(alive()){loading=false;find('.review-refresh').disabled=false;find('.review-more').disabled=false;find('.review-submit').disabled=posting||!account.current();}}
       }
@@ -1238,6 +1240,52 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   };
 })(window);
 
+(function(root){
+  'use strict';
+  root.createLunchSuggestionsUI=function({rpc,account,admin,escape:e}){
+    document.body.insertAdjacentHTML('beforeend','<dialog id="suggest-dialog" aria-labelledby="suggest-title"><button class="dialog-close" data-close aria-label="關閉推薦店家">×</button><p class="eyebrow">SHARE YOUR FAVORITE</p><h2 id="suggest-title">把你的愛店，推薦給大家。</h2><p>找不到喜歡的店？告訴團長，確認後就有機會加入午餐名單。</p><form id="suggest-form"><label>店名（必填）<input name="name" required maxlength="100" placeholder="請填完整店名與分店"></label><label>Google Maps 連結（必填）<input name="mapsUrl" type="url" required maxlength="1000" placeholder="https://maps.app.goo.gl/…"></label><p class="field-note">到 Google Maps 找到店家，按「分享」→「複製連結」，再貼到這裡。</p><label>為什麼推薦？（選填）<textarea name="note" maxlength="1000" rows="3" placeholder="例如：雞腿飯好吃，走路五分鐘就到"></textarea></label><p class="field-note">投稿前需 Google 登入。投稿內容與帳號只供團長查看，確認後才會加入名單；不用填位置座標。</p><button type="submit" class="primary" id="suggest-send">送出推薦 ↗</button></form><p id="suggest-feedback" role="status"></p></dialog><dialog id="suggest-inbox" aria-labelledby="suggest-inbox-title"><button class="dialog-close" data-close aria-label="關閉店家投稿">×</button><p class="eyebrow">FOR THE CLUB HOST</p><h2 id="suggest-inbox-title">大家推薦的好店</h2><p>確認店家後，再將店家加入名單。「標記已處理」只會收起這則投稿，不會自動加入轉盤。</p><button id="suggest-refresh" class="text-button">重新整理投稿</button><p id="suggest-inbox-status" role="status"></p><div id="suggest-items"></div><button id="suggest-more" class="secondary" hidden>看更多投稿</button></dialog>');
+    const $=id=>document.getElementById(id),dialog=$('suggest-dialog'),form=$('suggest-form'),inbox=$('suggest-inbox');
+    let posting=false,awaitingLogin=false,requestId=null,epoch=0,cursor=null,loading=false;
+    const notice=text=>$('suggest-feedback').textContent=text;
+    function access(){
+      if(awaitingLogin&&account.current()){awaitingLogin=false;notice('登入完成，確認內容後按「送出推薦」。');}
+      $('suggest-send').textContent=posting?'正在送出…':account.current()?'送出推薦 ↗':'Google 登入後投稿';
+      $('suggest-inbox-button').hidden=!admin.current();
+      if(!admin.current()){epoch++;loading=false;cursor=null;$('suggest-items').replaceChildren();$('suggest-inbox-status').textContent='';inbox.close();}
+    }
+    document.addEventListener('click',event=>{if(event.target.closest('[data-suggest]')){if(!dialog.open)dialog.showModal();access();}});
+    form.addEventListener('input',()=>{requestId=null;notice('');});
+    form.addEventListener('submit',async event=>{
+      event.preventDefault();if(posting||!form.reportValidity())return;
+      if(!account.current()){awaitingLogin=true;notice('先完成 Google 登入，再回來按「送出推薦」。填好的內容會保留。');account.open();return;}
+      const value={name:form.elements.name.value,mapsUrl:form.elements.mapsUrl.value,note:form.elements.note.value,requestId:requestId||(requestId=crypto.randomUUID())};
+      posting=true;form.querySelectorAll('input,textarea,button').forEach(n=>n.disabled=true);access();notice('正在把你的推薦交給團長…');
+      try{const result=await rpc('addSuggestion',value,account.current().token);if(!result?.received)throw Error('暫時無法確認投稿是否成功，請稍後再試。');form.reset();requestId=null;notice(result.duplicate?'這間店已經在待確認清單裡，團長會一起查看。':'收到你的推薦了！團長確認後再加入午餐名單，謝謝你分享愛店。');}
+      catch(err){if(err.code==='MEMBER_REQUIRED')account.invalidate();notice(err.message);}
+      finally{posting=false;form.querySelectorAll('input,textarea,button').forEach(n=>n.disabled=false);access();}
+    });
+    function closeInbox(){epoch++;loading=false;cursor=null;$('suggest-items').replaceChildren();$('suggest-inbox-status').textContent='';}
+    inbox.addEventListener('close',closeInbox);inbox.addEventListener('cancel',closeInbox);
+    inbox.querySelector('[data-close]').addEventListener('click',closeInbox);
+    function mapLink(url){try{const u=new URL(url);return u.protocol==='https:'&&['maps.app.goo.gl','goo.gl','google.com','www.google.com','google.com.tw','www.google.com.tw','maps.google.com','maps.google.com.tw'].includes(u.hostname)?'<a href="'+e(url)+'" target="_blank" rel="noopener noreferrer">到 Google Maps 看店家 ↗</a>':'<span>連結需要確認</span>';}catch{return '<span>連結需要確認</span>';}}
+    async function load(more=false){
+      const session=admin.current();if(!session||loading)return;const task=++epoch;loading=true;$('suggest-refresh').disabled=true;$('suggest-more').disabled=true;$('suggest-inbox-status').textContent='正在查看大家的推薦…';
+      try{const result=await rpc('listSuggestions',session.token,more?cursor:null);if(task!==epoch||!inbox.open||admin.current()?.token!==session.token)return;
+        if(!more)$('suggest-items').replaceChildren();
+        $('suggest-items').insertAdjacentHTML('beforeend',result.items.map(r=>'<article class="suggest-card"><h3>'+e(r.name)+'</h3>'+mapLink(r.mapsUrl)+'<p class="suggest-note">'+e(r.note||'沒有另外補充')+'</p><small>投稿帳號：'+e(r.email)+'</small><button class="secondary" data-suggest-done="'+e(r.id)+'">標記已處理</button></article>').join(''));
+        cursor=result.nextCursor;$('suggest-more').hidden=!cursor;$('suggest-inbox-status').textContent=result.total?'有 '+result.total+' 間店等你確認。':'目前沒有待確認的投稿。';
+      }catch(err){if(task===epoch){if(err.code==='AUTH_REQUIRED')admin.invalidate();else $('suggest-inbox-status').textContent=err.message;}}
+      finally{if(task===epoch){loading=false;$('suggest-refresh').disabled=false;$('suggest-more').disabled=false;}}
+    }
+    $('suggest-inbox-button').addEventListener('click',()=>{if(!admin.current())return;inbox.showModal();load();});
+    $('suggest-refresh').addEventListener('click',()=>load());$('suggest-more').addEventListener('click',()=>load(true));
+    $('suggest-items').addEventListener('click',async event=>{const button=event.target.closest('[data-suggest-done]'),session=admin.current();if(!button||button.disabled||loading||!session)return;button.disabled=true;
+      const task=epoch;try{await rpc('completeSuggestion',button.dataset.suggestDone,session.token);if(task===epoch&&inbox.open&&admin.current()?.token===session.token)await load();}catch(err){if(task===epoch){if(err.code==='AUTH_REQUIRED')admin.invalidate();else $('suggest-inbox-status').textContent=err.message;}}finally{if(button.isConnected)button.disabled=false;}
+    });
+    return {access};
+  };
+})(window);
+
 (function () {
   'use strict';
   const C = window.LunchCore, Catalog=window.LunchCatalog, $ = id => document.getElementById(id);
@@ -1253,9 +1301,11 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   let sourceRequest=0,sourceLoading=false,sourceTimer=null,localSourceRecords=[];
   let stage='type',lastLunchStage='type',chosenType=null,confirmedIds=null;
   const typeIcons={'早餐／早午餐':'🍳','便當':'🍱','牛肉麵':'🍜','其他麵食':'🍜','小吃':'🥟','拉麵':'🍜','牛排':'🥩','火鍋':'🍲','咖哩':'🍛','義大利麵':'🍝','輕食':'🥗','咖啡／甜點':'☕','冰品':'🍧'};
+  Object.assign(typeIcons,{'速食':'🍔','早餐店':'🍳','早午餐':'🍳','小吃店':'🥟','快餐便當':'🍱','咖啡廳':'☕','輕食咖啡廳':'🥗','韓式料理':'🍲','鍋物':'🍲','烏龍麵':'🍜','素食':'🥬','冰店':'🍧','甜點':'🍰','粥店':'🥣','港式':'🥟','台式':'🍚'});
   const foodIcon=p=>typeIcons[Catalog.foodTypesFor(p)[0]]||'🍽';
   const accountUI=window.createLunchAccountUI({rpc,onChange(){renderAccess();if($('detail-dialog').open&&state.detail&&state.mode==='live'){const host=$('detail-content').querySelector('.restaurant-reviews');if(host)reviewUI.mount(host,state.detail.id);}}});
   const reviewUI=window.createLunchReviewUI({rpc,escape:e,account:accountUI,admin:{current:()=>adminSession&&Date.now()<adminSession.expiresAt?adminSession:null,invalidate:clearAdmin}});
+  const suggestionsUI=window.createLunchSuggestionsUI({rpc,account:accountUI,admin:{current:()=>adminSession&&Date.now()<adminSession.expiresAt?adminSession:null,invalidate:clearAdmin},escape:e});
   function readOrigin(){try{const raw=localStorage.getItem(ORIGIN_STORAGE);return raw?C.validateOrigin(JSON.parse(raw)):null;}catch{return null;}}
   function updateOriginView(){
     $('origin-name').textContent=state.origin.name||defaultOrigin.name;
@@ -1274,23 +1324,23 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     originPicking=false;$('origin-pick-panel').hidden=true;
     $('origin-input-name').value=position?'自訂出發點':state.origin.name||defaultOrigin.name;
     $('origin-lat').value=position?.lat??state.origin.lat;$('origin-lng').value=position?.lng??state.origin.lng;
-    $('origin-feedback').textContent='儲存在這台裝置，私人與現有名單都可使用。';
+    $('origin-feedback').textContent='記住這次的出發點，下次打開也能用。';
     if(!$('origin-dialog').open)$('origin-dialog').showModal();
   }
   function chooseOriginOnMap(){
-    if(!mapView){$('origin-feedback').textContent='這裡暫時無法選地圖位置，請使用目前位置或填寫經緯度。';return;}
+    if(!mapView){$('origin-feedback').textContent='地圖暫時打不開，可以改按「使用目前位置」。';return;}
     $('origin-dialog').close();originPicking=true;page('map');document.querySelector('.map-layout').dataset.view='map';
     document.querySelectorAll('.mobile-view button').forEach(b=>b.classList.toggle('active',b.dataset.view==='map'));
     $('origin-pick-panel').hidden=false;mapView.invalidateSize();$('google-map').scrollIntoView({block:'center'});
   }
   function locateOrigin(){
-    if(!navigator.geolocation){$('origin-feedback').textContent='這台裝置不支援定位，請用地圖或填寫座標。';return;}
+    if(!navigator.geolocation){$('origin-feedback').textContent='這裡暫時無法取得你的位置，請改用地圖選位置。';return;}
     const request=++originRequest;$('origin-geolocate').disabled=true;$('origin-feedback').textContent='正在取得位置，瀏覽器可能會詢問定位權限…';
     navigator.geolocation.getCurrentPosition(position=>{
       if(request!==originRequest||!$('origin-dialog').open)return;
       $('origin-lat').value=position.coords.latitude;$('origin-lng').value=position.coords.longitude;$('origin-input-name').value='目前位置';
       $('origin-feedback').textContent='位置已帶入，請確認後按「使用這個出發點」。';$('origin-geolocate').disabled=false;
-    },()=>{if(request!==originRequest||!$('origin-dialog').open)return;$('origin-feedback').textContent='未取得定位權限或定位失敗，可以改用地圖選點或自行填座標。';$('origin-geolocate').disabled=false;},{enableHighAccuracy:false,timeout:10000,maximumAge:60000});
+    },()=>{if(request!==originRequest||!$('origin-dialog').open)return;$('origin-feedback').textContent='沒有取得你的位置，可以允許定位後再試一次，或改用地圖選位置。';$('origin-geolocate').disabled=false;},{enableHighAccuracy:false,timeout:10000,maximumAge:60000});
   }
   function message(text) {
     const dialog=document.querySelector('dialog[open]');
@@ -1306,7 +1356,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
       // Migrate personal additions from v2; never copy shared rows into personal data.
       const old=JSON.parse(localStorage.getItem('lunch-club-free-v2')||'{}');
       return mode==='local'&&old.mode==='demo'?{...old,localRecords:(Array.isArray(old.localRecords)?old.localRecords:[]).filter(p=>p&&!p.demo)}:{};
-    } catch { if(mode==='local')throw Error('這台裝置保存的名單無法讀取，原內容已保留，請聯絡管理者協助。');return {}; }
+    } catch { if(mode==='local')throw Error('這台裝置保存的名單無法讀取，原內容已保留，請聯絡團長協助。');return {}; }
   }
   function saveLocal() {
     if(!state.ready)return;
@@ -1318,10 +1368,10 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     const member=accountUI.current();$('account-button').hidden=state.mode!=='live';$('account-button').textContent=member?(member.nickname||member.name||'我的帳號'):'Google 登入';
     const active=state.mode==='live'&&adminSession&&Date.now()<adminSession.expiresAt;
     $('manual-add-button').hidden=!canAdd();$('demo-explore').hidden=!canAdd();
-    $('admin-button').hidden=state.mode!=='live';$('admin-button').textContent=active?'管理員登出':'管理員登入';
-    $('source-label').textContent=state.mode==='local'?'我的名單':active?'現有名單 · 管理者':'現有名單';
-    $('mode-banner').textContent=state.mode==='local'?'自己的名單只留在這台裝置。清除網站紀錄後，名單也會一併清除。':active?'管理者已登入，可以新增名單中的店家。登入最長 30 分鐘；網站不提供刪除功能。':'店家由管理者整理。挑選午餐，也歡迎登入分享吃過的心得。';
-    reviewUI.refreshAdmin();
+    $('admin-button').hidden=state.mode!=='live';$('admin-button').textContent=active?'團長登出':'團長登入';
+    $('source-label').textContent=state.mode==='local'?'我的名單':active?'現有名單 · 團長':'現有名單';
+    $('mode-banner').textContent=state.mode==='local'?'自己的名單只留在這台裝置。清除網站紀錄後，名單也會一併清除。':active?'團長已登入，可以新增名單中的店家。登入最長 30 分鐘；網站不提供刪除功能。':'店家由團長整理。挑選午餐，也歡迎登入分享吃過的心得。';
+    reviewUI.refreshAdmin();suggestionsUI.access();
   }
   function clearAdmin(){adminSession=null;clearTimeout(adminTimer);$('admin-passphrase').value='';renderAccess();}
   async function signOut(){
@@ -1331,7 +1381,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   async function adminAction(){
     if(state.busy)return;
     if(adminSession){await signOut();return;}
-    if(!adminConfigured){message('管理功能尚未準備好，請聯絡名單管理者。');return;}
+    if(!adminConfigured){message('管理功能尚未準備好，請聯絡團長。');return;}
     $('admin-feedback').textContent='登入有效 30 分鐘，關閉或重新整理頁面後需重新登入。';
     $('admin-dialog').showModal();$('admin-passphrase').focus();
   }
@@ -1342,7 +1392,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     try{
       const pending=rpc('adminLogin',passphrase);passphrase='';const session=await pending;
       if(state.mode!=='live'||!$('admin-dialog').open){await rpc('adminLogout',session.token);return;}
-      adminSession=session;clearTimeout(adminTimer);adminTimer=setTimeout(()=>{clearAdmin();message('管理員登入已到期，新增店家前請重新登入。');},Math.max(0,session.expiresAt-Date.now()));
+      adminSession=session;clearTimeout(adminTimer);adminTimer=setTimeout(()=>{clearAdmin();message('團長登入已到期，新增店家前請重新登入。');},Math.max(0,session.expiresAt-Date.now()));
       $('admin-dialog').close();renderAccess();message('登入成功，可以新增名單中的店家。');
     }catch(err){$('admin-feedback').textContent=err.message;}
     finally{passphrase='';button.disabled=false;}
@@ -1350,7 +1400,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   function rpc(method,...args) {
     return new Promise((resolve,reject)=> {
       const timer=setTimeout(()=>reject(Error(/^(add|set|save)/.test(method)?'送出時間較久，請重新整理，確認是否已經成功。':'等待時間較久，請再試一次。')),20000);
-      const fail=err=>{clearTimeout(timer);let text=typeof err?.message==='string'?err.message:'暫時連不上，請稍後再試。';const code=text.includes('MEMBER_REQUIRED:')?'MEMBER_REQUIRED':text.includes('AUTH_REQUIRED:')?'AUTH_REQUIRED':'';text=text.replace(/^(?:Error: |Exception: )/,'').replace(/(?:MEMBER_REQUIRED|AUTH_REQUIRED):\s*/,'');if(/SPREADSHEET_ID|表頭|JSON|Unexpected|TypeError|ReferenceError|Script function|伺服器函式|Authorization|授權|permission/i.test(text))text='名單暫時無法開啟，請聯絡名單管理者確認設定後再試。';const error=Error(text);error.code=code;reject(error);};
+      const fail=err=>{clearTimeout(timer);let text=typeof err?.message==='string'?err.message:'暫時連不上，請稍後再試。';const code=text.includes('MEMBER_REQUIRED:')?'MEMBER_REQUIRED':text.includes('AUTH_REQUIRED:')?'AUTH_REQUIRED':'';text=text.replace(/^(?:Error: |Exception: )/,'').replace(/(?:MEMBER_REQUIRED|AUTH_REQUIRED):\s*/,'');if(/SPREADSHEET_ID|表頭|JSON|Unexpected|TypeError|ReferenceError|Script function|伺服器函式|Authorization|授權|permission/i.test(text))text='名單暫時無法開啟，請聯絡團長確認設定後再試。';text=text.replaceAll('管理員','團長').replaceAll('管理者','團長');const error=Error(text);error.code=code;reject(error);};
       try{google.script.run.withSuccessHandler(value=>{clearTimeout(timer);resolve(value);}).withFailureHandler(fail)[method](...args);}catch(err){fail(err);}
     });
   }
@@ -1367,13 +1417,13 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   function wheelPlaces(){return eligible().filter(p=>confirmedIds?.has(p.id));}
   function visiblePlaces(){const query=$('pick-search').value.trim().toLowerCase();return state.records.filter(p=>inType(p)&&(p.name+' '+p.address).toLowerCase().includes(query)&&C.reasons(p,state.filters,context()).length===0);}
   function renderTypes(){
-    $('type-options').innerHTML=Catalog.typeOptions(state.records,{includeEmpty:true}).map(t=>'<button class="type-card" data-type="'+e(t.value)+'" '+(state.busy||(t.value!=='all'&&!t.count)?'disabled':'')+'><span aria-hidden="true">'+(t.value==='all'?'✳':typeIcons[t.value]||'🍽')+'</span><strong>'+e(t.label)+'</strong><small>'+t.count+' 間店'+(!t.count&&t.value!=='all'?' · 尚無分類資料':'')+'</small>'+(t.count||t.value==='all'?'<b aria-hidden="true">↗</b>':'')+'</button>').join('');
+    $('type-options').innerHTML=Catalog.typeOptions(state.records).map(t=>'<button class="type-card" data-type="'+e(t.value)+'" '+(state.busy||(t.value!=='all'&&!t.count)?'disabled':'')+'><span aria-hidden="true">'+(t.value==='all'?'✳':typeIcons[t.value]||'🍽')+'</span><strong>'+e(t.label)+'</strong><small>'+t.count+' 間店'+(!t.count&&t.value!=='all'?' · 尚無分類資料':'')+'</small>'+(t.count||t.value==='all'?'<b aria-hidden="true">↗</b>':'')+'</button>').join('');
     const unknown=state.records.filter(p=>Catalog.typeName(p.category)==='尚未分類').length;
-    $('type-note').textContent=!state.records.length?'名單還沒有店家，請聯絡管理者加入。':(unknown?unknown+' 間店尚未細分餐點，仍可從「不限」或「尚未分類」挑選。 ':'')+'灰色類別目前沒有店家資料；一間店可以出現在不同類別，「不限」只計一次。';
+    $('type-note').textContent=!state.records.length?'名單還沒有店家，請聯絡團長加入。':(unknown?unknown+' 間店還沒確認類別，仍可從「不限」或「尚未分類」挑選。 ':'')+'一間店可以有多種類別，選「不限」就能一起挑。';
   }
   function categoryPicker(p){
     const selected=Catalog.foodTypesFor(p);
-    return '<fieldset id="add-categories" class="category-picker wide"><legend>餐點類別（可複選）</legend><div class="category-checks">'+Catalog.foodCategories.map(c=>'<label><input type="checkbox" value="'+e(c)+'" '+(selected.includes(c)?'checked':'')+'><span>'+e(c)+'</span></label>').join('')+'</div><p class="field-note">只勾選確認有提供的餐點；還不確定可以先留空。</p></fieldset>';
+    return '<fieldset id="add-categories" class="category-picker wide"><legend>餐點類別（可複選）</legend><div class="category-checks">'+[...new Set([...Catalog.foodCategories,...state.records.flatMap(Catalog.foodTypesFor),...selected])].map(c=>'<label><input type="checkbox" value="'+e(c)+'" '+(selected.includes(c)?'checked':'')+'><span>'+e(c)+'</span></label>').join('')+'</div><p class="field-note">只勾選確認有提供的餐點；還不確定可以先留空。</p></fieldset>';
   }
   function renderLibrary(){
     const current=$('library-type').value||'all',options=Catalog.typeOptions(state.records);
@@ -1382,18 +1432,18 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     const query=$('library-search').value.trim().toLowerCase();
     const list=state.records.filter(p=>Catalog.matchesType(p,current)&&(p.name+' '+p.address).toLowerCase().includes(query));
     $('library-count').textContent='共 '+state.records.length+' 間店 · 顯示 '+list.length+' 間 · 點店家看食評';
-    $('library-cards').innerHTML=list.map(p=>'<article class="restaurant-card"><div class="restaurant-art" aria-hidden="true">'+foodIcon(p)+'</div><button class="restaurant-info" data-detail="'+e(p.id)+'"><strong>'+e(p.name)+'</strong><span>'+e(categoryName(p.category))+' · '+e(Catalog.diets[p.diet]||Catalog.diets.unknown)+'</span><span>'+e(p.address||'地址尚未提供')+'</span><span>'+ (p.unavailable?'基本資料待確認，暫不開放抽選與評論':'閱讀心得 · 留下評價 · 按讚或爛')+'</span><small>查看店家與食評 ↗</small></button></article>').join('')||'<div class="empty-state">'+(state.records.length?'沒有找到這間店，試試別的關鍵字或選「不限」。':'名單還沒有店家，請聯絡管理者加入。')+'</div>';
+    $('library-cards').innerHTML=list.map(p=>'<article class="restaurant-card"><div class="restaurant-art" aria-hidden="true">'+foodIcon(p)+'</div><button class="restaurant-info" data-detail="'+e(p.id)+'"><strong>'+e(p.name)+'</strong><span>'+e(categoryName(p.category))+' · '+e(Catalog.diets[p.diet]||Catalog.diets.unknown)+'</span><span>'+e(p.address||'地址尚未提供')+'</span><span>'+ (p.unavailable?'店名或位置還沒確認，暫時不能抽選或留言':'閱讀心得 · 留下評價 · 按讚或爛')+'</span><small>查看店家與食評 ↗</small></button></article>').join('')||'<div class="empty-state">'+(state.records.length?'沒有找到這間店，試試別的關鍵字或選「不限」。':'名單還沒有店家，請聯絡團長加入。')+'</div>';
   }
   function qualityText(summary){
     const parts=[];
-    if(summary.blocked)parts.push(summary.blocked+' 間店的基本資料待確認，暫不開放抽選與評論。');
-    if(summary.optional)parts.push(summary.optional+' 間店有選填資訊尚未確認；不限制這些條件時仍可抽選。');
+    if(summary.blocked)parts.push(summary.blocked+' 間店的店名或位置還沒確認，暫時不能抽選或留言。');
+    if(summary.optional)parts.push(summary.optional+' 間店還有資訊沒確認；選「不限」或「不拘」仍可抽選。');
     return parts.join(' ');
   }
   function qualityRows(rows){return rows.map(row=>'<li><span>'+e(row.label)+'</span><strong>'+row.count+' 間</strong></li>').join('');}
   function showDataHelp(){
     const summary=Catalog.qualitySummary(state.records);
-    $('data-help-content').innerHTML='<p>'+e(qualityText(summary)||'目前名單沒有待補資訊。')+'</p>'+(summary.filters.length?'<h3>影響指定篩選條件</h3><ul class="quality-list">'+qualityRows(summary.filters)+'</ul><p class="field-note">缺少哪一項，就無法判斷是否符合該條件。選「不限」或不勾選該條件，仍能抽選基本資料完整的店。</p>':'')+(summary.general.length?'<h3>不影響抽選的一般資訊</h3><ul class="quality-list">'+qualityRows(summary.general)+'</ul>':'')+(summary.blocked?'<p>基本資料包括可辨認且不重複的店家編號、店名與有效位置；點店家可以查看需確認的項目。</p>':'');
+    $('data-help-content').innerHTML='<p>'+e(qualityText(summary)||'目前名單沒有待補資訊。')+'</p>'+(summary.filters.length?'<h3>這些資訊會影響你挑選的條件</h3><ul class="quality-list">'+qualityRows(summary.filters)+'</ul><p class="field-note">缺少哪一項，就無法判斷是否符合該條件。選「不限」或不勾選該條件，仍能抽選基本資料完整的店。</p>':'')+(summary.general.length?'<h3>其他可以補充的資訊</h3><ul class="quality-list">'+qualityRows(summary.general)+'</ul>':'')+(summary.blocked?'<p>有些店的資訊還需要團長確認，點店家可以看看缺少哪些內容。</p>':'');
     $('data-help-dialog').showModal();
   }
   function enterSection(section){
@@ -1474,7 +1524,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   }
   function renderSaved() {
     $('saved-count').textContent=state.records.length;
-    $('selection-count').textContent='本次已勾選 '+state.selected.size+' / 20 間 · '+(state.mode==='local'?'記在這台裝置':'現有名單由管理者維護');
+    $('selection-count').textContent='本次已勾選 '+state.selected.size+' / 20 間 · '+(state.mode==='local'?'記在這台裝置':'現有名單由團長維護');
     const query=$('list-search').value.trim().toLowerCase();
     const list=state.records.filter(p=>(p.name||'店家資訊待載入').toLowerCase().includes(query));
     $('saved-list').innerHTML=list.map(p=>'<article class="saved-card '+(state.selected.has(p.id)?'selected':'')+'"><input type="checkbox" data-select="'+e(p.id)+'" aria-label="本次抽選 '+e(p.name||p.id)+'" '+(state.selected.has(p.id)?'checked':'')+' '+(state.busy||p.unavailable?'disabled':'')+'><span class="food-icon">'+foodIcon(p)+'</span><button class="card-main" data-detail="'+e(p.id)+'"><strong>'+e(p.name||'店家資訊待載入')+'</strong><small>'+e(categoryName(p.category))+' · '+e(Catalog.diets[p.diet]||Catalog.diets.unknown)+' · '+kmText(p)+' · '+(p.budget==null?'預算未知':'NT$ '+p.budget)+'</small>'+statusHtml(p)+'</button></article>').join('')||'<div class="empty-state">'+(query?'沒有符合搜尋的店家。':'還沒有店家，從右側地圖找一間吧！')+'</div>';
@@ -1596,7 +1646,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     const issues=[...issueKeys].map(key=>Catalog.issueLabels[key]).filter(Boolean);
     const issueHtml=issues.length?'<div class="notice"><strong>'+(p.unavailable?'基本資料需確認':'有些選填資訊尚未確認')+'</strong><p>'+issues.map(e).join('、')+'</p>'+(p.unavailable?'<p>基本資料確認後，才能抽選與留言。</p>':'<p>不限制相關條件時仍可抽選；電話與地址缺漏不影響抽選。</p>')+'</div>':'';
     $('detail-content').innerHTML='<p class="eyebrow">'+(p.demo?'DEMO · 虛構示範店家':'OUR SHARED FOOD LIST')+'</p><div class="detail-hero"><span class="food-icon">'+foodIcon(p)+'</span><div><h2 id="detail-title">'+e(p.name)+'</h2><p>直線 '+kmText(p)+'</p></div></div><p>'+e(p.address||'地址未提供')+'</p>'+statusHtml(p)+issueHtml+'<p class="diet-detail">'+e(Catalog.diets[p.diet]||Catalog.diets.unknown)+(p.covered==='yes'&&!C.coveredFrom(p,state.origin)?' · 此出發點的避雨路線待確認':'')+'</p>'+(warning?'<div class="notice">'+e(warning)+(p.phone?'<br>'+phoneHtml(p):'')+'</div>':'')+(p.demo?'':'<p class="field-note">以上為自行填寫的營業時間，臨時營業異動請致電確認。</p>')+'<details><summary class="field-note">查看營業時間</summary><p>'+p.hoursText.map(e).join('<br>')+'</p></details>'+(mapLink?'<p><a target="_blank" rel="noopener" href="'+e(mapLink)+'">在 Google Maps 查看 ↗</a></p>':'')+
-      (existing?'<div class="notice">已在目前名單。可用勾選框調整本次抽選，不會刪除店家。</div><button class="primary" id="detail-select" '+(p.unavailable?'disabled':'')+'>'+(state.selected.has(p.id)?'退出本次抽選':'加入本次抽選')+'</button>':'<form id="add-form"><div class="detail-form">'+categoryPicker(p)+'<label>葷／素（自行確認）<select id="add-diet">'+Object.entries(Catalog.diets).map(([value,label])=>'<option value="'+value+'"'+(value===(p.diet||'unknown')?' selected':'')+'>'+e(label)+'</option>').join('')+'</select></label><label>每人預算 NT$（選填）<input id="add-budget" type="number" min="1" max="10000" step="1" placeholder="例如 180" value="'+(p.budget??'')+'"></label><label class="wide">從 '+e(state.origin.name||defaultOrigin.name)+' 出發，全程可避雨？<select id="add-covered"><option value="unknown">尚未確認</option><option value="yes"'+(p.covered==='yes'?' selected':'')+'>是，已確認全程有遮蔽</option><option value="no"'+(p.covered==='no'?' selected':'')+'>否，需要走露天路段</option></select></label></div><p class="field-note">'+(state.mode==='local'?'這些資料只儲存在這台裝置，不會上傳。':'這些資料會加入現有名單，供大家抽選。')+'營業中與否仍由抽選條件決定。</p><div class="detail-actions"><button type="submit" class="primary">'+(status.today===false?'已知今日休息，仍儲存店家':(state.mode==='local'?'加入我的口袋名單 ＋':'加入共用口袋名單 ＋'))+'</button></div></form>');
+      (existing?'<div class="notice">已在目前名單。可用勾選框調整本次抽選，不會刪除店家。</div><button class="primary" id="detail-select" '+(p.unavailable?'disabled':'')+'>'+(state.selected.has(p.id)?'退出本次抽選':'加入本次抽選')+'</button>':'<form id="add-form"><div class="detail-form">'+categoryPicker(p)+'<label>葷／素（自行確認）<select id="add-diet">'+Object.entries(Catalog.diets).map(([value,label])=>'<option value="'+value+'"'+(value===(p.diet||'unknown')?' selected':'')+'>'+e(label)+'</option>').join('')+'</select></label><label>每人預算 NT$（選填）<input id="add-budget" type="number" min="1" max="10000" step="1" placeholder="例如 180" value="'+(p.budget??'')+'"></label><label class="wide">從 '+e(state.origin.name||defaultOrigin.name)+' 出發，全程可避雨？<select id="add-covered"><option value="unknown">尚未確認</option><option value="yes"'+(p.covered==='yes'?' selected':'')+'>是，已確認全程有遮蔽</option><option value="no"'+(p.covered==='no'?' selected':'')+'>否，需要走露天路段</option></select></label></div><p class="field-note">'+(state.mode==='local'?'這些資料只儲存在這台裝置，不會上傳。':'這些資料會加入現有名單，供大家抽選。')+'勾選「用餐時有營業」後，會依填寫的營業時間挑選店家。</p><div class="detail-actions"><button type="submit" class="primary">'+(status.today===false?'已知今日休息，仍儲存店家':(state.mode==='local'?'加入我的口袋名單 ＋':'加入午餐名單 ＋'))+'</button></div></form>');
     const meals=document.createElement('p');meals.className='meal-detail';meals.textContent='餐點類別：'+categoryName(p.category);$('detail-content').querySelector('.detail-hero').after(meals);
     if(existing&&stage==='library'){const selection=$('detail-select');if(selection){selection.previousElementSibling?.remove();selection.remove();}}
     if(existing&&state.mode==='live'&&!p.unavailable){
@@ -1606,7 +1656,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   }
   function manualForm(position){
     if(state.busy)return;
-    if(!canAdd()){message('現有名單僅限管理者新增，請先登入管理員。');return;}
+    if(!canAdd()){message('現有名單僅限團長新增，請先登入團長。');return;}
     const lat=position?.lat??'',lng=position?.lng??'';
     const days=['日','一','二','三','四','五','六'];
     $('detail-content').innerHTML='<p class="eyebrow">ADD A GOOD PLACE</p><h2 id="detail-title">新增一間口袋店家</h2><p>'+(state.mode==='local'?'這間店只會加入你的我的名單。':'這間店會加入大家使用的現有名單。')+'不會自動讀取 Google 店家資料。</p><form id="manual-form"><div class="detail-form"><label class="wide">店名<input id="manual-name" maxlength="100" required></label><label class="wide">地址（選填）<input id="manual-address" maxlength="250"></label><label>緯度<input id="manual-lat" type="number" step="any" min="-90" max="90" value="'+lat+'" required></label><label>經度<input id="manual-lng" type="number" step="any" min="-180" max="180" value="'+lng+'" required></label><label class="wide">電話（選填）<input id="manual-phone" type="tel" maxlength="40"></label><label class="wide">Google Maps 分享連結（選填）<input id="manual-url" type="url" maxlength="1000" placeholder="https://maps.app.goo.gl/…"></label></div><p class="field-note">可以點地圖位置自動帶入座標；或填入你確認的位置。分享連結只用於開啟 Google Maps，不會自動解析店家資料。</p><details class="hours-editor"><summary>填寫每週營業時間（選填）</summary><p class="field-note">未知就留白；休息日請明確選休息。每日可填兩段，涵蓋午休／晚餐；關門時間較早表示跨到翌日。</p>'+days.map((day,i)=>'<fieldset class="hours-day"><legend>星期'+day+'</legend><label>狀態<select id="day-'+i+'-status" aria-label="星期'+day+'狀態"><option value="unknown">尚未確認</option><option value="closed">休息</option><option value="open">有營業</option></select></label><div class="hours-times"><input type="time" id="day-'+i+'-from" aria-label="星期'+day+'第一段開始"><span>至</span><input type="time" id="day-'+i+'-to" aria-label="星期'+day+'第一段結束"><input type="time" id="day-'+i+'-from2" aria-label="星期'+day+'第二段開始"><span>至</span><input type="time" id="day-'+i+'-to2" aria-label="星期'+day+'第二段結束"></div></fieldset>').join('')+'</details><button class="primary" type="submit">下一步：確認店家資訊</button></form>';
@@ -1636,7 +1686,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   }
   async function addCurrent() {
     const p=state.detail;if(!p||state.busy)return;
-    if(!canAdd()){message('請關閉視窗並重新登入管理員，再新增店家。');return;}
+    if(!canAdd()){message('請關閉視窗並重新登入團長，再新增店家。');return;}
     const form=$('add-form');if(!form.reportValidity())return;
     const record={...p,category:Array.from($('add-categories').querySelectorAll('input:checked'),input=>input.value).join('、'),diet:$('add-diet').value,budget:$('add-budget').value===''?null:Number($('add-budget').value),covered:$('add-covered').value,coveredOrigin:$('add-covered').value==='unknown'?null:{lat:state.origin.lat,lng:state.origin.lng}};
     const submit=form.querySelector('button[type=submit]');submit.disabled=true;submit.textContent=state.mode==='local'?'正在存入這台裝置…':'正在存入現有名單…';
@@ -1680,14 +1730,14 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   let resultPlace=null;
   function showResult(p,count) {
     resultPlace=p;const link=mapsUrl(p,true);
-    $('result-content').innerHTML='<h3>'+e(p.name)+'</h3><p>'+e(categoryName(p.category))+' · '+(p.budget==null?'預算未標記':'NT$ '+p.budget)+' · 直線 '+kmText(p)+'</p><p>'+e(p.address||'地址未提供')+'</p><p class="field-note">'+count+' 間店每間機會相同'+(p.demo?' · 虛構示範結果':' · 營業時段由名單維護，臨時異動請致電確認')+'</p><div class="result-actions"><button id="confirm-lunch" class="primary">今天就吃這家 ✓</button>'+(link?'<a class="secondary" target="_blank" rel="noopener" href="'+e(link)+'">步行導航 ↗</a>':'')+'</div>'+phoneHtml(p)+'<button id="spin-again" class="text-button">還想轉一次</button>';
+    $('result-content').innerHTML='<h3>'+e(p.name)+'</h3><p>'+e(categoryName(p.category))+' · '+(p.budget==null?'預算還沒確認':'NT$ '+p.budget)+' · 直線 '+kmText(p)+'</p><p>'+e(p.address||'地址未提供')+'</p><p class="field-note">'+count+' 間店每間機會相同'+(p.demo?' · 虛構示範結果':' · 營業時段由名單維護，臨時異動請致電確認')+'</p><div class="result-actions"><button id="confirm-lunch" class="primary">今天就吃這家 ✓</button>'+(link?'<a class="secondary" target="_blank" rel="noopener" href="'+e(link)+'">步行導航 ↗</a>':'')+'</div>'+phoneHtml(p)+'<button id="spin-again" class="text-button">還想轉一次</button>';
     $('result-dialog').showModal();
   }
   function enterSource(mode,destination='type'){
     if(mode!=='live'){message('「自己建立」正在調整，請先使用現有名單。');return;}
     if(state.busy)return;
     const request=++sourceRequest;sourceLoading=true;lockUI(true);state.ready=false;clearAdmin();
-    const trace=(step,extra={})=>console.info('[Lunch Club 6.5.0] shared entry', {request,step,...extra});
+    const trace=(step,extra={})=>console.info('[Lunch Club 6.6.0] shared entry', {request,step,...extra});
     const current=()=>request===sourceRequest&&sourceLoading;
     $('source-page').setAttribute('aria-busy','true');$('cancel-source').hidden=false;$('cancel-source').disabled=false;
     $('source-status').textContent=mode==='live'?'正在打開現有名單，請稍候…':'正在打開你的名單…';
@@ -1699,7 +1749,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     function failed(error){
       if(!current())return;
       const raw=typeof error?.message==='string'?error.message:typeof error==='string'?error:'';
-      const messageText=!raw?'名單暫時無法開啟，請再試一次。':/SPREADSHEET_ID|表頭|JSON|Unexpected|TypeError|ReferenceError|Script function|伺服器函式|Authorization|授權|permission/i.test(raw)?'名單暫時無法開啟，請聯絡名單管理者確認設定後再試。':raw.replace(/^(?:Error: |Exception: )/,'');
+      const messageText=!raw?'名單暫時無法開啟，請再試一次。':/SPREADSHEET_ID|表頭|JSON|Unexpected|TypeError|ReferenceError|Script function|伺服器函式|Authorization|授權|permission/i.test(raw)?'名單暫時無法開啟，請聯絡團長確認設定後再試。':raw.replace(/^(?:Error: |Exception: )/,'');
       trace('failed',{message:messageText});
       state.ready=false;state.mode='loading';state.records=[];state.selected=new Set();
       $('source-page').hidden=false;$('source-workspace').hidden=true;$('main-nav').hidden=true;
@@ -1742,7 +1792,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     clearTimeout(sourceTimer);sourceTimer=setTimeout(()=>{if(current()){trace('timeout');failed(Error('等待時間較久，請再試一次。'));}},20000);
     try{
       if(mode==='live'){
-        if(!window.google?.script?.run)throw Error('請從正式網站開啟現有名單，或聯絡名單管理者確認網址。');
+        if(!window.google?.script?.run)throw Error('請從正式網站開啟現有名單，或聯絡團長確認網址。');
         // The Google callback directly completes navigation; no Promise wrapper in this path.
         google.script.run.withSuccessHandler(received).withFailureHandler(failed).getSharedHome('json');
       }else received(null);
@@ -1803,8 +1853,8 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   $('brand-home').addEventListener('click',event=>{event.preventDefault();switchSource();});$('cancel-source').addEventListener('click',switchSource);$('account-button').addEventListener('click',()=>accountUI.open());
   $('switch-source').addEventListener('click',switchSource);$('admin-button').addEventListener('click',adminAction);$('admin-form').addEventListener('submit',loginAdmin);
   $('admin-dialog').addEventListener('close',()=>{$('admin-passphrase').value='';});
-  $('map-home').addEventListener('click',()=>{if(mapView){mapView.setView([state.origin.lat,state.origin.lng],16);}else message('示意地圖：正式版會回到目前設定的出發點。');});
-  const originPanel=document.createElement('div');originPanel.id='origin-pick-panel';originPanel.className='origin-pick-panel';originPanel.hidden=true;originPanel.innerHTML='<strong>點一下地圖，選擇你的出發點。</strong><p>選好後會開啟確認視窗，店家位置不會更動。</p><button type="button" class="secondary" id="origin-pick-cancel">取消選點</button>';document.querySelector('.map-panel').append(originPanel);
+  $('map-home').addEventListener('click',()=>{if(mapView){mapView.setView([state.origin.lat,state.origin.lng],16);}else message('地圖暫時打不開，請稍後再試。');});
+  const originPanel=document.createElement('div');originPanel.id='origin-pick-panel';originPanel.className='origin-pick-panel';originPanel.hidden=true;originPanel.innerHTML='<strong>點一下地圖，選擇你的出發點。</strong><p>選好後會請你再確認位置，店家位置不會更動。</p><button type="button" class="secondary" id="origin-pick-cancel">取消選點</button>';document.querySelector('.map-panel').append(originPanel);
   $('change-origin').addEventListener('click',()=>openOrigin());$('origin-pick-map').addEventListener('click',chooseOriginOnMap);$('origin-geolocate').addEventListener('click',locateOrigin);
   $('origin-pick-cancel').addEventListener('click',()=>{originPicking=false;originPanel.hidden=true;});
   $('origin-form').addEventListener('submit',event=>{event.preventDefault();if(state.busy||!$('origin-form').reportValidity())return;try{const origin=C.validateOrigin({name:$('origin-input-name').value,lat:Number($('origin-lat').value),lng:Number($('origin-lng').value)});$('origin-dialog').close();applyOrigin(origin);}catch(err){$('origin-feedback').textContent=err.message;}});

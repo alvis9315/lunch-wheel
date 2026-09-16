@@ -1,27 +1,28 @@
 (function(root){
   'use strict';
-  const foodCategories=['早餐／早午餐','便當','牛肉麵','拉麵','其他麵食','牛排','火鍋','咖哩','義大利麵','小吃','輕食','咖啡／甜點','冰品'];
-  // Retain coarse legacy labels on reads/writes; they do not imply any specific meal.
-  const categories=[...new Set([...foodCategories,'正餐','早餐店','便當／快餐','麵食','咖啡廳','甜點','台式','日式','韓式','西式','其他'])];
-  const aliases=new Map([['冰店','冰品'],['咖啡店','咖啡廳'],['小吃店','小吃'],['便當店','便當'],['快餐店','便當／快餐'],['早餐','早餐／早午餐'],['早午餐','早餐／早午餐'],['咖啡','咖啡／甜點']]);
-  const foodAliases=new Map([['早餐店','早餐／早午餐'],['咖啡廳','咖啡／甜點'],['甜點','咖啡／甜點']]);
-  function normalizeCategory(value){const text=typeof value==='string'?value.trim().replace(/\//g,'／'):'';return aliases.get(text)||text;}
+  // These are curator shortcuts/order preferences, never a whitelist or empty entry cards.
+  const foodCategories=['速食','咖哩','拉麵','早餐店','早午餐','牛肉麵','牛排','小吃店','快餐便當','咖啡廳','輕食咖啡廳','韓式料理','鍋物','烏龍麵','素食','冰店','甜點','粥店','港式','台式'];
+  const categories=foodCategories;
+  const uncategorized=new Set(['unknown','其他','正餐','尚未分類']);
+  function normalizeCategory(value){return typeof value==='string'?value.trim().replace(/\//g,'／'):'';}
+  function validCategory(value){return value.length<=32&&!['all','unclassified','不限','__proto__','constructor','prototype'].includes(value)&&/^[\p{L}\p{N}][\p{L}\p{N} ／＆&()（）·・.-]*$/u.test(value);}
   function parseCategories(value){
     if(value==null||value==='')return {values:[],foodTypes:[],valid:true};
     const source=Array.isArray(value)?value:[value];
     if(source.length>50||source.some(v=>typeof v!=='string')||source.reduce((n,v)=>n+v.length,0)>500)return {values:[],foodTypes:[],valid:false};
     const tokens=source.flatMap(v=>v.split(/[,，、;；|\r\n]+/)).map(normalizeCategory).filter(Boolean);
-    const values=[...new Set(tokens.filter(v=>v==='unknown'||categories.includes(v)))];
-    const foodTypes=[...new Set(values.map(v=>foodAliases.get(v)||v).filter(v=>foodCategories.includes(v)))];
-    return {values,foodTypes,valid:tokens.every(v=>v==='unknown'||categories.includes(v))};
+    const values=[...new Set(tokens.filter(validCategory))];
+    const foodTypes=values.filter(v=>!uncategorized.has(v));
+    return {values,foodTypes,valid:tokens.every(validCategory)};
   }
   const foodTypesFor=record=>parseCategories(record?.category).foodTypes;
   const typeName=value=>parseCategories(value).foodTypes.join('、')||'尚未分類';
-  function typeOptions(records,{includeEmpty=false}={}){
+  function typeOptions(records){
     const counts=new Map();let unknown=0;records.forEach(r=>{const types=foodTypesFor(r);if(!types.length)unknown++;types.forEach(type=>counts.set(type,(counts.get(type)||0)+1));});
-    return [{value:'all',label:'不限',count:records.length},...foodCategories.map(c=>({value:c,label:c,count:counts.get(c)||0})).filter(c=>includeEmpty||c.count),...(unknown?[{value:'unclassified',label:'尚未分類',count:unknown}]:[])];
+    const present=[...counts.keys()].sort((a,b)=>{const ai=foodCategories.indexOf(a),bi=foodCategories.indexOf(b);return (ai<0?999:ai)-(bi<0?999:bi)||a.localeCompare(b,'zh-Hant');});
+    return [{value:'all',label:'不限',count:records.length},...present.map(c=>({value:c,label:c,count:counts.get(c)})),...(unknown?[{value:'unclassified',label:'尚未分類',count:unknown}]:[])];
   }
-  const matchesType=(record,value)=>value==='all'||(value==='unclassified'?!foodTypesFor(record).length:foodTypesFor(record).includes(foodAliases.get(normalizeCategory(value))||normalizeCategory(value)));
+  const matchesType=(record,value)=>value==='all'||(value==='unclassified'?!foodTypesFor(record).length:foodTypesFor(record).includes(normalizeCategory(value)));
   function qualitySummary(records){
     const filters=[['category','餐點類別'],['diet','葷素'],['budget','每人預算'],['hours','營業時間'],['covered','避雨情況'],['coveredOrigin','避雨出發點']];
     const general=[['phone','電話'],['address','地址'],['mapsUrl','地圖連結']];
@@ -57,7 +58,7 @@
     if(coveredOrigin!==null&&(!coveredOrigin||!Number.isFinite(coveredOrigin.lat)||!Number.isFinite(coveredOrigin.lng)||Math.abs(coveredOrigin.lat)>90||Math.abs(coveredOrigin.lng)>180))throw Error('避雨路線出發點不正確');
     if(input.budget!==null&&(!Number.isInteger(input.budget)||input.budget<1||input.budget>10000))throw Error('預算請填 1～10000 整數或留空');
     const mapsUrl=text(blank(input.mapsUrl)?'':input.mapsUrl,1000,'Google Maps 連結');
-    if(mapsUrl&&!mapsPattern.test(mapsUrl))throw Error('請貼上有效的 HTTPS Google Maps 分享連結');
+    if(mapsUrl&&!mapsPattern.test(mapsUrl))throw Error('請到 Google Maps 店家頁按「分享」，複製連結後貼上');
     if(!Array.isArray(input.weeklyHours)||input.weeklyHours.length!==7)throw Error('每週營業資料需包含 7 天');
     const weeklyHours=input.weeklyHours.map(day=>{
       if(!day||!['unknown','closed','open'].includes(day.status))throw Error('營業日狀態不正確');
@@ -483,3 +484,49 @@ function reviewAuthorLabel_(review){
   return (review.authorDisplayMode==='nickname'||!review.authorDisplayMode)&&nickname?nickname:review.authorEmail?'匿名食友':'以前的匿名食友';
 }
 function reviewSummary_(reviews){return {count:reviews.length,average:reviews.length?Math.round(reviews.reduce((sum,r)=>sum+r.score,0)/reviews.length*10)/10:null};}
+
+// Suggestions never write to the restaurant list. Curator-only reads and status updates.
+const SUGGESTION_HEADERS_=['id','request_id','name','maps_url','note','submitter_key','submitter_email','created_at','status','reviewed_at'];
+function suggestionInput_(input){
+  if(!input||typeof input!=='object')throw Error('請填寫店名和 Google Maps 連結。');
+  const name=typeof input.name==='string'?input.name.trim():'',mapsUrl=typeof input.mapsUrl==='string'?input.mapsUrl.trim():'',note=input.note==null?'':input.note;
+  if(!name||name.length>100||/[\u0000-\u001f\u007f]/.test(name))throw Error('店名請填 1～100 個字，請勿換行。');
+  if(typeof note!=='string'||note.length>1000)throw Error('推薦理由最多 1000 個字。');
+  // Use the same trusted Google Maps host/path validation as curated restaurants.
+  if(!mapsUrl||/[\s\u0000-\u001f\u007f]/.test(mapsUrl))throw Error('請貼上 Google Maps 店家的分享連結。');
+  try{LunchCatalog.validate({name,location:{lat:0,lng:0},mapsUrl});}catch{throw Error('請到 Google Maps 店家頁按「分享」，複製連結後貼到這裡。');}
+  return {requestId:LunchReviews.id(input.requestId,'這次投稿'),name,mapsUrl,note:note.trim()};
+}
+function suggestionRows_(){
+  const sheet=communitySheet_('Suggestions',SUGGESTION_HEADERS_),n=sheet.getLastRow()-1;
+  const rows=n>0?sheet.getRange(2,1,n,SUGGESTION_HEADERS_.length).getValues():[];
+  return {sheet,rows:rows.map((r,i)=>({id:readCell_(r[0]),requestId:readCell_(r[1]),name:readCell_(r[2]),mapsUrl:readCell_(r[3]),note:readCell_(r[4]),key:readCell_(r[5]),email:readCell_(r[6]),createdAt:dateCell_(r[7]),status:readCell_(r[8])||'pending',row:i+2})).filter(r=>r.id&&r.name)};
+}
+function addSuggestion(input,memberToken){
+  const member=requireMember_(memberToken),value=suggestionInput_(input),key=hash_('google:'+member.googleId),lock=LockService.getScriptLock();lock.waitLock(10000);
+  try{
+    const {sheet,rows}=suggestionRows_(),previous=rows.find(r=>r.key===key&&r.requestId===value.requestId);
+    if(previous){if(previous.name!==value.name||previous.mapsUrl!==value.mapsUrl||previous.note!==value.note)throw Error('這次投稿已送出，請重新開啟視窗再推薦另一間店。');return {received:true,duplicate:true};}
+    if(rows.some(r=>r.status==='pending'&&r.name===value.name&&r.mapsUrl===value.mapsUrl))return {received:true,duplicate:true};
+    const now=Date.now(),mine=rows.filter(r=>r.key===key);
+    if(mine.filter(r=>now-Date.parse(r.createdAt)<600000).length>=3||mine.filter(r=>now-Date.parse(r.createdAt)<86400000).length>=10)throw Error('先讓團長看看這幾間吧！每 10 分鐘可推薦 3 間，一天最多 10 間，請稍後再來。');
+    sheet.appendRow([Utilities.getUuid(),value.requestId,safeCell_(value.name),safeCell_(value.mapsUrl),safeCell_(value.note),key,safeCell_(member.email),new Date().toISOString(),'pending','']);
+    SpreadsheetApp.flush();return {received:true,duplicate:false};
+  }finally{lock.releaseLock();}
+}
+function listSuggestions(adminToken,cursor){
+  requireAdmin_(adminToken);const before=cursor?LunchReviews.id(cursor,'上一則投稿'):null,lock=LockService.getScriptLock();lock.waitLock(10000);
+  try{
+    requireAdmin_(adminToken);const all=suggestionRows_().rows.filter(r=>r.status==='pending').reverse();
+    const start=before?all.findIndex(r=>r.id===before)+1:0;if(before&&start===0)throw Error('投稿內容已更新，請重新整理。');
+    const page=all.slice(start,start+30);
+    return {items:page.map(r=>({id:r.id,name:r.name,mapsUrl:r.mapsUrl,note:r.note,email:r.email,createdAt:r.createdAt})),nextCursor:start+30<all.length?page[page.length-1].id:null,total:all.length};
+  }finally{lock.releaseLock();}
+}
+function completeSuggestion(id,adminToken){
+  requireAdmin_(adminToken);id=LunchReviews.id(id,'這則投稿');const lock=LockService.getScriptLock();lock.waitLock(10000);
+  try{requireAdmin_(adminToken);const {sheet,rows}=suggestionRows_(),row=rows.find(r=>r.id===id);if(!row)throw Error('找不到這則投稿，請重新整理。');
+    if(row.status!=='done')sheet.getRange(row.row,9,1,2).setValues([['done',new Date().toISOString()]]);
+    return {id,status:'done'};
+  }finally{lock.releaseLock();}
+}

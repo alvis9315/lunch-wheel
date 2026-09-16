@@ -59,7 +59,7 @@
   }
   function reasons(place, filters, context) {
     const out = [], km = distance(context.origin, place.location);
-    if (!place.loaded||place.unavailable) out.push('店家必要資料待補，暫不抽選');
+    if (!place.loaded||place.unavailable) out.push('店名或位置尚待確認，暫時不能抽選');
     const status = opening(place, filters.from, filters.to, context.now);
     if (place.businessStatus && place.businessStatus !== 'OPERATIONAL') out.push(status.reason);
     if (filters.open && status.lunch !== true) out.push(status.reason);
@@ -73,9 +73,9 @@
     if (filters.weather === 'auto' && context.weather.rain === null) out.push('天氣未知，請手選天氣');
     if (rain && place.covered !== 'yes') out.push('未確認全程可避雨');
     else if(rain&&!coveredFrom(place,context.origin))out.push('此出發點的避雨路線待確認');
-    if (filters.budget !== 'any' && !(Number.isFinite(place.budget) && place.budget <= Number(filters.budget))) out.push(place.budget == null ? '預算未標記' : '超出預算');
+    if (filters.budget !== 'any' && !(Number.isFinite(place.budget) && place.budget <= Number(filters.budget))) out.push(place.budget == null ? '預算還沒確認' : '超出預算');
     if (filters.category !== 'all' && !(root.LunchCatalog?root.LunchCatalog.matchesType(place,filters.category):place.category===filters.category)) out.push('餐點類別不符合');
-    if(filters.diet&&filters.diet!=='any'&&place.diet!==filters.diet&&place.diet!=='both')out.push(!place.diet||place.diet==='unknown'?'葷素未標記':filters.diet==='vegetarian'?'未標記提供素食':'未標記提供葷食');
+    if(filters.diet&&filters.diet!=='any'&&place.diet!==filters.diet&&place.diet!=='both')out.push(!place.diet||place.diet==='unknown'?'葷素還沒確認':filters.diet==='vegetarian'?'尚未確認有素食餐點':'尚未確認有葷食餐點');
     if (filters.rating !== 'any' && !(typeof place.rating === 'number' && place.rating >= Number(filters.rating))) out.push('評分不足或未知');
     if (filters.noRepeat && context.lastId === place.id) out.push('上次已吃過');
     return [...new Set(out)];

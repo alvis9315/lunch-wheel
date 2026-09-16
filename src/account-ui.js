@@ -21,7 +21,7 @@
       try{Object.keys(localStorage).filter(key=>key.startsWith('lunch-club-signin-')).forEach(key=>{let saved;try{saved=JSON.parse(localStorage.getItem(key));}catch{}if(!saved||Date.now()>=saved.expiresAt)localStorage.removeItem(key);});}catch{}
       render();
     }
-    function open(){render();feedback(member?'這是新評論的預設顯示方式；每次留言都能另選匿名或暱稱。':configured?'瀏覽與抽午餐不用登入；留言、按讚或按爛前，請先用 Google 登入。':'Google 登入尚未準備好，請聯絡名單管理者。');if(!dialog.open)dialog.showModal();if(flow)check();}
+    function open(){render();feedback(member?'這是新評論的預設顯示方式；每次留言都能另選匿名或暱稱。':configured?'瀏覽與抽午餐不用登入；留言、推薦店家、按讚或按爛前，請先用 Google 登入。':'Google 登入尚未準備好，請聯絡團長。');if(!dialog.open)dialog.showModal();if(flow)check();}
     function expire(){member=null;clearTimeout(expiryTimer);feedback('登入已到期，請重新用 Google 登入。');notify();}
     async function check(){
       clearTimeout(pollTimer);if(!flow||checking||!dialog.open)return;
