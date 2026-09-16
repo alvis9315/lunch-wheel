@@ -54,7 +54,7 @@ const legacyId=crypto.randomUUID();old.makeSheet('Reviews',[
 const before=JSON.stringify(old.sheets.get('Reviews').data[1]);
 const legacy=old.box.listReviews(rid,null).reviews[0];
 assert.equal(legacy.id,legacyId);assert.equal(legacy.authorLabel,'以前的匿名食友');assert.equal(legacy.verifiedAccount,false);
-assert.equal(old.sheets.get('Reviews').data[0].length,11);assert.equal(JSON.stringify(old.sheets.get('Reviews').data[1]),before);
+assert.equal(old.sheets.get('Reviews').data[0].length,12);assert.equal(JSON.stringify(old.sheets.get('Reviews').data[1]),before);
 assert.equal(f.held(),false);assert.equal(old.held(),false);
 const numeric=createFixture(),longSub='123456789012345678901';
 const numericMember=numeric.issueMember(longSub);

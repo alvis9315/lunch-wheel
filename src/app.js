@@ -15,7 +15,7 @@
   const typeIcons={'早餐／早午餐':'🍳','便當':'🍱','牛肉麵':'🍜','其他麵食':'🍜','小吃':'🥟','拉麵':'🍜','牛排':'🥩','火鍋':'🍲','咖哩':'🍛','義大利麵':'🍝','輕食':'🥗','咖啡／甜點':'☕','冰品':'🍧'};
   const foodIcon=p=>typeIcons[Catalog.foodTypesFor(p)[0]]||'🍽';
   const accountUI=window.createLunchAccountUI({rpc,onChange(){renderAccess();if($('detail-dialog').open&&state.detail&&state.mode==='live'){const host=$('detail-content').querySelector('.restaurant-reviews');if(host)reviewUI.mount(host,state.detail.id);}}});
-  const reviewUI=window.createLunchReviewUI({rpc,escape:e,account:accountUI});
+  const reviewUI=window.createLunchReviewUI({rpc,escape:e,account:accountUI,admin:{current:()=>adminSession&&Date.now()<adminSession.expiresAt?adminSession:null,invalidate:clearAdmin}});
   function readOrigin(){try{const raw=localStorage.getItem(ORIGIN_STORAGE);return raw?C.validateOrigin(JSON.parse(raw)):null;}catch{return null;}}
   function updateOriginView(){
     $('origin-name').textContent=state.origin.name||defaultOrigin.name;
@@ -81,6 +81,7 @@
     $('admin-button').hidden=state.mode!=='live';$('admin-button').textContent=active?'管理員登出':'管理員登入';
     $('source-label').textContent=state.mode==='local'?'我的名單':active?'現有名單 · 管理者':'現有名單';
     $('mode-banner').textContent=state.mode==='local'?'自己的名單只留在這台裝置。清除網站紀錄後，名單也會一併清除。':active?'管理者已登入，可以新增名單中的店家。登入最長 30 分鐘；網站不提供刪除功能。':'店家由管理者整理。挑選午餐，也歡迎登入分享吃過的心得。';
+    reviewUI.refreshAdmin();
   }
   function clearAdmin(){adminSession=null;clearTimeout(adminTimer);$('admin-passphrase').value='';renderAccess();}
   async function signOut(){
@@ -446,7 +447,7 @@
     if(mode!=='live'){message('「自己建立」正在調整，請先使用現有名單。');return;}
     if(state.busy)return;
     const request=++sourceRequest;sourceLoading=true;lockUI(true);state.ready=false;clearAdmin();
-    const trace=(step,extra={})=>console.info('[Lunch Club 6.4.0] shared entry', {request,step,...extra});
+    const trace=(step,extra={})=>console.info('[Lunch Club 6.5.0] shared entry', {request,step,...extra});
     const current=()=>request===sourceRequest&&sourceLoading;
     $('source-page').setAttribute('aria-busy','true');$('cancel-source').hidden=false;$('cancel-source').disabled=false;
     $('source-status').textContent=mode==='live'?'正在打開現有名單，請稍候…':'正在打開你的名單…';
@@ -531,7 +532,7 @@
     if(b.dataset.section)enterSection(b.dataset.section);
     if(b.dataset.type)chooseType(b.dataset.type);
     if(b.dataset.page)page(b.dataset.page);
-    if(b.hasAttribute('data-close'))b.closest('dialog').close();
+    if(b.hasAttribute('data-close')){const dialog=b.closest('dialog');if(dialog.id==='detail-dialog')reviewUI.dispose();dialog.close();}
     if(b.dataset.walk&&!state.busy){state.filters.walk=b.dataset.walk;setChoice('#walk-choices','walk',state.filters.walk);render();}
     if(b.dataset.weather&&!state.busy){state.filters.weather=b.dataset.weather;setChoice('#weather-choices','weather',state.filters.weather);render();}
     if(b.dataset.diet&&!state.busy){state.filters.diet=b.dataset.diet;setChoice('#diet-choices','diet',state.filters.diet);render();}
@@ -571,6 +572,7 @@
   $('origin-dialog').addEventListener('close',()=>{originRequest++;$('origin-geolocate').disabled=false;});
   ['about-button','privacy-button'].forEach(id=>$(id).addEventListener('click',()=>$('about-dialog').showModal()));
   $('detail-dialog').addEventListener('close',()=>{detailRequest++;reviewUI.dispose();});
+  $('detail-dialog').addEventListener('cancel',()=>reviewUI.dispose());
   $('result-dialog').addEventListener('close',()=>{if(!state.busy)render();});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.ready&&!state.busy&&dateKey!==C.taipeiDay()){dateKey=C.taipeiDay();render();loadWeather();message('已跨日，將依新日期的營業時間重新篩選。');}});
   boot();

@@ -1,11 +1,11 @@
 {
   "name": "lunch-club-banqiao",
-  "version": "6.4.0",
+  "version": "6.5.0",
   "private": true,
   "scripts": {
     "build": "node scripts/build.mjs",
     "check": "node --check src/core.js && node --check src/catalog.js && node --check src/reviews.js && node --check src/review-ui.js && node --check src/app.js && node --check src/account-ui.js",
-    "test": "npm run check && npm run build && node tests/catalog.test.cjs && node tests/reviews.test.cjs && node tests/preferences.test.cjs && node tests/identity.test.cjs && node tests/data-quality.test.cjs && node tests/workflow.test.cjs && node tests/food-types.test.cjs"
+    "test": "npm run check && npm run build && node tests/catalog.test.cjs && node tests/reviews.test.cjs && node tests/preferences.test.cjs && node tests/identity.test.cjs && node tests/data-quality.test.cjs && node tests/workflow.test.cjs && node tests/food-types.test.cjs && node tests/review-privacy.test.cjs"
   },
   "engines": {
     "node": ">=18"

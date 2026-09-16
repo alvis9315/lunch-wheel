@@ -1,6 +1,6 @@
 // Build prepends the shared catalog and review validators to Code.gs.
 const FREE_HEADERS_=['id','name','address','lat','lng','phone','category','budget_twd','covered_route','weekly_hours','maps_url','added_at','diet','covered_origin'];
-const REVIEW_HEADERS_=['id','restaurant_id','item','feedback','score','author_key','request_id','created_at','author_email','author_name','author_nickname'];
+const REVIEW_HEADERS_=['id','restaurant_id','item','feedback','score','author_key','request_id','created_at','author_email','author_name','author_nickname','author_display_mode'];
 const VOTE_HEADERS_=['review_id','voter_key','value','updated_at'];
 function doGet(event){if(event&&event.parameter&&(event.parameter.state||event.parameter.code||event.parameter.error))return googleCallbackPage_(event.parameter);return HtmlService.createHtmlOutputFromFile('Index').setTitle('午餐俱樂部 · 今天吃什麼').addMetaTag('viewport','width=device-width, initial-scale=1, viewport-fit=cover');}
 function getBootstrap(){
@@ -112,20 +112,32 @@ function listReviews(restaurantId,memberToken,cursor){
 }
 function addReview(input,memberToken){
   const member=requireMember_(memberToken),review=LunchReviews.validate(input),author=hash_('google:'+member.googleId);
+  const requestedDisplay=input.display===undefined?null:memberDisplay_(input.display);
   const lock=LockService.getScriptLock();lock.waitLock(10000);
   try{
     requireRestaurant_(review.restaurantId);
     const records=reviewRows_(),existing=records.find(r=>r.authorKey===author&&r.requestId===review.requestId);
     if(existing){
       if(existing.restaurantId!==review.restaurantId||existing.item!==review.item||existing.feedback!==review.feedback||existing.score!==review.score)throw Error('這則評論已送出，若要分享另一份餐點，請重新開啟評論表單。');
+      if(requestedDisplay&&(existing.authorDisplayMode!==requestedDisplay.mode||existing.authorNickname!==requestedDisplay.nickname))throw Error('這則評論已送出，請重新整理確認原本的顯示方式。');
       return {review:publicReview_(existing,voteRows_(),author),duplicate:true};
     }
     const now=Date.now(),mine=records.filter(r=>r.authorKey===author);
     if(mine.filter(r=>now-Date.parse(r.createdAt)<60000).length>=5||mine.filter(r=>now-Date.parse(r.createdAt)<86400000).length>=50)throw Error('評論送出太頻繁，請稍後再試；同一帳號每分鐘最多 5 則、24 小時最多 50 則。');
-    const profile=memberProfile_(member);
-    const record={...review,id:Utilities.getUuid(),authorKey:author,createdAt:new Date().toISOString(),authorEmail:profile.email,authorName:profile.name,authorNickname:profile.nickname};
-    communitySheet_('Reviews',REVIEW_HEADERS_).appendRow([record.id,record.restaurantId,safeCell_(record.item),safeCell_(record.feedback),record.score,author,record.requestId,record.createdAt,safeCell_(profile.email),safeCell_(profile.name),safeCell_(profile.nickname)]);
+    const profile=memberProfile_(member),display=requestedDisplay||{mode:profile.displayMode,nickname:profile.nickname};
+    const record={...review,id:Utilities.getUuid(),authorKey:author,createdAt:new Date().toISOString(),authorEmail:profile.email,authorName:profile.name,authorNickname:display.nickname,authorDisplayMode:display.mode};
+    communitySheet_('Reviews',REVIEW_HEADERS_).appendRow([record.id,record.restaurantId,safeCell_(record.item),safeCell_(record.feedback),record.score,author,record.requestId,record.createdAt,safeCell_(profile.email),safeCell_(profile.name),safeCell_(display.nickname),display.mode]);
     SpreadsheetApp.flush();return {review:publicReview_(record,[],author),duplicate:false};
+  }finally{lock.releaseLock();}
+}
+// Private identity is fetched separately and authorized on every request.
+function getReviewAuthor(reviewId,adminToken){
+  requireAdmin_(adminToken);
+  const id=LunchReviews.id(reviewId,'這則評論'),lock=LockService.getScriptLock();lock.waitLock(10000);
+  try{
+    requireAdmin_(adminToken);
+    const review=reviewRows_().find(r=>r.id===id);if(!review)throw Error('找不到這則評論，請重新整理。');
+    return {reviewId:id,publicName:reviewAuthorLabel_(review),nickname:storedNickname_(review.authorNickname),email:review.authorEmail||null};
   }finally{lock.releaseLock();}
 }
 function setReviewVote(reviewId,value,memberToken){
@@ -147,9 +159,11 @@ function communitySheet_(name,headers){
   const id=PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');if(!id)throw Error('共用試算表尚未設定。');
   const book=SpreadsheetApp.openById(id);let sheet=book.getSheetByName(name);if(!sheet)sheet=book.insertSheet(name);
   if(sheet.getLastRow()===0){sheet.appendRow(headers);sheet.setFrozenRows(1);}
-  if(name==='Reviews'){
+  if(name==='Reviews'||name==='Members'){
     const current=sheet.getRange(1,1,1,headers.length).getValues()[0];
-    if(current.slice(0,8).join('|')===headers.slice(0,8).join('|')&&current.slice(8).every(value=>!value))sheet.getRange(1,9,1,3).setValues([headers.slice(8)]);
+    const previousLengths=name==='Reviews'?[8,11]:[5];
+    const previous=previousLengths.find(n=>current.slice(0,n).join('|')===headers.slice(0,n).join('|')&&current.slice(n).every(value=>!value));
+    if(previous)sheet.getRange(1,previous+1,1,headers.length-previous).setValues([headers.slice(previous)]);
   }
   if(sheet.getRange(1,1,1,headers.length).getValues()[0].join('|')!==headers.join('|'))throw Error(name+' 表頭不正確，請擁有者確認；資料未覆寫。');
   return sheet;
@@ -162,7 +176,7 @@ function reviewRows_(){
       const restaurantId=LunchReviews.id(readCell_(r[1])),item=readCell_(r[2]).trim(),feedback=readCell_(r[3]).trim();LunchReviews.id(id);
       if(!item||item.length>100||!feedback||feedback.length>1500)throw Error('invalid review');
       const score=LunchReviews.score(LunchCatalog.blank(r[4])?NaN:LunchCatalog.number(r[4]));
-      result.push({id,restaurantId,item,feedback,score,authorKey:readCell_(r[5]),requestId:readCell_(r[6]),createdAt:dateCell_(r[7]),authorEmail:readCell_(r[8]),authorName:readCell_(r[9]),authorNickname:readCell_(r[10])});
+      result.push({id,restaurantId,item,feedback,score,authorKey:readCell_(r[5]),requestId:readCell_(r[6]),createdAt:dateCell_(r[7]),authorEmail:readCell_(r[8]),authorName:readCell_(r[9]),authorNickname:readCell_(r[10]),authorDisplayMode:readCell_(r[11])});
     }catch{invalidCount++;}
   });
   const valid=result.filter(r=>{if(counts.get(r.id)>1){invalidCount++;return false;}return true;});valid.invalidCount=invalidCount;return valid;
@@ -179,6 +193,11 @@ function voteRows_(){
 }
 function publicReview_(r,votes,voter){
   const related=votes.filter(v=>v.reviewId===r.id),mine=related.find(v=>v.voterKey===voter);
-  return {id:r.id,restaurantId:r.restaurantId,item:r.item,feedback:r.feedback,score:r.score,createdAt:r.createdAt,authorLabel:r.authorNickname||r.authorName||(r.authorEmail?'食友':'以前的匿名食友'),verifiedAccount:Boolean(r.authorEmail),likes:related.filter(v=>v.value===1).length,dislikes:related.filter(v=>v.value===-1).length,myVote:mine?mine.value:0};
+  return {id:r.id,restaurantId:r.restaurantId,item:r.item,feedback:r.feedback,score:r.score,createdAt:r.createdAt,authorLabel:reviewAuthorLabel_(r),verifiedAccount:Boolean(r.authorEmail),likes:related.filter(v=>v.value===1).length,dislikes:related.filter(v=>v.value===-1).length,myVote:mine?mine.value:0};
+}
+function reviewAuthorLabel_(review){
+  const nickname=storedNickname_(review.authorNickname);
+  // Blank mode is legacy: only an explicitly entered nickname can be public.
+  return (review.authorDisplayMode==='nickname'||!review.authorDisplayMode)&&nickname?nickname:review.authorEmail?'匿名食友':'以前的匿名食友';
 }
 function reviewSummary_(reviews){return {count:reviews.length,average:reviews.length?Math.round(reviews.reduce((sum,r)=>sum+r.score,0)/reviews.length*10)/10:null};}

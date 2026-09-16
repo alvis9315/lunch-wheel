@@ -42,8 +42,10 @@
 
 ## 驗證與範圍
 
-`npm test` 執行七組可攜測試。`tests/data-quality.test.cjs` 包含 126 組逐欄異常輸入，另驗證篩選、營業時間、座標、危險連結、重複編號、試算表原列保留、零分完整性與投票去重。`tests/workflow.test.cjs` 驗證類型銜接與缺漏分類統計；`tests/food-types.test.cjs` 驗證多餐點、去重、舊分類、混合錯誤、既有欄位儲存與評論關聯。瀏覽器以本機服務替身測試流程、獨立食評與登入操作；Google 正式部署與 iPhone Safari 仍需更新後確認。這是已列舉案例的驗證，不是保證任何格式或未來外部服務變動都不會出錯。
+`npm test` 執行八組可攜測試。`tests/data-quality.test.cjs` 包含 126 組逐欄異常輸入，另驗證篩選、營業時間、座標、危險連結、重複編號、試算表原列保留、零分完整性與投票去重。`tests/workflow.test.cjs` 驗證類型銜接與缺漏分類統計；`tests/food-types.test.cjs` 驗證多餐點、去重、舊分類、混合錯誤、既有欄位儲存與評論關聯。瀏覽器以本機服務替身測試流程、獨立食評與登入操作；Google 正式部署與 iPhone Safari 仍需更新後確認。這是已列舉案例的驗證，不是保證任何格式或未來外部服務變動都不會出錯。
 
 ## 更新
 
-下載新版 ZIP，替換 **Code.gs、Index.html**，再從原部署選「編輯 → 新版本 → 部署」。使用說明應顯示「版本 6.4.0」。已部署 v6 者不需更換 `appsscript.json`、重新授權或重匯 Excel。
+下載新版 ZIP，替換 **Code.gs、Index.html**，再從原部署選「編輯 → 新版本 → 部署」。使用說明應顯示「版本 6.5.0」。已部署 v6 者不需更換 `appsscript.json`、重新授權或重匯 Excel。
+
+- v6.5：另以 tests/review-privacy.test.cjs 驗證匿名／暱稱、公開回應不含 Google 身分、管理者權限、舊資料升級及未登入訪客的 OAuth 瀏覽器確認流程。

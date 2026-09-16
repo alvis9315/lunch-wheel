@@ -719,6 +719,7 @@ body[data-stage=type] .context,body[data-stage=type] #mode-banner,body[data-stag
 h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
 .type-card:disabled{opacity:1;background:#eeeee8;color:#777b72;border-style:dashed}.type-card:disabled>span{filter:grayscale(1);opacity:.55}.type-card:disabled:hover{transform:none;box-shadow:none}.type-card:disabled small{line-height:1.6}#type-note{background:#edf1e6;border:1px solid #dce2d4;line-height:1.9;margin:0 0 24px}.type-card strong{overflow-wrap:anywhere}.category-picker{margin:8px 0 0;padding:12px 0 0}.category-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.category-checks label{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--line);border-radius:8px;min-height:46px;cursor:pointer;color:var(--ink);font-size:12px}.category-checks label:has(input:checked){background:var(--green);border-color:var(--ink)}.detail-form .category-checks input{width:18px;height:18px;min-height:18px;padding:0;margin:0;flex:none}.restaurant-info>span{overflow-wrap:anywhere}
 @media(max-width:640px){.type-card strong{grid-column:1/-1;text-wrap:balance}.type-card b{position:absolute;top:24px;right:20px}.type-card small{grid-column:1/-1}}
+.display-choice{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;padding:0;border:0}.display-choice legend{width:100%;margin-bottom:10px;font-weight:700;font-size:14px}.display-choice label{display:flex;align-items:center;gap:8px;flex:1;min-width:120px;padding:12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}.display-choice label:has(input:checked){background:var(--green);border-color:var(--ink)}.display-choice input[type=radio]{width:18px;height:18px;min-height:18px;margin:0;flex:none}.review-admin{border-top:1px dashed var(--line);margin-top:16px;padding-top:10px}.review-author{background:var(--green);padding:12px 14px;margin-top:10px;border-radius:10px;font-size:12px;overflow-wrap:anywhere}.review-author p{margin:4px 0}.review-admin .text-button{white-space:normal;text-align:left}.review-nickname-label[hidden],#account-nickname-label[hidden]{display:none}
 .header .section-nav{margin-left:auto;margin-right:0;gap:8px;padding:5px;background:#edeee5;border-radius:12px}.section-nav button{font-size:15px;font-weight:700;min-height:46px;padding:10px 20px;border-radius:9px;white-space:nowrap}.section-nav button.active{background:var(--ink);color:white;box-shadow:0 3px 8px #253f321a}.source-options{grid-template-columns:repeat(2,minmax(0,1fr))}
 #main-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:26px 0 4px;padding:0}#main-nav .nav{display:flex;align-items:center;justify-content:center;gap:16px;min-height:86px;padding:16px 22px;border:1px solid #cdd3c7;border-radius:14px;background:var(--white);color:var(--ink);font-size:19px;text-align:left;opacity:1}#main-nav .nav:after{display:none}#main-nav .nav.active{background:var(--ink);color:white;border-color:var(--ink);box-shadow:0 5px 14px #253f321a}#main-nav .nav:disabled{background:#eeefe8;color:#73796f;border-color:#e0e2d9;opacity:1}#main-nav .step-number{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;font-size:19px;background:#e8ecdf;color:var(--ink);padding:0}#main-nav .nav.active .step-number{background:#e7b978}#main-nav .step-label{display:block;padding:0;background:none;font-size:19px;line-height:1.4}#main-nav .step-label small{display:block;font-size:11px;font-weight:400;margin-top:5px;color:inherit;opacity:.85}
 .data-notice{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;margin:18px 0;border:1px solid #dce2d4;border-radius:10px;background:#eff2e8;font-size:12px;line-height:1.8}.data-notice p{margin:0}.data-notice.has-blocked{background:#fae8dc;border-color:#efd1bd}.data-notice .text-button{flex:none;font-size:12px}.library-tools{display:flex;align-items:center;gap:18px;margin:0 0 20px}.library-tools .search-label{flex:1;margin:0;background:var(--white);min-height:50px}.library-type-label{display:flex;align-items:center;gap:10px;font-size:13px;white-space:nowrap}.library-type-label select{width:200px;min-height:50px;font-size:14px}.library-count{font-size:13px;color:var(--muted);margin:0 0 20px}.library-grid{gap:22px}.library-grid .restaurant-info{min-height:205px}.library-grid .restaurant-info strong{font-size:18px}.library-grid .restaurant-art{height:125px}.library-grid .restaurant-info>span{font-size:12px}.library-grid .restaurant-info small{font-size:12px;font-weight:700}.library-grid .restaurant-card:focus-within{outline:2px solid var(--ink);outline-offset:3px}#library-page{margin-bottom:44px}#library-page[aria-busy=true] .library-grid{opacity:.5;pointer-events:none}#library-page[aria-busy=true] #library-refresh:before{content:'';width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:loading-turn .8s linear infinite}.quality-list{padding:0;list-style:none}.quality-list li{display:flex;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding:10px 0;font-size:14px}#data-help-dialog{line-height:1.9}#data-help-dialog h3{font-size:16px;margin-top:24px}#data-help-dialog p{font-size:13px}.detail-review-jump{margin-bottom:12px}.restaurant-reviews h3{scroll-margin-top:60px}body[data-stage=library] .context,body[data-stage=library] #mode-banner{display:none}
@@ -728,7 +729,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
 
 </style>
 </head>
-<body data-version="6.4.0">
+<body data-version="6.5.0">
   <a class="skip" href="#main">跳到主要內容</a>
   <header class="header"><a class="brand" id="brand-home" href="#home" aria-label="午餐俱樂部首頁"><span class="brand-icon">✳</span><span>午餐俱樂部<small>LUNCH CLUB</small></span></a>
     <nav class="section-nav" aria-label="主要功能"><button id="lunch-entry" data-section="lunch">抽午餐</button><button id="library-entry" data-section="library">店家與食評</button></nav>
@@ -794,8 +795,8 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   <dialog id="origin-dialog" aria-labelledby="origin-title"><button class="dialog-close" data-close aria-label="關閉出發點設定">×</button><p class="eyebrow">WHERE WE BEGIN</p><h2 id="origin-title">午餐，從這裡出發。</h2><p>這是你自己的出發點。換個地方吃，距離與天氣也跟著更新。</p><form id="origin-form"><div class="detail-form"><label class="wide">出發點名稱<input id="origin-input-name" required maxlength="80" placeholder="例如：公司、家裡、板橋車站"></label><label>緯度<input id="origin-lat" type="number" step="any" min="-90" max="90" required></label><label>經度<input id="origin-lng" type="number" step="any" min="-180" max="180" required></label></div><div class="origin-actions"><button class="secondary" type="button" id="origin-pick-map">在地圖選位置</button><button class="secondary" type="button" id="origin-geolocate">使用目前位置</button></div><p id="origin-feedback" class="field-note" role="status">出發點儲存在這台裝置，只影響你自己的距離與天氣條件。</p><div class="origin-actions"><button type="submit" class="primary">使用這個出發點 ↗</button><button type="button" class="text-button" id="origin-reset">恢復預設出發點</button></div></form></dialog>
   <dialog id="admin-dialog" aria-labelledby="admin-title"><button class="dialog-close" data-close aria-label="關閉管理員登入">×</button><p class="eyebrow">FOR THE CURATOR</p><h2 id="admin-title">管理你的好店名單</h2><p>輸入管理者通關密語，即可新增名單中的店家。</p><form id="admin-form"><label class="admin-field">通關密語<input id="admin-passphrase" type="password" autocomplete="current-password" required maxlength="256"></label><p id="admin-feedback" class="field-note" role="status">登入有效 30 分鐘，關閉或重新整理頁面後需重新登入。</p><button class="primary" type="submit">登入管理員</button></form></dialog>
   <dialog id="result-dialog" aria-labelledby="result-title"><button class="dialog-close" data-close aria-label="關閉抽選結果">×</button><div class="result-art" aria-hidden="true">✦ <span>🍽</span> ✦</div><p class="eyebrow">YOUR LUNCH IS CALLING</p><h2 id="result-title">今天就吃這一家！</h2><div id="result-content"></div></dialog>
-  <dialog id="about-dialog" aria-labelledby="about-title"><button class="dialog-close" data-close aria-label="關閉使用說明">×</button><p class="eyebrow">A SEAT AT THE TABLE</p><h2 id="about-title">一起，解決午餐選擇困難。</h2><p class="field-note">版本 6.4.0</p><p>先選餐點，再篩選並勾選 2～20 間店，按「確認名單」進入轉盤。符合條件的店家每間機會相同，轉盤約 2.5 秒後揭曉。</p><h3>今天的午餐，三步決定</h3><p>先選餐點，再搭配距離、預算、葷素等條件，挑出今天想吃的店。確認後進入獨立轉盤；想換店可以返回調整。「現有名單」由管理者整理，取消勾選不會刪除店家。「自己建立」暫時不開放，之前儲存的名單會保留。</p><h3>讓食友認識你</h3><p>用 Google 帳戶登入後，就能分享品項、回饋與 -100～200 分的評價。暱稱可以不填，沒填時會顯示 Google 名稱。完整信箱只供名單管理者查閱，不會出現在公開評論。</p><p>每個帳號都能對一則評論按讚或按爛，改變心意時可改票或取消。評論分數只供參考，不會改變抽中的機會。以前的匿名評論會保留。</p><h3>營業與路線提醒</h3><p>營業時間、電話和預算由名單管理者整理，沒有填寫的資訊不會自動當成符合條件。臨時公休或假日營業可能不同，出發前請向店家確認。</p><p>地圖顯示的是直線距離，實際走路可能更遠。下雨時能否全程避雨，也需要從你的出發點重新確認。天氣預報只供參考，可以自己切換天氣條件。</p><h3>地圖與天氣來源</h3><p>地圖來自 OpenStreetMap，天氣來自 Open-Meteo。Google Maps 可另開分頁找店與導航。這些服務暫時無法使用時，仍可從已有名單挑選午餐。</p><p><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 隱私權政策</a></p></dialog>
-  <dialog id="account-dialog" aria-labelledby="account-title"><button class="dialog-close" data-close aria-label="關閉帳號設定">×</button><p class="eyebrow">HELLO, FOOD FRIEND.</p><h2 id="account-title">讓食友認識你。</h2><div id="account-login-panel"><p>用 Google 帳戶登入，留下你的用餐心得。信箱只供名單管理者查閱，其他食友會看到你的暱稱或 Google 名稱。</p><button id="account-google-login" class="primary" type="button">使用 Google 帳戶登入</button></div><div id="account-pending" hidden><p>如果沒有開啟新分頁，請按下方連結。</p><a id="account-login-link" class="secondary" target="_blank" rel="noopener noreferrer">前往 Google 登入 ↗</a><div class="account-actions"><button id="account-check" class="text-button" type="button">我已完成登入</button><button id="account-cancel" class="text-button" type="button">取消登入</button></div></div><form id="account-profile" hidden><p class="field-note">Google 名稱：<strong id="account-name"></strong><br>你的帳號：<span id="account-email"></span></p><label class="admin-field">暱稱（選填）<input id="account-nickname" maxlength="32" autocomplete="nickname" placeholder="食友要怎麼稱呼你？"></label><div class="account-actions"><button id="account-save" class="primary" type="submit">儲存暱稱</button><button id="account-logout" class="text-button" type="button">登出</button></div></form><p id="account-feedback" class="field-note" role="status"></p></dialog>
+  <dialog id="about-dialog" aria-labelledby="about-title"><button class="dialog-close" data-close aria-label="關閉使用說明">×</button><p class="eyebrow">A SEAT AT THE TABLE</p><h2 id="about-title">一起，解決午餐選擇困難。</h2><p class="field-note">版本 6.5.0</p><p>先選餐點，再篩選並勾選 2～20 間店，按「確認名單」進入轉盤。符合條件的店家每間機會相同，轉盤約 2.5 秒後揭曉。</p><h3>今天的午餐，三步決定</h3><p>先選餐點，再搭配距離、預算、葷素等條件，挑出今天想吃的店。確認後進入獨立轉盤；想換店可以返回調整。「現有名單」由管理者整理，取消勾選不會刪除店家。「自己建立」暫時不開放，之前儲存的名單會保留。</p><h3>讓食友認識你</h3><p>瀏覽店家、看心得與抽午餐不用登入。用 Google 帳戶登入後，就能分享品項、回饋與 -100～200 分的評價。每則評論可選匿名或自訂暱稱；匿名顯示「匿名食友」，選暱稱時需填名稱。Google 名稱和帳號不會自動公開；匿名只對其他食友隱藏，管理者仍可查看帳號與留言時填寫的暱稱。</p><p>每個帳號都能對一則評論按讚或按爛，改變心意時可改票或取消。評論分數只供參考，不會改變抽中的機會。以前的匿名評論會保留。</p><h3>營業與路線提醒</h3><p>營業時間、電話和預算由名單管理者整理，沒有填寫的資訊不會自動當成符合條件。臨時公休或假日營業可能不同，出發前請向店家確認。</p><p>地圖顯示的是直線距離，實際走路可能更遠。下雨時能否全程避雨，也需要從你的出發點重新確認。天氣預報只供參考，可以自己切換天氣條件。</p><h3>地圖與天氣來源</h3><p>地圖來自 OpenStreetMap，天氣來自 Open-Meteo。Google Maps 可另開分頁找店與導航。這些服務暫時無法使用時，仍可從已有名單挑選午餐。</p><p><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 隱私權政策</a></p></dialog>
+  <dialog id="account-dialog" aria-labelledby="account-title"><button class="dialog-close" data-close aria-label="關閉帳號設定">×</button><p class="eyebrow">HELLO, FOOD FRIEND.</p><h2 id="account-title">讓食友認識你。</h2><div id="account-login-panel"><p>用 Google 帳戶登入，留下你的用餐心得。你可以選擇匿名或自訂暱稱。Google 帳號只供名單管理者查閱，其他食友不會看到。</p><button id="account-google-login" class="primary" type="button">使用 Google 帳戶登入</button></div><div id="account-pending" hidden><p>如果沒有開啟新分頁，請按下方連結。</p><a id="account-login-link" class="secondary" target="_blank" rel="noopener noreferrer">前往 Google 登入 ↗</a><div class="account-actions"><button id="account-check" class="text-button" type="button">我已完成登入</button><button id="account-cancel" class="text-button" type="button">取消登入</button></div></div><form id="account-profile" hidden><p class="field-note">Google 名稱：<strong id="account-name"></strong><br>你的帳號：<span id="account-email"></span></p><fieldset class="display-choice"><legend>新評論預設怎麼顯示？</legend><label><input id="account-mode-anonymous" type="radio" name="account-display" value="anonymous" checked> 匿名</label><label><input id="account-mode-nickname" type="radio" name="account-display" value="nickname"> 自訂暱稱</label></fieldset><label id="account-nickname-label" class="admin-field" hidden>顯示的暱稱<input id="account-nickname" maxlength="32" autocomplete="nickname" placeholder="食友要怎麼稱呼你？"></label><p class="field-note">選擇匿名時，其他食友只會看到「匿名食友」。管理者仍可查看帳號與留言時填寫的暱稱。每則評論可另選顯示方式，既有評論不會跟著更名。</p><div class="account-actions"><button id="account-save" class="primary" type="submit">儲存顯示方式</button><button id="account-logout" class="text-button" type="button">登出</button></div></form><p id="account-feedback" class="field-note" role="status"></p></dialog>
   <div id="toast" class="toast" role="status" hidden></div>
   <script>
 /* @preserve
@@ -1058,53 +1059,66 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   root.createLunchAccountUI=function({rpc,onChange}){
     const $=id=>document.getElementById(id),dialog=$('account-dialog');
     let member=null,configured=false,flow=null,pollTimer=null,checking=false,epoch=0,expiryTimer=null;
+    const flowKey=state=>'lunch-club-signin-'+state;
+    function clearFlow(){if(flow)try{localStorage.removeItem(flowKey(flow.state));}catch{}flow=null;}
+    function syncDisplay(){const named=$('account-mode-nickname').checked;$('account-nickname-label').hidden=!named;$('account-nickname').disabled=!named;$('account-nickname').required=named;}
+    function displayValue(){return {mode:$('account-mode-nickname').checked?'nickname':'anonymous',nickname:$('account-nickname').value};}
     function feedback(text){$('account-feedback').textContent=text;}
     function render(){
       $('account-login-panel').hidden=Boolean(member);$('account-profile').hidden=!member;
       $('account-google-login').disabled=!configured;
-      if(member){$('account-email').textContent=member.email;$('account-name').textContent=member.name;$('account-nickname').value=member.nickname||'';}
+      if(member){$('account-email').textContent=member.email;$('account-name').textContent=member.name;$('account-nickname').value=member.nickname||'';$('account-mode-nickname').checked=member.displayMode==='nickname';$('account-mode-anonymous').checked=member.displayMode!=='nickname';syncDisplay();}
+      else{$('account-email').textContent='';$('account-name').textContent='';$('account-nickname').value='';}
       $('account-pending').hidden=!flow;
     }
     function notify(){render();onChange?.();}
-    function configure(value){configured=Boolean(value);render();}
-    function open(){render();feedback(member?'暱稱會顯示在之後的新評論；留空則使用 Google 名稱。':configured?'用 Google 登入後，就能分享心得、按讚或按爛。':'Google 登入尚未準備好，請聯絡名單管理者。');if(!dialog.open)dialog.showModal();if(flow)check();}
+    function configure(value){
+      configured=Boolean(value);
+      try{Object.keys(localStorage).filter(key=>key.startsWith('lunch-club-signin-')).forEach(key=>{let saved;try{saved=JSON.parse(localStorage.getItem(key));}catch{}if(!saved||Date.now()>=saved.expiresAt)localStorage.removeItem(key);});}catch{}
+      render();
+    }
+    function open(){render();feedback(member?'這是新評論的預設顯示方式；每次留言都能另選匿名或暱稱。':configured?'瀏覽與抽午餐不用登入；留言、按讚或按爛前，請先用 Google 登入。':'Google 登入尚未準備好，請聯絡名單管理者。');if(!dialog.open)dialog.showModal();if(flow)check();}
     function expire(){member=null;clearTimeout(expiryTimer);feedback('登入已到期，請重新用 Google 登入。');notify();}
     async function check(){
       clearTimeout(pollTimer);if(!flow||checking||!dialog.open)return;
-      if(Date.now()>=flow.expiresAt){flow=null;feedback('這次登入已逾時，請重新開始。');render();return;}
+      if(Date.now()>=flow.expiresAt){clearFlow();feedback('這次登入已逾時，請重新開始。');render();return;}
       checking=true;const request=epoch,attempt=flow;
       try{
-        const result=await rpc('getGoogleSignInResult',attempt.state,attempt.pollToken);
+        const result=await rpc('getGoogleSignInResult',attempt.state,attempt.pollToken,attempt.proof);
         if(request!==epoch)return;
         if(result.status==='done'){
-          member=result.member;flow=null;epoch++;
+          member=result.member;clearFlow();epoch++;
           clearTimeout(expiryTimer);expiryTimer=setTimeout(expire,Math.max(0,member.expiresAt-Date.now()));
-          feedback('登入成功！可以先設定暱稱，或直接回去分享心得。');notify();
+          feedback('登入成功！可以選擇匿名或暱稱，再回去分享心得。');notify();
         }
-      }catch(err){if(request===epoch){flow=null;feedback(err.message);render();}}
+      }catch(err){if(request===epoch){clearFlow();feedback(err.message);render();}}
       finally{checking=false;if(flow&&dialog.open&&!document.hidden)pollTimer=setTimeout(check,4000);}
     }
     async function signIn(){
       if(!configured)return;
-      const request=++epoch;flow=null;clearTimeout(pollTimer);
+      const request=++epoch;clearFlow();clearTimeout(pollTimer);
       // Open immediately on the click so Safari can recognize the user gesture.
       const popup=window.open('about:blank','_blank');
       if(popup)try{popup.opener=null;}catch{}
       $('account-google-login').disabled=true;feedback('正在開啟 Google 登入…');
       try{
-        const result=await rpc('beginGoogleSignIn');if(request!==epoch){popup?.close();return;}
-        flow=result;$('account-login-link').href=result.url;
+        const proof=Array.from(crypto.getRandomValues(new Uint8Array(36)),b=>b.toString(16).padStart(2,'0')).join('');
+        const result=await rpc('beginGoogleSignIn',proof);if(request!==epoch){popup?.close();return;}
+        // Store only a ten-minute browser proof; never persist identity or member tokens.
+        try{localStorage.setItem(flowKey(result.state),JSON.stringify({proof,expiresAt:result.expiresAt}));}catch{throw Error('瀏覽器未允許暫存登入確認資訊，請允許此網站儲存資料後再試。仍可直接瀏覽與抽午餐。');}
+        flow={...result,proof};$('account-login-link').href=result.url;
         if(popup)popup.location.replace(result.url);
         feedback('請在 Google 分頁完成登入，再回到這裡。');render();check();
       }catch(err){popup?.close();feedback(err.message);render();}
     }
     $('account-google-login').addEventListener('click',signIn);
     $('account-check').addEventListener('click',check);
-    $('account-cancel').addEventListener('click',()=>{epoch++;flow=null;clearTimeout(pollTimer);render();feedback('已取消這次登入。');});
+    $('account-cancel').addEventListener('click',()=>{epoch++;clearFlow();clearTimeout(pollTimer);render();feedback('已取消這次登入。');});
+    for(const id of ['account-mode-anonymous','account-mode-nickname'])$(id).addEventListener('change',syncDisplay);
     $('account-profile').addEventListener('submit',async event=>{
       event.preventDefault();if(!member)return;const current=member,button=$('account-save');button.disabled=true;
-      try{const profile=await rpc('saveMemberNickname',$('account-nickname').value,current.token);if(member!==current)return;member={...current,...profile};notify();feedback('暱稱已儲存。');}
-      catch(err){feedback(err.message);}finally{button.disabled=false;}
+      try{const profile=await rpc('saveMemberDisplay',displayValue(),current.token);if(member!==current)return;member={...current,...profile};notify();feedback('顯示方式已儲存。');}
+      catch(err){if(err.code==='MEMBER_REQUIRED')expire();feedback(err.message);}finally{button.disabled=false;}
     });
     $('account-logout').addEventListener('click',async()=>{
       const current=member;member=null;clearTimeout(expiryTimer);notify();feedback('已登出午餐俱樂部。');
@@ -1112,35 +1126,41 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     });
     dialog.addEventListener('close',()=>clearTimeout(pollTimer));
     document.addEventListener('visibilitychange',()=>{if(!document.hidden&&flow&&dialog.open)check();});
-    return {configure,open,current:()=>member,invalidate:expire,async nickname(value){if(!member)throw Error('請先用 Google 登入。');const current=member,profile=await rpc('saveMemberNickname',value,current.token);if(member!==current)throw Error('登入已變更，請重新送出。');member={...current,...profile};return member;}};
+    return {configure,open,current:()=>member,invalidate:expire};
   };
 })(typeof globalThis!=='undefined'?globalThis:this);
 
 (function(root){
   'use strict';
-  root.createLunchReviewUI=function({rpc,escape:e,account}){
+  root.createLunchReviewUI=function({rpc,escape:e,account,admin}){
     const R=root.LunchReviews,drafts=new Map();
-    let generation=0;
-    function dispose(){generation++;}
+    let generation=0,refreshAdminView=null;
+    function clearPrivateView(){document.querySelectorAll('.review-admin').forEach(node=>node.remove());}
+    function dispose(){generation++;refreshAdminView=null;clearPrivateView();}
     function mount(host,restaurantId){
       const version=++generation,token=account.current()?.token||null;let reviews=[],cursor=null,loading=false,posting=false,voting=false,loadEpoch=0;
       const alive=()=>version===generation&&host.isConnected;
       const find=selector=>host.querySelector(selector);
       const draft=drafts.get(restaurantId)||{item:'',feedback:'',score:'60',requestId:null};drafts.set(restaurantId,draft);
+      const member=account.current();
+      if(draft.memberToken!==token){draft.memberToken=token;draft.mode=member?.displayMode||'anonymous';draft.nickname=member?.nickname||'';}
       host.innerHTML='<div class="review-heading"><div><p class="eyebrow">NO FILTER. JUST FLAVOR.</p><h3>吃過的人，出來說兩句。</h3></div><span class="review-stamp" aria-hidden="true">食後<br>有感</span></div>'+
         '<div class="review-summary" role="status">正在讀取大家的真心話…</div><p class="field-note">本站食友的品項心得，分數不是 Google 評分。符合條件的每間店，抽中的機會都相同。</p>'+
         '<details class="review-compose"><summary>＋ 我吃過，讓我說</summary><form class="review-form">'+
-        '<div class="review-identity">'+(account.current()?'<p>以 '+e(account.current().name)+' 的帳號留言</p><label>暱稱（選填）<input name="nickname" maxlength="32" placeholder="食友要怎麼稱呼你？" value="'+e(account.current().nickname||'')+'"></label>':'<p>登入後，讓大家認識這位食友。</p><button type="button" class="secondary review-login">使用 Google 帳戶登入</button>')+'</div>'+
+        '<div class="review-identity">'+(member?'<fieldset class="display-choice"><legend>這則評論怎麼顯示？</legend><label><input type="radio" name="displayMode" value="anonymous" '+(draft.mode!=='nickname'?'checked':'')+'> 匿名</label><label><input type="radio" name="displayMode" value="nickname" '+(draft.mode==='nickname'?'checked':'')+'> 自訂暱稱</label></fieldset><label class="review-nickname-label">顯示的暱稱<input name="nickname" maxlength="32" placeholder="食友要怎麼稱呼你？" value="'+e(draft.nickname)+'"></label><p class="field-note">匿名時，其他食友只會看到「匿名食友」。名單管理者仍可查看你的 Google 帳號與這則留言填寫的暱稱。</p>':'<p>瀏覽心得不用登入；想分享、按讚或按爛時再登入即可。</p><button type="button" class="secondary review-login">使用 Google 帳戶登入</button>')+'</div>'+
         '<label>01 · 品項<input name="item" required maxlength="100" placeholder="例如：雞腿飯" value="'+e(draft.item)+'"></label>'+
         '<label>02 · 回饋<textarea name="feedback" required maxlength="1500" rows="3" placeholder="便當菜不好吃，雞腿太小隻很盤">'+e(draft.feedback)+'</textarea><small class="review-char-count"></small></label>'+
         '<fieldset class="review-score-editor"><legend>03 · 分數</legend><div class="score-readout"><span class="score-mood" aria-live="polite"></span><label class="score-number-label">直接輸入<input name="score" type="number" min="-100" max="200" step="1" required value="'+e(draft.score)+'" aria-label="直接輸入分數"></label></div>'+
         '<input class="score-slider" type="range" min="-100" max="200" step="1" value="60" aria-label="評分滑桿"><div class="score-ticks"><span>−100 · 退貨</span><span>0 · 難吃</span><span>100 · 頂上人間</span><span>200 · 封神</span></div>'+
         '<details class="score-guide"><summary>看完整嘴砲分級表</summary><ul>'+R.bands.map(b=>'<li><b>'+b.min+(b.max===b.min?'':'～'+b.max)+'</b><span>'+e(b.label)+'</span></li>').join('')+'</ul></details></fieldset>'+
-        '<p class="field-note">品項、回饋與分數必填；暱稱選填。評論會顯示暱稱或 Google 名稱，完整信箱僅供名單管理者查閱。</p><button class="primary review-submit" type="submit">送出這口真心話 ↗</button></form></details>'+
+        '<p class="field-note">品項、回饋與分數必填。選擇自訂暱稱時需填寫名稱；Google 名稱和帳號不會自動顯示給其他食友。</p><button class="primary review-submit" type="submit">送出這口真心話 ↗</button></form></details>'+
         '<p class="review-feedback" role="status" hidden></p><div class="review-list-heading"><h4>食友實話區</h4><button type="button" class="text-button review-refresh">重新整理評論</button></div>'+
         '<p class="field-note">最新評論在前。對這則回饋按讚或爛；同一帳號可改票，再按一次取消。'+'</p><div class="review-list" aria-live="polite"></div><button type="button" class="secondary review-more" hidden>更多真心話 ↓</button>';
       find('.review-login')?.addEventListener('click',()=>account.open());
+      find('.review-compose>summary').addEventListener('click',event=>{if(!account.current()){event.preventDefault();draft.wantsCompose=true;account.open();}});
+      if(member&&draft.wantsCompose){find('.review-compose').open=true;draft.wantsCompose=false;}
       const form=find('.review-form'),number=form.elements.namedItem('score'),slider=find('.score-slider');
+      function syncDisplay(){const input=form.elements.namedItem('nickname');if(!input)return;const named=form.elements.namedItem('displayMode').value==='nickname';input.required=named;input.disabled=!named||posting;find('.review-nickname-label').hidden=!named;}
       function notice(text,error=false){if(!alive())return;const node=find('.review-feedback');node.textContent=text;node.hidden=false;node.classList.toggle('error',error);}
       function syncScore(){
         const value=number.value===''?NaN:Number(number.value),band=Number.isInteger(value)?R.band(value):null;
@@ -1149,17 +1169,31 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
         if(band){slider.value=String(value);slider.setAttribute('aria-valuetext',value+' 分，'+band.label);}
         find('.review-char-count').textContent=form.elements.namedItem('feedback').value.length+' / 1500';
       }
-      function saveDraft(){draft.item=form.elements.namedItem('item').value;draft.feedback=form.elements.namedItem('feedback').value;draft.score=number.value;draft.requestId=null;syncScore();}
-      form.addEventListener('input',event=>{if(event.target===slider)number.value=slider.value;saveDraft();});syncScore();
+      function saveDraft(){draft.item=form.elements.namedItem('item').value;draft.feedback=form.elements.namedItem('feedback').value;draft.score=number.value;draft.mode=form.elements.namedItem('displayMode')?.value||'anonymous';draft.nickname=form.elements.namedItem('nickname')?.value||'';draft.requestId=null;syncScore();syncDisplay();}
+      form.addEventListener('input',event=>{if(event.target===slider)number.value=slider.value;saveDraft();});syncScore();syncDisplay();
       function dateText(iso){const date=new Date(iso);return Number.isNaN(date.getTime())?'時間未提供':new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(date);}
       function cards(){
         if(!alive())return;
         find('.review-list').innerHTML=reviews.map(r=>{
           const band=R.band(r.score),label=band?.label||'分數待確認';
-          return '<article class="review-card" data-review="'+e(r.id)+'"><div class="review-card-top"><h4>'+e(r.item)+'</h4><div class="review-score" data-tone="'+e(band?.tone||'neutral')+'"><strong>'+r.score+'<small> 分</small></strong><span>'+e(label)+'</span></div></div><p class="review-body">'+e(r.feedback)+'</p><div class="review-card-bottom"><small>'+e(r.authorLabel||'以前的匿名食友')+' · '+e(dateText(r.createdAt))+'</small><div class="review-votes" aria-label="評論投票"><button type="button" data-vote="1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===1)+'" aria-label="讚這則評論'+(r.myVote===1?'，再按取消':'')+'">👍 讚 <b>'+r.likes+'</b></button><button type="button" data-vote="-1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===-1)+'" aria-label="爛這則評論'+(r.myVote===-1?'，再按取消':'')+'">👎 爛 <b>'+r.dislikes+'</b></button></div></div></article>';
+          return '<article class="review-card" data-review="'+e(r.id)+'"><div class="review-card-top"><h4>'+e(r.item)+'</h4><div class="review-score" data-tone="'+e(band?.tone||'neutral')+'"><strong>'+r.score+'<small> 分</small></strong><span>'+e(label)+'</span></div></div><p class="review-body">'+e(r.feedback)+'</p><div class="review-card-bottom"><small>'+e(r.authorLabel||'匿名食友')+' · '+e(dateText(r.createdAt))+'</small><div class="review-votes" aria-label="評論投票"><button type="button" data-vote="1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===1)+'" aria-label="讚這則評論'+(r.myVote===1?'，再按取消':'')+'">👍 讚 <b>'+r.likes+'</b></button><button type="button" data-vote="-1" data-id="'+e(r.id)+'" aria-pressed="'+(r.myVote===-1)+'" aria-label="爛這則評論'+(r.myVote===-1?'，再按取消':'')+'">👎 爛 <b>'+r.dislikes+'</b></button></div></div>'+(admin?.current()?'<section class="review-admin"><button type="button" class="text-button" data-author="'+e(r.id)+'" aria-expanded="false">查看留言者帳號（管理者）</button><div class="review-author" hidden></div></section>':'')+'</article>';
         }).join('')||'<div class="empty-state">這間還沒有評論。<br>吃過什麼？你的第一口情報很重要。</div>';
         find('.review-more').hidden=!cursor;
       }
+      refreshAdminView=()=>{if(alive())cards();};
+      find('.review-list').addEventListener('click',async event=>{
+        const button=event.target.closest('[data-author]');if(!button||button.disabled)return;
+        const current=admin?.current(),panel=button.nextElementSibling;if(!current)return;
+        if(!panel.hidden){panel.replaceChildren();panel.hidden=true;button.setAttribute('aria-expanded','false');return;}
+        button.disabled=true;button.textContent='正在確認留言者…';
+        try{
+          const author=await rpc('getReviewAuthor',button.dataset.author,current.token);
+          if(!alive()||!button.isConnected||admin.current()?.token!==current.token)return;
+          panel.innerHTML='<p><strong>僅管理者可見</strong></p><p>公開名稱：'+e(author.publicName)+'</p><p>填寫暱稱：'+e(author.nickname||'未填寫')+'</p><p>Google 帳號：'+e(author.email||'舊匿名評論，未留存帳號')+'</p>';
+          panel.hidden=false;button.setAttribute('aria-expanded','true');
+        }catch(err){if(err.code==='AUTH_REQUIRED')admin.invalidate();notice(err.message,true);}
+        finally{if(button.isConnected){button.disabled=false;button.textContent='查看留言者帳號（管理者）';}}
+      });
       async function load(more=false){
         if(!alive()||loading||voting)return;loading=true;const epoch=++loadEpoch;
         find('.review-refresh').disabled=true;find('.review-more').disabled=true;
@@ -1177,17 +1211,16 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
       }
       form.addEventListener('submit',async event=>{
         event.preventDefault();if(posting||loading||voting||!form.reportValidity())return;if(!account.current()){account.open();return;}
-        let input;try{if(number.value==='')throw Error('請輸入分數。');input=R.validate({restaurantId,item:form.elements.namedItem('item').value,feedback:form.elements.namedItem('feedback').value,score:Number(number.value),requestId:draft.requestId||(draft.requestId=crypto.randomUUID())});}catch(err){notice(err.message,true);return;}
+        let input;try{if(number.value==='')throw Error('請輸入分數。');input={...R.validate({restaurantId,item:form.elements.namedItem('item').value,feedback:form.elements.namedItem('feedback').value,score:Number(number.value),requestId:draft.requestId||(draft.requestId=crypto.randomUUID())}),display:{mode:form.elements.namedItem('displayMode').value,nickname:form.elements.namedItem('nickname').value}};}catch(err){notice(err.message,true);return;}
         posting=true;form.querySelectorAll('input,textarea,button').forEach(node=>node.disabled=true);find('.review-submit').textContent='正在送出…';
         try{
-          const nickname=form.elements.namedItem('nickname')?.value||'';if(nickname!==(account.current()?.nickname||''))await account.nickname(nickname);
           const result=await rpc('addReview',input,account.current()?.token);
           if(draft.requestId===input.requestId){draft.item='';draft.feedback='';draft.score='60';draft.requestId=null;}
           if(!alive())return;
           form.elements.namedItem('item').value=draft.item;form.elements.namedItem('feedback').value=draft.feedback;number.value=draft.score;syncScore();find('.review-compose').open=false;
           notice(result.duplicate?'這則已送出，沒有重複新增。':'真心話已收下，謝謝你幫大家探路。');await load();
         }catch(err){if(err.code==='MEMBER_REQUIRED')account.invalidate();notice(err.message,true);}
-        finally{if(alive()){posting=false;form.querySelectorAll('input,textarea,button').forEach(node=>node.disabled=false);find('.review-submit').textContent='送出這口真心話 ↗';}}
+        finally{if(alive()){posting=false;form.querySelectorAll('input,textarea,button').forEach(node=>node.disabled=false);syncDisplay();find('.review-submit').textContent='送出這口真心話 ↗';}}
       });
       find('.review-list').addEventListener('click',async event=>{
         const button=event.target.closest('button[data-vote]');if(!button||button.disabled||loading||voting||posting)return;if(!account.current()){account.open();return;}
@@ -1201,7 +1234,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
       });
       find('.review-refresh').addEventListener('click',()=>{if(!posting)load();});find('.review-more').addEventListener('click',()=>{if(!posting)load(true);});load();
     }
-    return {mount,dispose};
+    return {mount,dispose,refreshAdmin(){clearPrivateView();refreshAdminView?.();}};
   };
 })(window);
 
@@ -1222,7 +1255,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   const typeIcons={'早餐／早午餐':'🍳','便當':'🍱','牛肉麵':'🍜','其他麵食':'🍜','小吃':'🥟','拉麵':'🍜','牛排':'🥩','火鍋':'🍲','咖哩':'🍛','義大利麵':'🍝','輕食':'🥗','咖啡／甜點':'☕','冰品':'🍧'};
   const foodIcon=p=>typeIcons[Catalog.foodTypesFor(p)[0]]||'🍽';
   const accountUI=window.createLunchAccountUI({rpc,onChange(){renderAccess();if($('detail-dialog').open&&state.detail&&state.mode==='live'){const host=$('detail-content').querySelector('.restaurant-reviews');if(host)reviewUI.mount(host,state.detail.id);}}});
-  const reviewUI=window.createLunchReviewUI({rpc,escape:e,account:accountUI});
+  const reviewUI=window.createLunchReviewUI({rpc,escape:e,account:accountUI,admin:{current:()=>adminSession&&Date.now()<adminSession.expiresAt?adminSession:null,invalidate:clearAdmin}});
   function readOrigin(){try{const raw=localStorage.getItem(ORIGIN_STORAGE);return raw?C.validateOrigin(JSON.parse(raw)):null;}catch{return null;}}
   function updateOriginView(){
     $('origin-name').textContent=state.origin.name||defaultOrigin.name;
@@ -1288,6 +1321,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     $('admin-button').hidden=state.mode!=='live';$('admin-button').textContent=active?'管理員登出':'管理員登入';
     $('source-label').textContent=state.mode==='local'?'我的名單':active?'現有名單 · 管理者':'現有名單';
     $('mode-banner').textContent=state.mode==='local'?'自己的名單只留在這台裝置。清除網站紀錄後，名單也會一併清除。':active?'管理者已登入，可以新增名單中的店家。登入最長 30 分鐘；網站不提供刪除功能。':'店家由管理者整理。挑選午餐，也歡迎登入分享吃過的心得。';
+    reviewUI.refreshAdmin();
   }
   function clearAdmin(){adminSession=null;clearTimeout(adminTimer);$('admin-passphrase').value='';renderAccess();}
   async function signOut(){
@@ -1653,7 +1687,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     if(mode!=='live'){message('「自己建立」正在調整，請先使用現有名單。');return;}
     if(state.busy)return;
     const request=++sourceRequest;sourceLoading=true;lockUI(true);state.ready=false;clearAdmin();
-    const trace=(step,extra={})=>console.info('[Lunch Club 6.4.0] shared entry', {request,step,...extra});
+    const trace=(step,extra={})=>console.info('[Lunch Club 6.5.0] shared entry', {request,step,...extra});
     const current=()=>request===sourceRequest&&sourceLoading;
     $('source-page').setAttribute('aria-busy','true');$('cancel-source').hidden=false;$('cancel-source').disabled=false;
     $('source-status').textContent=mode==='live'?'正在打開現有名單，請稍候…':'正在打開你的名單…';
@@ -1738,7 +1772,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
     if(b.dataset.section)enterSection(b.dataset.section);
     if(b.dataset.type)chooseType(b.dataset.type);
     if(b.dataset.page)page(b.dataset.page);
-    if(b.hasAttribute('data-close'))b.closest('dialog').close();
+    if(b.hasAttribute('data-close')){const dialog=b.closest('dialog');if(dialog.id==='detail-dialog')reviewUI.dispose();dialog.close();}
     if(b.dataset.walk&&!state.busy){state.filters.walk=b.dataset.walk;setChoice('#walk-choices','walk',state.filters.walk);render();}
     if(b.dataset.weather&&!state.busy){state.filters.weather=b.dataset.weather;setChoice('#weather-choices','weather',state.filters.weather);render();}
     if(b.dataset.diet&&!state.busy){state.filters.diet=b.dataset.diet;setChoice('#diet-choices','diet',state.filters.diet);render();}
@@ -1778,6 +1812,7 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
   $('origin-dialog').addEventListener('close',()=>{originRequest++;$('origin-geolocate').disabled=false;});
   ['about-button','privacy-button'].forEach(id=>$(id).addEventListener('click',()=>$('about-dialog').showModal()));
   $('detail-dialog').addEventListener('close',()=>{detailRequest++;reviewUI.dispose();});
+  $('detail-dialog').addEventListener('cancel',()=>reviewUI.dispose());
   $('result-dialog').addEventListener('close',()=>{if(!state.busy)render();});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.ready&&!state.busy&&dateKey!==C.taipeiDay()){dateKey=C.taipeiDay();render();loadWeather();message('已跨日，將依新日期的營業時間重新篩選。');}});
   boot();

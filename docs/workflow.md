@@ -7,7 +7,7 @@
 1. 下載最新版 `Lunch-Club-Apps-Script.zip` 並解壓。
 2. 用其中的 **Code.gs 全文**取代 Apps Script 的程式碼；用 **Index.html 全文**取代 HTML 檔 `Index`。
 3. 儲存後，選「部署 → 管理部署 → 編輯 → 新版本 → 部署」。保持原部署網址、試算表及指令碼屬性。這次沒有新增權限，`appsscript.json` 不需更動。
-4. 重新開啟 `/exec`；使用說明應顯示 **版本 6.4.0**。
+4. 重新開啟 `/exec`；使用說明應顯示 **版本 6.5.0**。
 
 只更新 GitHub 不會更新已部署的網站。請複製 ZIP 或 `dist/Code.gs` 的完整內容；不要單獨使用 `apps-script/Code.gs`。
 

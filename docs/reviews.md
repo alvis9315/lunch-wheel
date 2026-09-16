@@ -6,7 +6,7 @@
 
 - 三欄必填：品項 1～100 字、回饋 1～1500 字、-100～200 整數分數。
 - 分數可拖滑桿或直接輸入，兩者連動，並即時顯示嘴砲分級。
-- 評論及投票須先用 Google 帳號登入；暱稱選填，留空顯示 Google 名稱。管理密語只授權新增店家，兩種權限分開驗證。
+- 評論及投票須先用 Google 帳號登入；每則評論選匿名或自訂暱稱，Google 名稱不自動公開。管理密語授權新增店家及查看留言者帳號，兩種登入分開驗證。詳見 [匿名與公開瀏覽](review-privacy.md)。
 - 最新評論在前，每次載入 20 則；可以繼續載入。
 - 店家詳情顯示全部品項心得的平均分數與筆數。平均分數不是 Google 評分，也不是按讚加權；沒有評論時顯示尚未有人評分，不當作 0 分。
 - 讚／爛是對評論的回應。每個 Google 帳號對每則評論最多一個狀態：讚、爛、未投票；可切換，再按同一個按鈕取消。
@@ -25,7 +25,7 @@
 
 ### Reviews：品項評論
 
-`id | restaurant_id | item | feedback | score | author_key | request_id | created_at | author_email | author_name | author_nickname`
+`id | restaurant_id | item | feedback | score | author_key | request_id | created_at | author_email | author_name | author_nickname | author_display_mode`
 
 | 欄位 | 用途 |
 |---|---|
@@ -39,7 +39,8 @@
 | created_at | 伺服器產生的 ISO 時間；網站以台北時區顯示 |
 | author_email | 經 Google 驗證的完整信箱，只給管理者查看 |
 | author_name | 留言當時的 Google 名稱 |
-| author_nickname | 留言當時的選填暱稱 |
+| author_nickname | 留言當時填寫的暱稱；匿名時只限管理者查看 |
+| author_display_mode | anonymous＝匿名、nickname＝自訂暱稱；舊列留白保留有效自訂暱稱，其餘匿名 |
 
 ### ReviewVotes：評論投票
 
@@ -53,9 +54,9 @@
 
 ### Members：Google 帳號
 
-`google_id | email | google_name | nickname | updated_at`
+`google_id | email | google_name | nickname | updated_at | display_mode`
 
-第一次成功登入時自動建立。google_id 加上 `google:` 前綴保存為文字，避免試算表把長數字四捨五入。信箱及名稱由 Google 確認，暱稱選填；不要公開分享此試算表。
+第一次成功登入時自動建立。google_id 加上 `google:` 前綴保存為文字，避免試算表把長數字四捨五入。信箱及名稱由 Google 確認，display_mode 保存新評論的預設匿名／暱稱選擇；不要公開分享此試算表。
 
 ## 身分與資料保護的實際範圍
 
@@ -65,7 +66,7 @@
 - 同一帳號每分鐘最多新增 5 則、滾動 24 小時最多 50 則，重試已寫入的同一則不佔新名額。
 - 評論與投票寫入由 Script Lock 序列化，並檢查店家／評論存在。文字防試算表公式注入，前端轉義 HTML，不執行留言中的標籤或程式。
 - 公開評論回傳品項、回饋、分數、時間、票數、作者顯示名稱及目前帳號的投票狀態；不回傳完整信箱、作者／投票者識別碼或管理密語。登入者可在自己的帳號畫面看到本人信箱。
-- 網站不提供評論刪除、修改與投票明細管理畫面。擁有者仍可在私人試算表原生管理資料；請保留 ID、欄位格式與關聯。
+- 網站提供管理者逐則查看作者帳號，不提供評論刪除、修改與投票明細管理畫面。擁有者仍可在私人試算表原生管理資料；請保留 ID、欄位格式與關聯。
 - 目前依需求面向小群同事使用，後端會讀取分頁資料進行統計，適合小型名單；這次沒有把 Google Sheets 當作大量公開社群的資料庫。
 
 ## 分數文案
@@ -92,7 +93,7 @@
 ## 驗證
 
 - `tests/reviews.test.cjs`（npm test）：301 分級完整、四分頁、無效欄位、不存在店家、重試去重、文字安全、摘要分數、游標分頁、隱私欄位、不同投票者、改票／取消、限制頻率、管理權限分離。
-- v6 本機瀏覽器驗證 Google 登入替身、暱稱與 Google 名稱顯示、完整信箱不出現在公開評論、評論／投票、私人模式隔離及手機排版；瀏覽器工具與影像未納入公開儲存庫。
+- v6 本機瀏覽器驗證 Google 登入替身、匿名與自訂暱稱顯示、完整信箱不出現在公開評論、評論／投票、私人模式隔離及手機排版；瀏覽器工具與影像未納入公開儲存庫。
 - `tests/identity.test.cjs` 驗證登入綁定、重放拒絕、長數字帳號保留、同帳號投票、登出／到期／設定輪替失效與舊評論表頭升級。
 - 測試執行實際建置的 Code.gs，Google Sheets／Cache／Lock 使用本機替身。網頁自動化攔截 OSM 與天氣，不向公共圖磚服務下載測試地圖。
 - Google 帳戶仍未連接；真正部署、多人使用、iPhone Safari 的滑桿／數字鍵盤與試算表權限需在部署後驗收。
