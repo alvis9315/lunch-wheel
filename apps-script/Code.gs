@@ -75,7 +75,25 @@ function sheet_(){
 }
 function rows_(sheet){
   const n=sheet.getLastRow()-1;if(n<1)return [];
-  return LunchCatalog.collection(sheet.getRange(2,1,n,FREE_HEADERS_.length).getValues().filter(r=>r.some(v=>!LunchCatalog.blank(v))).map(r=>({id:readCell_(r[0]),name:readCell_(r[1]),address:readCell_(r[2]),location:{lat:r[3],lng:r[4]},phone:readCell_(r[5]),category:r[6],budget:r[7],covered:r[8],weeklyHours:r[9],mapsUrl:readCell_(r[10]),addedAt:dateCell_(r[11]),diet:r[12],coveredOrigin:r[13]})));
+  const values=sheet.getRange(2,1,n,FREE_HEADERS_.length).getValues().filter(r=>r.some(v=>!LunchCatalog.blank(v)));
+  const needsType=value=>LunchCatalog.blank(value)||value==='其他'||value==='unknown';
+  const original=values.some(r=>needsType(r[6]))?originalTypes_():new Map();
+  return LunchCatalog.collection(values.map(r=>({id:readCell_(r[0]),name:readCell_(r[1]),address:readCell_(r[2]),location:{lat:r[3],lng:r[4]},phone:readCell_(r[5]),category:needsType(r[6])?(original.get(readCell_(r[0]))||r[6]):r[6],budget:r[7],covered:r[8],weeklyHours:r[9],mapsUrl:readCell_(r[10]),addedAt:dateCell_(r[11]),diet:r[12],coveredOrigin:r[13]})));
+}
+// Read the owner's original classifications by ID. Never guess from names or rewrite cells.
+function originalTypes_(){
+  const result=new Map(),seen=new Set();
+  const book=SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID'));
+  const source=book.getSheetByName('原始清單');if(!source||source.getLastRow()<2)return result;
+  const rows=source.getRange(1,1,source.getLastRow(),11).getValues(),headers=rows.shift();
+  const idIndex=headers.indexOf('系統店家 ID'),typeIndex=headers.indexOf('店家類型');
+  if(idIndex<0||typeIndex<0)return result;
+  rows.forEach(row=>{
+    const id=readCell_(row[idIndex]),type=LunchCatalog.normalizeCategory(row[typeIndex]);
+    if(seen.has(id)){result.delete(id);return;}seen.add(id);
+    if(LunchCatalog.categories.includes(type)&&type!=='其他')result.set(id,type);
+  });
+  return result;
 }
 
 // Public community actions do not grant permission to add restaurants.
