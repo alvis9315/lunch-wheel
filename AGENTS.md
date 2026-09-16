@@ -1,6 +1,7 @@
 # Lunch Club — 私人 Side Project
 
 此專案與 IISI／RDSS 工作專案無關。
+- v6.9：選餐點大螢幕可切換 4／8 欄，偏好保存在瀏覽器；窄螢幕 3 欄、手機 2 欄。類別、挑店家與店家名單背景依 src/catalog.js 固定七色群，多類別跨群使用分色背景及全部文字標籤，不依 nth-child 輪色。配色不影響既有分類、葷素、評分與抽選，詳見 docs/layout-and-colors.md。
 - v6.8 優先：店家名單／挑店家／地圖的既有店家資訊皆進完整 restaurant-page，離開須 dispose 食評、清除私人內容及忽略遲到回應。新增店家仍可用 dialog。評論寫入前必須確認，取消保留草稿；不提供修改／刪除。全選依目前顯示結果，允許超過 20 間勾選但確認抽選仍限 2～20。推薦區塊放頁尾；共用 loading 管理重疊工作及完成／錯誤／取消。登入診斷只回設定名稱與狀態，完整結果限團長。详見 docs/browsing-and-login.md。
 - v6.7 優先：固定 27 類主清單集中於 src/catalog.js categoryDefinitions，名称／排序／圖示／前後端讀寫檢查／團長選項共用；不自動新增試算表自訂類別。韓式料理讀為韓式，其他清單外分類提示待確認但不改原表。入口只顯示有店家的主清單類別。主清單變更必須重建並更新 Code.gs 與 Index.html。Suggestions 只存投稿，Google 登入後送出、團長才可讀與處理，不自動寫入店家名單。詳見 docs/suggestions-and-categories.md。
 - v6.5：匿名／自訂暱稱二選一，新會員預設匿名；公開評論不得回傳 Google 名稱、信箱或匿名時的暱稱。getReviewAuthor 每次驗證管理者，關閉／登出清除私人 DOM 且忽略遲到回應。Reviews 追加 author_display_mode、Members 追加 display_mode；升級只補表頭。公開瀏覽使用「我／任何人」，留言／投票須 Google 登入。OAuth 瀏覽器確認資訊短暫存放，會員／管理者憑證不得持久儲存。詳見 docs/review-privacy.md。

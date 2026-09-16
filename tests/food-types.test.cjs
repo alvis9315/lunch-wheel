@@ -27,6 +27,17 @@ assert.throws(()=>b.addCandidate({...base,name:'未知類別',category:'新分�
 assert.deepEqual(options.slice(1,types.length+1).map(t=>t.value),types);
 assert.deepEqual(JSON.parse(JSON.stringify(b.LunchCatalog.foodCategories)),types);
 for(const category of types)assert.notEqual(C.categoryIcon(category),'🍽');
+// Appearance follows category data, never result position, category order or vote scores.
+for(const category of types){const group=C.categoryGroup(category);assert(C.foodGroups.includes(group));assert(/^#[0-9a-f]{6}$/.test(group.color));}
+assert.equal(C.foodGroups.length,7);assert.equal(new Set(C.foodGroups.map(g=>g.color)).size,7);
+assert.equal(C.categoryGroup('烏龍麵').id,C.categoryGroup('拉麵').id);
+assert.equal(C.categoryGroup('韓式料理').id,C.categoryGroup('韓式').id);
+const appearance=C.foodAppearance({category:'早餐店、輕食咖啡廳、素食'});
+assert.deepEqual(appearance,C.foodAppearance({category:'素食、早餐店、輕食咖啡廳、早餐店'}));
+assert.equal(appearance.groups.length,3);assert(appearance.background.startsWith('linear-gradient('));
+assert.equal(C.foodAppearance({category:'拉麵、烏龍麵'}).background,C.categoryGroup('拉麵').color);
+assert.equal(C.foodAppearance({category:'<script>'}).groups[0].id,'unclassified');
+assert.equal(C.foodAppearance({category:'素食'}).groups[0].id,'greens');
 const fs=require('node:fs'),path=require('node:path'),root=path.resolve(__dirname,'..'),source=fs.readFileSync(path.join(root,'src/catalog.js'),'utf8');
 assert(fs.readFileSync(path.join(root,'dist/Code.gs'),'utf8').startsWith(source));
 assert(fs.readFileSync(path.join(root,'dist/Index.html'),'utf8').includes(source));

@@ -31,12 +31,12 @@
 .source-card{min-height:220px}.source-page{max-width:1000px}
 .type-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin:10px 0 28px}
 .type-card{display:grid;grid-template-columns:1fr auto;text-align:left;padding:26px;border:1px solid var(--line);border-radius:18px;background:#ece7db;min-height:190px;position:relative;transition:transform .18s}
-.type-card:hover{transform:translateY(-3px)}.type-card:first-child{background:var(--ink);color:var(--white)}.type-card:nth-child(3n){background:#e3e8da}.type-card:nth-child(4n){background:#e9e1ed}
+.type-card:hover{transform:translateY(-3px)}.type-card:first-child{background:var(--ink);color:var(--white)}
 .type-card>span{font-size:38px;grid-column:1/-1;margin-bottom:18px}.type-card strong{font-size:22px}.type-card small{grid-column:1;font-size:12px;margin-top:8px}.type-card b{grid-column:2;grid-row:2;font-size:23px}
 .pick-heading{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:32px 0 22px}.pick-heading h1,.wheel-page-heading h1{font-size:clamp(26px,3.2vw,40px);line-height:1.5;margin:0}
 .confirm-area{display:grid;gap:10px;flex:none;text-align:right}.confirm-area>span{font-size:11px;color:var(--muted)}.confirm-area>.primary{min-height:50px;font-size:14px}
 .pick-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;margin-bottom:44px;align-items:start}.pick-layout .filter-panel{padding:20px}.restaurant-panel{min-width:0}.restaurant-tools{display:flex;gap:16px;align-items:center}.restaurant-tools .search-label{flex:1;margin:0}.restaurant-tools input{width:100%;min-width:0}.selection-tools{display:flex;align-items:center;flex-wrap:wrap;gap:12px;justify-content:flex-end;padding:10px 0 16px}.selection-tools>span{margin-right:auto;font-size:12px;line-height:1.8}.selection-tools .text-button{font-size:11px}
-.restaurant-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.restaurant-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white);min-width:0;box-shadow:0 4px 12px #253f3205}.restaurant-card.selected{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}.restaurant-select{display:flex;align-items:center;gap:8px;font-size:11px;padding:10px 12px;min-height:44px;cursor:pointer}.restaurant-select input{flex:none;width:18px;height:18px;margin:0}.restaurant-card.selected .restaurant-select{background:var(--ink);color:var(--white)}.restaurant-art{height:100px;display:grid;place-items:center;background:#e6eadc;font-size:44px}.restaurant-card:nth-child(3n+2) .restaurant-art{background:#eee0d2}.restaurant-card:nth-child(3n) .restaurant-art{background:#e5dfee}.restaurant-info{display:flex;flex-direction:column;align-items:flex-start;width:100%;padding:16px;text-align:left;gap:9px;min-height:186px}.restaurant-info strong{font-size:15px;line-height:1.65;overflow-wrap:anywhere}.restaurant-info>span:not(.status-tag){font-size:11px;color:var(--muted);line-height:1.7}.restaurant-info small{font-size:10px;margin-top:auto;padding-top:8px;text-decoration:underline;text-underline-offset:4px}.restaurant-grid>.empty-state{grid-column:1/-1;padding:60px 20px;line-height:2;background:var(--white);border:1px dashed var(--line);border-radius:14px}
+.restaurant-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.restaurant-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white);min-width:0;box-shadow:0 4px 12px #253f3205}.restaurant-card.selected{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}.restaurant-select{display:flex;align-items:center;gap:8px;font-size:11px;padding:10px 12px;min-height:44px;cursor:pointer}.restaurant-select input{flex:none;width:18px;height:18px;margin:0}.restaurant-card.selected .restaurant-select{background:var(--ink);color:var(--white)}.restaurant-art{height:100px;display:grid;place-items:center;background:#e6eadc;font-size:44px}.restaurant-info{display:flex;flex-direction:column;align-items:flex-start;width:100%;padding:16px;text-align:left;gap:9px;min-height:186px}.restaurant-info strong{font-size:15px;line-height:1.65;overflow-wrap:anywhere}.restaurant-info>span:not(.status-tag){font-size:11px;color:var(--muted);line-height:1.7}.restaurant-info small{font-size:10px;margin-top:auto;padding-top:8px;text-decoration:underline;text-underline-offset:4px}.restaurant-grid>.empty-state{grid-column:1/-1;padding:60px 20px;line-height:2;background:var(--white);border:1px dashed var(--line);border-radius:14px}
 .wheel-page-heading{text-align:center;padding:26px 0 28px;position:relative}.wheel-page-heading>.text-button{display:block;margin-bottom:20px}.wheel-page-heading .eyebrow{margin-top:6px}#wheel-page>.wheel-panel{max-width:860px;margin:0 auto 44px;padding:24px 40px}#wheel-page .wheel-stage{padding:35px 20px 20px;min-height:0}#wheel-page .wheel-shell{width:min(100%,560px)}#wheel-page .spin-button{width:144px;height:144px;font-size:28px}#wheel-page .spin-button>span{font-size:30px}#wheel-page .spin-button>small{font-size:11px}#wheel-page .wheel-bottom{justify-content:center}#wheel-page .wheel-caption p{font-size:12px}
 body[data-stage=type] .context,body[data-stage=type] #mode-banner,body[data-stage=type] #data-status,body[data-stage=wheel] .context,body[data-stage=wheel] #mode-banner,body[data-stage=wheel] #data-status,body[data-stage=wheel] .source-toolbar{display:none}
 #pick-page[aria-busy=true] .restaurant-grid{opacity:.5;pointer-events:none}@keyframes loading-turn{to{transform:rotate(360deg)}}
@@ -66,3 +66,28 @@ h1[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
 @media(max-width:640px){.restaurant-page-toolbar .eyebrow{display:none}.restaurant-page-toolbar{margin:20px 0}.restaurant-overview,.restaurant-detail-layout>.restaurant-reviews{padding:18px}.restaurant-overview h1{font-size:24px}.restaurant-detail-layout .review-heading h3{font-size:20px}.restaurant-detail-layout .review-form{padding:0 12px 18px}.app-loading{font-size:13px;padding:12px 16px}.restaurant-overview .food-icon{width:46px;height:54px;font-size:26px}}
 @media(prefers-reduced-motion:reduce){.loading-spinner{animation:none;border-style:dotted}}
 body[data-stage=restaurant] #data-status,body[data-stage=restaurant] #mode-banner{display:none}
+
+/* Category colors are fixed by the shared catalog, independent of card order. */
+.type-card{background:var(--food-background,#e9e8e1)}
+.restaurant-art{background:var(--food-background,#e9e8e1)}
+.type-layout-control{flex:none;display:flex;align-items:center;gap:12px;font-size:12px;margin-left:24px}
+.type-layout-control .segmented{border:1px solid var(--line)}
+.type-layout-control button{min-width:58px;min-height:44px}
+.type-layout-control button[aria-pressed=true]{background:var(--ink);color:var(--white)}
+.food-color-guide{margin:0 0 22px;color:var(--ink);font-size:12px}
+.food-color-guide summary{cursor:pointer;min-height:44px;display:list-item;align-content:center;width:fit-content;text-underline-offset:4px}
+.food-color-guide ul{display:flex;flex-wrap:wrap;gap:12px 22px;list-style:none;padding:0;margin:8px 0 12px}
+.food-color-guide li{display:flex;align-items:center;gap:8px}
+.food-color-dot{width:18px;height:18px;border:1px solid #253f3226;border-radius:50%;flex:none}
+.food-color-guide p{color:var(--muted);line-height:1.8;max-width:780px;margin:0}
+.restaurant-info>.food-tags{display:flex;flex-wrap:wrap;gap:6px}
+.food-tag{display:inline-block;padding:3px 9px;border-radius:6px;background:var(--tag-color,#e9e8e1);color:var(--ink);font-size:12px;line-height:1.6}
+@media(min-width:1101px){
+  .type-grid[data-columns="8"]{grid-template-columns:repeat(8,minmax(0,1fr));gap:12px}
+  .type-grid[data-columns="8"] .type-card{padding:16px 12px;min-height:156px}
+  .type-grid[data-columns="8"] .type-card>span{font-size:30px;margin-bottom:14px}
+  .type-grid[data-columns="8"] .type-card strong{font-size:17px;grid-column:1/-1;line-height:1.6}
+  .type-grid[data-columns="8"] .type-card small{grid-column:1/-1;font-size:11px}
+  .type-grid[data-columns="8"] .type-card b{position:absolute;top:18px;right:12px;font-size:16px}
+}
+@media(max-width:1100px){.type-layout-control{display:none}}

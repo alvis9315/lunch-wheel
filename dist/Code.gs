@@ -1,7 +1,24 @@
 (function(root){
   'use strict';
   // Single category master: names, order and icons. Build embeds this same file in BOTH deployment files.
-  const categoryDefinitions=[['速食','🍔'],['咖哩','🍛'],['拉麵','🍜'],['烏龍麵','🍜'],['早餐店','🍳'],['早午餐','🍳'],['牛肉麵','🍜'],['牛排','🥩'],['小吃店','🥟'],['快餐便當','🍱'],['咖啡廳','☕'],['輕食咖啡廳','🥗'],['韓式','🍲'],['鍋物','🍲'],['素食','🥬'],['冰店','🍧'],['甜點','🍰'],['粥店','🥣'],['港式','🥟'],['台式','🍚'],['飯糰飯捲','🍙'],['鵝肉專賣','🍗'],['燒臘','🍖'],['義式','🍝'],['壽司','🍣'],['泰式','🍛'],['日式定食','🍱']];
+  const categoryDefinitions=[['速食','🍔','breakfast'],['咖哩','🍛','rice'],['拉麵','🍜','noodles'],['烏龍麵','🍜','noodles'],['早餐店','🍳','breakfast'],['早午餐','🍳','breakfast'],['牛肉麵','🍜','noodles'],['牛排','🥩','hearty'],['小吃店','🥟','rice'],['快餐便當','🍱','rice'],['咖啡廳','☕','cafe'],['輕食咖啡廳','🥗','cafe'],['韓式','🍲','world'],['鍋物','🍲','hearty'],['素食','🥬','greens'],['冰店','🍧','cafe'],['甜點','🍰','cafe'],['粥店','🥣','rice'],['港式','🥟','rice'],['台式','🍚','rice'],['飯糰飯捲','🍙','rice'],['鵝肉專賣','🍗','rice'],['燒臘','🍖','rice'],['義式','🍝','world'],['壽司','🍣','world'],['泰式','🍛','world'],['日式定食','🍱','world']];
+  const foodGroups=[
+    {id:'breakfast',label:'早餐速食',color:'#f2e5bf'},
+    {id:'rice',label:'飯食小吃',color:'#efdbc8'},
+    {id:'noodles',label:'麵食',color:'#e3dcf0'},
+    {id:'cafe',label:'咖啡甜點',color:'#efdae3'},
+    {id:'world',label:'異國料理',color:'#d8e5ec'},
+    {id:'hearty',label:'牛排鍋物',color:'#edcfc5'},
+    {id:'greens',label:'蔬食',color:'#dfe8d2'}
+  ];
+  const neutralGroup={id:'unclassified',label:'尚未分類',color:'#e9e8e1'};
+  function categoryGroup(value){const id=categoryDefinitions.find(([name])=>name===normalizeCategory(value))?.[2];return foodGroups.find(group=>group.id===id)||neutralGroup;}
+  function foodAppearance(record){
+    const types=foodTypesFor(record),ids=new Set(types.map(type=>categoryGroup(type).id));
+    const groups=foodGroups.filter(group=>ids.has(group.id));if(!groups.length)groups.push(neutralGroup);
+    const background=groups.length===1?groups[0].color:'linear-gradient(110deg, '+groups.map((group,i)=>group.color+' '+(i/groups.length*100)+'% '+((i+1)/groups.length*100)+'%').join(', ')+')';
+    return {groups,background};
+  }
   const foodCategories=categoryDefinitions.map(([name])=>name);
   const categoryIcon=value=>categoryDefinitions.find(([name])=>name===normalizeCategory(value))?.[1]||'🍽';
   const categories=foodCategories;
@@ -116,7 +133,7 @@
     }):[]);
     return {...checked,loaded:!checked.unavailable,manualHours:true,periods,hoursText:checked.weeklyHours.map((day,i)=>'週'+days[i]+'：'+(day.status==='unknown'?'未填寫':day.status==='closed'?'休息':day.spans.map(s=>s.from+'–'+s.to+(s.to<s.from?'（翌日）':'')).join('、')))};
   }
-  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets,typeName,typeOptions,matchesType,normalizeCategory,qualitySummary,foodCategories,categoryIcon,parseCategories,foodTypesFor};root.LunchCatalog=api;
+  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets,typeName,typeOptions,matchesType,normalizeCategory,qualitySummary,foodCategories,categoryIcon,parseCategories,foodTypesFor,foodGroups,categoryGroup,foodAppearance};root.LunchCatalog=api;
   if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
 
