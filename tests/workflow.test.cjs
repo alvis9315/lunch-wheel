@@ -28,6 +28,15 @@ assert(Catalog.matchesType(rows[1],'unclassified'));assert(Catalog.matchesType(r
 assert(!Catalog.matchesType(rows[0],'unclassified'));
 assert.deepEqual(Catalog.typeOptions([]),[{value:'all',label:'不限',count:0}]);
 assert.equal(Catalog.normalizeCategory(' 冰店 '),'冰品');assert.equal(Catalog.read({category:'冰店'}).category,'冰品');
+// Optional missing information is counted separately from stores blocked from use.
+const healthy={category:'拉麵',covered:'no',unavailable:false,dataIssues:['phone','hours','budget','coveredOrigin']};
+let quality=Catalog.qualitySummary([healthy,{...healthy,category:'其他',unavailable:true,dataIssues:['id','location','phone']}]);
+assert.equal(quality.total,2);assert.equal(quality.blocked,1);assert.equal(quality.optional,1);
+assert.deepEqual(quality.general,[{key:'phone',label:'電話',count:2}]);
+assert(!quality.filters.some(r=>r.key==='coveredOrigin'),'uncovered routes do not need a covered origin');
+assert.deepEqual(quality.filters.map(r=>r.key),['category','budget','hours']);
+quality=Catalog.qualitySummary([{...healthy,covered:'yes'}]);assert.equal(quality.filters.find(r=>r.key==='coveredOrigin').count,1);
+assert.deepEqual(Catalog.qualitySummary([]),{total:0,blocked:0,optional:0,filters:[],general:[]});
 // Reordering source rows/columns does not associate a type with the wrong store.
 originals.pop();originals.forEach(r=>{[r[4],r[7]]=[r[7],r[4]];});
 originals[2][7]='早餐店';assert.equal(f.box.listCandidates()[1].category,'早餐店');

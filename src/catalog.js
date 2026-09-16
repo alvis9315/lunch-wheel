@@ -8,6 +8,13 @@
     return [{value:'all',label:'不限',count:records.length},...categories.filter(c=>c!=='其他').map(c=>({value:c,label:c,count:counts.get(c)||0})).filter(c=>c.count),...(counts.has('尚未分類')?[{value:'unclassified',label:'尚未分類',count:counts.get('尚未分類')}]:[])];
   }
   const matchesType=(record,value)=>value==='all'||(value==='unclassified'?typeName(record.category)==='尚未分類':record.category===value);
+  function qualitySummary(records){
+    const filters=[['category','店家類型'],['diet','葷素'],['budget','每人預算'],['hours','營業時間'],['covered','避雨情況'],['coveredOrigin','避雨出發點']];
+    const general=[['phone','電話'],['address','地址'],['mapsUrl','地圖連結']];
+    const missing=(r,key)=>key==='category'?typeName(r.category)==='尚未分類':key==='coveredOrigin'?r.covered==='yes'&&(r.dataIssues||[]).includes(key):(r.dataIssues||[]).includes(key);
+    const count=fields=>fields.map(([key,label])=>({key,label,count:records.filter(r=>missing(r,key)).length})).filter(row=>row.count);
+    return {total:records.length,blocked:records.filter(r=>r.unavailable).length,optional:records.filter(r=>!r.unavailable&&[...filters,...general].some(([key])=>missing(r,key))).length,filters:count(filters),general:count(general)};
+  }
   const diets={unknown:'葷素未確認',meat:'葷食',vegetarian:'素食',both:'葷素皆有'};
   const issueLabels={row:'店家內容待確認',id:'店家編號待確認',duplicateId:'店家編號重複，請管理者更正',name:'店名待補',location:'位置待確認',address:'地址未提供',phone:'電話未提供或格式待確認',category:'料理類型待確認',diet:'葷素待確認',budget:'預算待確認',covered:'避雨情況待確認',coveredOrigin:'避雨路線出發點待確認',hours:'營業時間待確認',mapsUrl:'Google Maps 連結待確認'};
   const blank=v=>v==null||(typeof v==='string'&&!v.trim());
@@ -91,6 +98,6 @@
     }):[]);
     return {...checked,loaded:!checked.unavailable,manualHours:true,periods,hoursText:checked.weeklyHours.map((day,i)=>'週'+days[i]+'：'+(day.status==='unknown'?'未填寫':day.status==='closed'?'休息':day.spans.map(s=>s.from+'–'+s.to+(s.to<s.from?'（翌日）':'')).join('、')))};
   }
-  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets,typeName,typeOptions,matchesType,normalizeCategory};root.LunchCatalog=api;
+  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets,typeName,typeOptions,matchesType,normalizeCategory,qualitySummary};root.LunchCatalog=api;
   if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

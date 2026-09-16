@@ -12,7 +12,7 @@
   let toastTimer, weatherRequest = 0, detailRequest = 0, searchRequest = 0, mapView, markerLayer, originMarker, dateKey = C.taipeiDay();
   const e = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let sourceRequest=0,sourceLoading=false,sourceTimer=null,localSourceRecords=[];
-  let stage='type',chosenType=null,confirmedIds=null;
+  let stage='type',lastLunchStage='type',chosenType=null,confirmedIds=null;
   const typeIcons={'正餐':'🍚','早餐店':'🍳','便當／快餐':'🍱','小吃':'🥟','麵食':'🍜','拉麵':'🍜','牛排':'🥩','火鍋':'🍲','咖哩':'🍛','義大利麵':'🍝','咖啡廳':'☕','甜點':'🍰','冰品':'🍧'};
   const accountUI=window.createLunchAccountUI({rpc,onChange(){renderAccess();if($('detail-dialog').open&&state.detail&&state.mode==='live'){const host=$('detail-content').querySelector('.restaurant-reviews');if(host)reviewUI.mount(host,state.detail.id);}}});
   const reviewUI=window.createLunchReviewUI({rpc,escape:e,account:accountUI});
@@ -130,6 +130,32 @@
     const unknown=state.records.filter(p=>Catalog.typeName(p.category)==='尚未分類').length;
     $('type-note').textContent=!state.records.length?'名單還沒有店家，請聯絡管理者加入。':unknown?unknown+' 間店尚未分類，選「不限」或「尚未分類」仍能查看；不會自動當成其他類型。':'依名單已填寫的類型顯示，沒有店家的類型不會出現。正餐尚未細分；素食需求可在下一步選擇。';
   }
+  function renderLibrary(){
+    const current=$('library-type').value||'all',options=Catalog.typeOptions(state.records);
+    if(!options.some(t=>t.value===current))options.push({value:current,label:current==='unclassified'?'尚未分類':current,count:0});
+    $('library-type').innerHTML=options.map(t=>'<option value="'+e(t.value)+'">'+e(t.label)+'（'+t.count+'）</option>').join('');$('library-type').value=current;
+    const query=$('library-search').value.trim().toLowerCase();
+    const list=state.records.filter(p=>Catalog.matchesType(p,current)&&(p.name+' '+p.address).toLowerCase().includes(query));
+    $('library-count').textContent='共 '+state.records.length+' 間店 · 顯示 '+list.length+' 間 · 點店家看食評';
+    $('library-cards').innerHTML=list.map(p=>'<article class="restaurant-card"><div class="restaurant-art" aria-hidden="true">'+(typeIcons[p.category]||ICONS[p.category]||'🍽')+'</div><button class="restaurant-info" data-detail="'+e(p.id)+'"><strong>'+e(p.name)+'</strong><span>'+e(categoryName(p.category))+' · '+e(Catalog.diets[p.diet]||Catalog.diets.unknown)+'</span><span>'+e(p.address||'地址尚未提供')+'</span><span>'+ (p.unavailable?'基本資料待確認，暫不開放抽選與評論':'閱讀心得 · 留下評價 · 按讚或爛')+'</span><small>查看店家與食評 ↗</small></button></article>').join('')||'<div class="empty-state">'+(state.records.length?'沒有找到這間店，試試別的關鍵字或選「不限」。':'名單還沒有店家，請聯絡管理者加入。')+'</div>';
+  }
+  function qualityText(summary){
+    const parts=[];
+    if(summary.blocked)parts.push(summary.blocked+' 間店的基本資料待確認，暫不開放抽選與評論。');
+    if(summary.optional)parts.push(summary.optional+' 間店有選填資訊尚未確認；不限制這些條件時仍可抽選。');
+    return parts.join(' ');
+  }
+  function qualityRows(rows){return rows.map(row=>'<li><span>'+e(row.label)+'</span><strong>'+row.count+' 間</strong></li>').join('');}
+  function showDataHelp(){
+    const summary=Catalog.qualitySummary(state.records);
+    $('data-help-content').innerHTML='<p>'+e(qualityText(summary)||'目前名單沒有待補資訊。')+'</p>'+(summary.filters.length?'<h3>影響指定篩選條件</h3><ul class="quality-list">'+qualityRows(summary.filters)+'</ul><p class="field-note">缺少哪一項，就無法判斷是否符合該條件。選「不限」或不勾選該條件，仍能抽選基本資料完整的店。</p>':'')+(summary.general.length?'<h3>不影響抽選的一般資訊</h3><ul class="quality-list">'+qualityRows(summary.general)+'</ul>':'')+(summary.blocked?'<p>基本資料包括可辨認且不重複的店家編號、店名與有效位置；點店家可以查看需確認的項目。</p>':'');
+    $('data-help-dialog').showModal();
+  }
+  function enterSection(section){
+    if(state.busy)return;
+    const destination=section==='library'?'library':lastLunchStage;
+    if(state.ready)page(destination);else enterSource('live',section==='library'?'library':'type');
+  }
   function chooseType(value){
     if(state.busy||!Catalog.typeOptions(state.records).some(t=>t.value===value))return;
     chosenType=value;confirmedIds=null;state.selected=new Set();$('pick-search').value='';
@@ -189,15 +215,17 @@
   }
   function render() {
     renderAccess();
-    const incomplete=state.records.filter(p=>p.dataIssues?.length),unavailable=state.records.filter(p=>p.unavailable);
-    $('data-status').hidden=!state.ready||!incomplete.length;$('data-status').textContent=incomplete.length+' 間店有資料待補'+(unavailable.length?'，其中 '+unavailable.length+' 間暫時無法抽選':'')+'。未確認的資料不會視為符合指定條件；點店家可查看。';
+    const quality=Catalog.qualitySummary(state.records);
+    $('data-status').hidden=!state.ready||!(quality.blocked||quality.optional);$('data-status').classList.toggle('has-blocked',quality.blocked>0);
+    $('data-status').innerHTML='<p>'+e(qualityText(quality))+'</p><button class="text-button" data-data-help>查看缺少哪些資料與補充方式 ↗</button>';
     const choices=stage==='wheel'?wheelPlaces():eligible(), count=state.selected.size;
     $('nav-count').textContent=state.records.length;
     $('filter-summary').innerHTML=validTime()?'已勾選 '+count+' 間，<strong>'+choices.length+'</strong> 間符合今天的條件。<br>至少 2 間符合條件才能抽選。':'用餐結束時間必須晚於開始時間。';
     $('spin-button').disabled=state.busy||!state.ready||!confirmedIds||choices.length<2||count>20||!validTime();
     $('chance-label').textContent=choices.length>=2?choices.length+' 間候選 · 每間 '+(100/choices.length).toFixed(1)+'% 機會':'至少選 2 間符合條件的店';
     if(!state.busy) renderWheel(choices);
-    renderSaved();renderTypes();renderPick();
+    renderSaved();renderTypes();renderPick();renderLibrary();
+    document.querySelectorAll('[data-section]').forEach(button=>{const active=state.ready&&(button.dataset.section==='library'?stage==='library':stage!=='library');button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
   }
   function renderSaved() {
     $('saved-count').textContent=state.records.length;
@@ -208,16 +236,17 @@
   }
   function page(name) {
     if(state.busy||!state.ready) return;
-    if(!['type','pick','wheel','map'].includes(name))return;
+    if(!['type','pick','wheel','map','library'].includes(name))return;
     if(name==='pick'&&chosenType===null)return;
     if(name==='wheel'&&!confirmedIds)return;
     if(name==='pick')confirmedIds=null;
+    if(name!=='library')lastLunchStage=name;
     stage=name;document.body.dataset.stage=name;
     if(name!=='map'){originPicking=false;$('origin-pick-panel').hidden=true;}
-    ['type','pick','wheel','map'].forEach(p=>$(p+'-page').hidden=name!==p);
+    ['type','pick','wheel','map','library'].forEach(p=>$(p+'-page').hidden=name!==p);$('main-nav').hidden=name==='library';
     document.querySelectorAll('.nav').forEach(el=>{const active=el.dataset.page===name;el.classList.toggle('active',active);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});
     if(name==='map'&&mapView)requestAnimationFrame(()=>mapView.invalidateSize());
-    render();const heading=$(name==='type'?'type-title':name==='pick'?'pick-title':name==='wheel'?'wheel-page-title':'map-page');heading?.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});
+    render();const heading=$(name==='library'?'library-title':name==='type'?'type-title':name==='pick'?'pick-title':name==='wheel'?'wheel-page-title':'map-page');heading?.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});
   }
   function setChoice(group,key,value) { document.querySelectorAll(group+' button').forEach(b=>{const active=b.dataset[key]===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));}); }
   function resetFilters() {
@@ -278,13 +307,13 @@
     });
   }
   async function refreshCatalog() {
-    if(state.busy)return;lockUI(true);$('pick-page').setAttribute('aria-busy','true');$('refresh-picks').textContent='正在更新名單…';$('refresh-list').textContent='正在更新名單…';
+    if(state.busy)return;lockUI(true);$('pick-page').setAttribute('aria-busy','true');$('library-page').setAttribute('aria-busy','true');$('library-refresh').textContent='正在更新店家…';$('refresh-picks').textContent='正在更新名單…';$('refresh-list').textContent='正在更新名單…';
     try {
       if(state.mode==='live')state.records=await readCatalog();
       else state.records=hydrateCatalog(localSourceRecords);
       state.selected=new Set([...state.selected].filter(id=>state.records.some(p=>p.id===id&&!p.unavailable)));
       saveLocal();drawMarkers(state.records);message('已更新名單；營業資訊依自行維護的營業時間推估。');
-    } catch(err){message(err.message);}finally{lockUI(false);$('pick-page').removeAttribute('aria-busy');$('refresh-picks').textContent='重新整理';$('refresh-list').textContent='重新整理';render();}
+    } catch(err){message(err.message);}finally{lockUI(false);$('pick-page').removeAttribute('aria-busy');$('library-page').removeAttribute('aria-busy');$('library-refresh').textContent='重新整理店家';$('refresh-picks').textContent='重新整理';$('refresh-list').textContent='重新整理';render();}
   }
   async function searchMap(query) {
     const places=state.records.filter(p=>(p.name+' '+p.address+' '+p.category).toLowerCase().includes(query.toLowerCase()));
@@ -318,12 +347,15 @@
     if(status.today===false) warning=(p.demo?'該店家今日沒營業。':'依填寫的營業時間，該店家今日沒營業；臨時調整請另行確認。')+(p.phone?'實際營業狀況請撥電話確認。':'');
     else if(status.today===null)warning='店家未提供足夠營業時間，今日營業狀況待確認。';
     else if(!status.lunch)warning='今天有營業，但未涵蓋完整用餐時段 '+state.filters.from+'–'+state.filters.to+'。';
-    const mapLink=p.unavailable?null:mapsUrl(p),issues=(p.dataIssues||[]).map(key=>Catalog.issueLabels[key]).filter(Boolean);
-    const issueHtml=issues.length?'<div class="notice"><strong>店家資料待補</strong><p>'+issues.map(e).join('、')+'</p>'+(p.unavailable?'<p>必要資料完整後，就能加入抽選。</p>':'')+'</div>':'';
+    const mapLink=p.unavailable?null:mapsUrl(p),issueKeys=new Set(p.dataIssues||[]);if(Catalog.typeName(p.category)==='尚未分類')issueKeys.add('category');
+    const issues=[...issueKeys].map(key=>Catalog.issueLabels[key]).filter(Boolean);
+    const issueHtml=issues.length?'<div class="notice"><strong>'+(p.unavailable?'基本資料需確認':'有些選填資訊尚未確認')+'</strong><p>'+issues.map(e).join('、')+'</p>'+(p.unavailable?'<p>基本資料確認後，才能抽選與留言。</p>':'<p>不限制相關條件時仍可抽選；電話與地址缺漏不影響抽選。</p>')+'</div>':'';
     $('detail-content').innerHTML='<p class="eyebrow">'+(p.demo?'DEMO · 虛構示範店家':'OUR SHARED FOOD LIST')+'</p><div class="detail-hero"><span class="food-icon">'+(ICONS[category]||'🍽')+'</span><div><h2 id="detail-title">'+e(p.name)+'</h2><p>直線 '+kmText(p)+'</p></div></div><p>'+e(p.address||'地址未提供')+'</p>'+statusHtml(p)+issueHtml+'<p class="diet-detail">'+e(Catalog.diets[p.diet]||Catalog.diets.unknown)+(p.covered==='yes'&&!C.coveredFrom(p,state.origin)?' · 此出發點的避雨路線待確認':'')+'</p>'+(warning?'<div class="notice">'+e(warning)+(p.phone?'<br>'+phoneHtml(p):'')+'</div>':'')+(p.demo?'':'<p class="field-note">以上為自行填寫的營業時間，臨時營業異動請致電確認。</p>')+'<details><summary class="field-note">查看營業時間</summary><p>'+p.hoursText.map(e).join('<br>')+'</p></details>'+(mapLink?'<p><a target="_blank" rel="noopener" href="'+e(mapLink)+'">在 Google Maps 查看 ↗</a></p>':'')+
       (existing?'<div class="notice">已在目前名單。可用勾選框調整本次抽選，不會刪除店家。</div><button class="primary" id="detail-select" '+(p.unavailable?'disabled':'')+'>'+(state.selected.has(p.id)?'退出本次抽選':'加入本次抽選')+'</button>':'<form id="add-form"><div class="detail-form"><label>店家類型（自行標記）<select id="add-category">'+Catalog.categories.map(c=>'<option'+(c===category?' selected':'')+'>'+c+'</option>').join('')+'</select></label><label>葷／素（自行確認）<select id="add-diet">'+Object.entries(Catalog.diets).map(([value,label])=>'<option value="'+value+'"'+(value===(p.diet||'unknown')?' selected':'')+'>'+e(label)+'</option>').join('')+'</select></label><label>每人預算 NT$（選填）<input id="add-budget" type="number" min="1" max="10000" step="1" placeholder="例如 180" value="'+(p.budget??'')+'"></label><label class="wide">從 '+e(state.origin.name||defaultOrigin.name)+' 出發，全程可避雨？<select id="add-covered"><option value="unknown">尚未確認</option><option value="yes"'+(p.covered==='yes'?' selected':'')+'>是，已確認全程有遮蔽</option><option value="no"'+(p.covered==='no'?' selected':'')+'>否，需要走露天路段</option></select></label></div><p class="field-note">'+(state.mode==='local'?'這些資料只儲存在這台裝置，不會上傳。':'這些資料會加入現有名單，供大家抽選。')+'營業中與否仍由抽選條件決定。</p><div class="detail-actions"><button type="submit" class="primary">'+(status.today===false?'已知今日休息，仍儲存店家':(state.mode==='local'?'加入我的口袋名單 ＋':'加入共用口袋名單 ＋'))+'</button></div></form>');
+    if(existing&&stage==='library'){const selection=$('detail-select');if(selection){selection.previousElementSibling?.remove();selection.remove();}}
     if(existing&&state.mode==='live'&&!p.unavailable){
       const host=document.createElement('section');host.className='restaurant-reviews';host.setAttribute('aria-label','品項評論與評分');$('detail-content').append(host);reviewUI.mount(host,p.id);
+      const jump=document.createElement('button');jump.className='secondary detail-review-jump';jump.textContent='看食評／寫心得 ↓';jump.addEventListener('click',()=>{const title=host.querySelector('h3');title.tabIndex=-1;title.focus();title.scrollIntoView({block:'start'});});$('detail-content').querySelector('.detail-hero').after(jump);
     }
   }
   function manualForm(position){
@@ -405,17 +437,18 @@
     $('result-content').innerHTML='<h3>'+e(p.name)+'</h3><p>'+e(categoryName(p.category))+' · '+(p.budget==null?'預算未標記':'NT$ '+p.budget)+' · 直線 '+kmText(p)+'</p><p>'+e(p.address||'地址未提供')+'</p><p class="field-note">'+count+' 間店每間機會相同'+(p.demo?' · 虛構示範結果':' · 營業時段由名單維護，臨時異動請致電確認')+'</p><div class="result-actions"><button id="confirm-lunch" class="primary">今天就吃這家 ✓</button>'+(link?'<a class="secondary" target="_blank" rel="noopener" href="'+e(link)+'">步行導航 ↗</a>':'')+'</div>'+phoneHtml(p)+'<button id="spin-again" class="text-button">還想轉一次</button>';
     $('result-dialog').showModal();
   }
-  function enterSource(mode){
+  function enterSource(mode,destination='type'){
     if(mode!=='live'){message('「自己建立」正在調整，請先使用現有名單。');return;}
     if(state.busy)return;
     const request=++sourceRequest;sourceLoading=true;lockUI(true);state.ready=false;clearAdmin();
-    const trace=(step,extra={})=>console.info('[Lunch Club 6.2.0] shared entry', {request,step,...extra});
+    const trace=(step,extra={})=>console.info('[Lunch Club 6.3.0] shared entry', {request,step,...extra});
     const current=()=>request===sourceRequest&&sourceLoading;
     $('source-page').setAttribute('aria-busy','true');$('cancel-source').hidden=false;$('cancel-source').disabled=false;
     $('source-status').textContent=mode==='live'?'正在打開現有名單，請稍候…':'正在打開你的名單…';
     function unlock(){
       clearTimeout(sourceTimer);sourceTimer=null;sourceLoading=false;
       $('source-page').removeAttribute('aria-busy');$('cancel-source').hidden=true;lockUI(false);
+      if(state.ready)render();
     }
     function failed(error){
       if(!current())return;
@@ -447,13 +480,14 @@
         const customOrigin=readOrigin();state.origin=customOrigin||{...defaultOrigin};originCustom=Boolean(customOrigin);
         state.records=records;state.mode=mode;state.filters={...DEFAULT_FILTERS};state.detail=null;resultPlace=null;
         const local=getLocal(mode);state.lastId=typeof local.lastId==='string'?local.lastId:null;
-        chosenType=null;confirmedIds=null;state.selected=new Set();state.ready=true;
+        chosenType=null;confirmedIds=null;lastLunchStage='type';state.selected=new Set();state.ready=true;
+        $('library-search').value='';$('library-type').value='all';
         $('list-search').value='';$('map-query').value='';$('search-results').hidden=true;searchPlaces=[];
         $('source-status').textContent='正在顯示今天的午餐名單…';
         $('source-page').hidden=true;$('source-workspace').hidden=false;$('main-nav').hidden=false;
         try{if(!mapView)loadMaps(config);updateOriginView();drawMarkers(records);}
         catch{try{mapView?.remove();}catch{}mapView=null;originMarker=null;markerLayer=null;$('map-placeholder').hidden=false;message('地圖暫時無法開啟，仍可從口袋名單挑選午餐。');}
-        saveLocal();lockUI(false);resetFilters();page('type');
+        saveLocal();lockUI(false);resetFilters();page(destination);
         unlock();trace('visible',{count:records.length});
       }catch(error){failed(error);}
     }
@@ -476,7 +510,7 @@
     document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());reviewUI.dispose();state.detail=null;
     $('source-workspace').hidden=true;$('main-nav').hidden=true;$('source-page').hidden=false;
     $('source-page').removeAttribute('aria-busy');$('cancel-source').hidden=true;
-    chosenType=null;confirmedIds=null;delete document.body.dataset.stage;
+    chosenType=null;confirmedIds=null;lastLunchStage='type';delete document.body.dataset.stage;
     $('source-status').textContent='選好類型，開始今天的午餐冒險。';lockUI(false);render();$('choose-shared').focus();
   }
   function boot(){
@@ -488,6 +522,8 @@
 
   document.addEventListener('click',event=>{
     const b=event.target.closest('button');if(!b)return;
+    if(b.hasAttribute('data-data-help'))showDataHelp();
+    if(b.dataset.section)enterSection(b.dataset.section);
     if(b.dataset.type)chooseType(b.dataset.type);
     if(b.dataset.page)page(b.dataset.page);
     if(b.hasAttribute('data-close'))b.closest('dialog').close();
@@ -505,6 +541,8 @@
   document.addEventListener('change',event=>{if(event.target.dataset.select&&!state.busy)toggleSelection(event.target.dataset.select,event.target.checked);});
   [['budget-filter','budget'],['lunch-from','from'],['lunch-to','to'],['open-filter','open'],['repeat-filter','noRepeat']].forEach(([id,key])=>$(id).addEventListener('change',()=>{state.filters[key]=$(id).type==='checkbox'?$(id).checked:$(id).value;render();if(key==='from'||key==='to')loadWeather();}));
   $('pick-search').addEventListener('input',renderPick);
+  $('library-search').addEventListener('input',renderLibrary);$('library-type').addEventListener('change',renderLibrary);$('library-refresh').addEventListener('click',refreshCatalog);
+  $('choose-library').addEventListener('click',()=>enterSection('library'));
   $('toggle-filters').addEventListener('click',()=>{const button=$('toggle-filters'),expanded=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(expanded));button.textContent='篩選條件 · '+(expanded?'收起':'展開');$('pick-filters').classList.toggle('expanded',expanded);});
   $('confirm-selection').addEventListener('click',confirmSelection);
   $('refresh-picks').addEventListener('click',refreshCatalog);
