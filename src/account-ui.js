@@ -1,8 +1,8 @@
 (function(root){
   'use strict';
-  root.createLunchAccountUI=function({rpc,onChange}){
+  root.createLunchAccountUI=function({rpc,onChange,admin}){
     const $=id=>document.getElementById(id),dialog=$('account-dialog');
-    let member=null,configured=false,flow=null,pollTimer=null,checking=false,epoch=0,expiryTimer=null;
+    let member=null,configured=false,flow=null,pollTimer=null,checking=false,epoch=0,expiryTimer=null,setupEpoch=0;
     const flowKey=state=>'lunch-club-signin-'+state;
     function clearFlow(){if(flow)try{localStorage.removeItem(flowKey(flow.state));}catch{}flow=null;}
     function syncDisplay(){const named=$('account-mode-nickname').checked;$('account-nickname-label').hidden=!named;$('account-nickname').disabled=!named;$('account-nickname').required=named;}
@@ -10,6 +10,7 @@
     function feedback(text){$('account-feedback').textContent=text;}
     function render(){
       $('account-login-panel').hidden=Boolean(member);$('account-profile').hidden=!member;
+      $('account-refresh-setup').hidden=Boolean(member);
       $('account-google-login').disabled=!configured;
       if(member){$('account-email').textContent=member.email;$('account-name').textContent=member.name;$('account-nickname').value=member.nickname||'';$('account-mode-nickname').checked=member.displayMode==='nickname';$('account-mode-anonymous').checked=member.displayMode!=='nickname';syncDisplay();}
       else{$('account-email').textContent='';$('account-name').textContent='';$('account-nickname').value='';}
@@ -21,7 +22,24 @@
       try{Object.keys(localStorage).filter(key=>key.startsWith('lunch-club-signin-')).forEach(key=>{let saved;try{saved=JSON.parse(localStorage.getItem(key));}catch{}if(!saved||Date.now()>=saved.expiresAt)localStorage.removeItem(key);});}catch{}
       render();
     }
-    function open(){render();feedback(member?'這是新評論的預設顯示方式；每次留言都能另選匿名或暱稱。':configured?'瀏覽與抽午餐不用登入；留言、推薦店家、按讚或按爛前，請先用 Google 登入。':'Google 登入尚未準備好，請聯絡團長。');if(!dialog.open)dialog.showModal();if(flow)check();}
+    function access(){const active=Boolean(admin?.current());$('account-setup').hidden=!active;if(!active){setupEpoch++;$('account-setup-result').textContent='';}}
+    async function refreshSetup(){
+      $('account-refresh-setup').disabled=true;feedback('正在確認 Google 登入是否可用…');
+      try{const result=await rpc('getGoogleLoginStatus');configure(result?.configured===true);if(dialog.open&&!member)feedback(configured?'Google 登入已開放，可以按上方按鈕登入。':'團長尚未完成 Google 登入設定。你仍可看店家、看評論與抽午餐。');}
+      catch(err){if(dialog.open)feedback('暫時無法確認登入狀態，請再試一次。');}
+      finally{$('account-refresh-setup').disabled=false;}
+    }
+    function open(){render();access();feedback(member?'這是新評論的預設顯示方式；每次留言都能另選匿名或暱稱。':configured?'瀏覽與抽午餐不用登入；留言、推薦店家、按讚或按爛前，請先用 Google 登入。':'正在確認 Google 登入…');if(!dialog.open)dialog.showModal();if(flow)check();else if(!member&&!configured)refreshSetup();}
+    $('account-refresh-setup').addEventListener('click',refreshSetup);
+    $('account-check-setup').addEventListener('click',async()=>{
+      const session=admin?.current();if(!session)return;const request=++setupEpoch,button=$('account-check-setup');button.disabled=true;
+      try{const result=await rpc('getGoogleLoginSetup',session.token);if(request!==setupEpoch||!dialog.open||admin.current()?.token!==session.token)return;
+        const labels={missing:'尚未填寫',invalid:'格式需要確認',ready:'已填寫'};
+        $('account-setup-result').textContent=result.checks.map(row=>row.name+'：'+labels[row.status]).join('\n')+'\n請到 Apps Script「專案設定 → 指令碼屬性」補齊設定。已填寫僅表示格式通過；仍需確認 Google 用戶端資料正確、重新導向網址與目前網站相同。';
+        configure(result.configured);
+      }catch(err){if(request===setupEpoch&&dialog.open)$('account-setup-result').textContent=err.message;}
+      finally{button.disabled=false;}
+    });
     function expire(){member=null;clearTimeout(expiryTimer);feedback('登入已到期，請重新用 Google 登入。');notify();}
     async function check(){
       clearTimeout(pollTimer);if(!flow||checking||!dialog.open)return;
@@ -68,8 +86,9 @@
       const current=member;member=null;clearTimeout(expiryTimer);notify();feedback('已登出午餐俱樂部。');
       if(current)try{await rpc('memberLogout',current.token);}catch{}
     });
-    dialog.addEventListener('close',()=>clearTimeout(pollTimer));
+    function closeSetup(){clearTimeout(pollTimer);setupEpoch++;$('account-setup-result').textContent='';}
+    dialog.addEventListener('close',closeSetup);dialog.addEventListener('cancel',closeSetup);dialog.querySelector('[data-close]').addEventListener('click',closeSetup);
     document.addEventListener('visibilitychange',()=>{if(!document.hidden&&flow&&dialog.open)check();});
-    return {configure,open,current:()=>member,invalidate:expire};
+    return {configure,open,access,current:()=>member,invalidate:expire};
   };
 })(typeof globalThis!=='undefined'?globalThis:this);

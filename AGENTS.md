@@ -1,6 +1,7 @@
 # Lunch Club — 私人 Side Project
 
 此專案與 IISI／RDSS 工作專案無關。
+- v6.8 優先：店家名單／挑店家／地圖的既有店家資訊皆進完整 restaurant-page，離開須 dispose 食評、清除私人內容及忽略遲到回應。新增店家仍可用 dialog。評論寫入前必須確認，取消保留草稿；不提供修改／刪除。全選依目前顯示結果，允許超過 20 間勾選但確認抽選仍限 2～20。推薦區塊放頁尾；共用 loading 管理重疊工作及完成／錯誤／取消。登入診斷只回設定名稱與狀態，完整結果限團長。详見 docs/browsing-and-login.md。
 - v6.7 優先：固定 27 類主清單集中於 src/catalog.js categoryDefinitions，名称／排序／圖示／前後端讀寫檢查／團長選項共用；不自動新增試算表自訂類別。韓式料理讀為韓式，其他清單外分類提示待確認但不改原表。入口只顯示有店家的主清單類別。主清單變更必須重建並更新 Code.gs 與 Index.html。Suggestions 只存投稿，Google 登入後送出、團長才可讀與處理，不自動寫入店家名單。詳見 docs/suggestions-and-categories.md。
 - v6.5：匿名／自訂暱稱二選一，新會員預設匿名；公開評論不得回傳 Google 名稱、信箱或匿名時的暱稱。getReviewAuthor 每次驗證管理者，關閉／登出清除私人 DOM 且忽略遲到回應。Reviews 追加 author_display_mode、Members 追加 display_mode；升級只補表頭。公開瀏覽使用「我／任何人」，留言／投票須 Google 登入。OAuth 瀏覽器確認資訊短暫存放，會員／管理者憑證不得持久儲存。詳見 docs/review-privacy.md。
 - v6.4 分類以具體餐點為準，同店可有多個類別；沿用 RestaurantsFree.category（G 欄）以頓號分隔，不新增欄位。舊正餐／國別料理等大類不猜成特定餐點，仍包含在不限／尚未分類。類別重複與跨類別不得增加轉盤機率。新類別及別名以 src/catalog.js 為準。

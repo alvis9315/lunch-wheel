@@ -1,12 +1,13 @@
 (function(root){
   'use strict';
   root.createLunchReviewUI=function({rpc,escape:e,account,admin}){
-    const R=root.LunchReviews,drafts=new Map();
+    const R=root.LunchReviews,drafts=new Map(),confirmation=root.createLunchReviewConfirmation(e);
     let generation=0,refreshAdminView=null;
     function clearPrivateView(){document.querySelectorAll('.review-admin').forEach(node=>node.remove());}
-    function dispose(){generation++;refreshAdminView=null;clearPrivateView();}
+    function dispose(){generation++;refreshAdminView=null;confirmation.cancel();clearPrivateView();}
     function mount(host,restaurantId){
-      const version=++generation,token=account.current()?.token||null;let reviews=[],cursor=null,loading=false,posting=false,voting=false,loadEpoch=0;
+      confirmation.cancel();
+      const version=++generation,token=account.current()?.token||null;let reviews=[],cursor=null,loading=false,posting=false,confirming=false,voting=false,loadEpoch=0;
       const alive=()=>version===generation&&host.isConnected;
       const find=selector=>host.querySelector(selector);
       const draft=drafts.get(restaurantId)||{item:'',feedback:'',score:'60',requestId:null};drafts.set(restaurantId,draft);
@@ -78,11 +79,14 @@
         finally{if(alive()){loading=false;find('.review-refresh').disabled=false;find('.review-more').disabled=false;find('.review-submit').disabled=posting||!account.current();}}
       }
       form.addEventListener('submit',async event=>{
-        event.preventDefault();if(posting||loading||voting||!form.reportValidity())return;if(!account.current()){account.open();return;}
+        event.preventDefault();if(posting||confirming||loading||voting||!form.reportValidity())return;if(!account.current()){account.open();return;}
         let input;try{if(number.value==='')throw Error('請輸入分數。');input={...R.validate({restaurantId,item:form.elements.namedItem('item').value,feedback:form.elements.namedItem('feedback').value,score:Number(number.value),requestId:draft.requestId||(draft.requestId=crypto.randomUUID())}),display:{mode:form.elements.namedItem('displayMode').value,nickname:form.elements.namedItem('nickname').value}};}catch(err){notice(err.message,true);return;}
+        confirming=true;const authorToken=account.current().token;
+        const approved=await confirmation.ask(input);confirming=false;
+        if(!approved||!alive()||account.current()?.token!==authorToken)return;
         posting=true;form.querySelectorAll('input,textarea,button').forEach(node=>node.disabled=true);find('.review-submit').textContent='正在送出…';
         try{
-          const result=await rpc('addReview',input,account.current()?.token);
+          const result=await rpc('addReview',input,authorToken);
           if(draft.requestId===input.requestId){draft.item='';draft.feedback='';draft.score='60';draft.requestId=null;}
           if(!alive())return;
           form.elements.namedItem('item').value=draft.item;form.elements.namedItem('feedback').value=draft.feedback;number.value=draft.score;syncScore();find('.review-compose').open=false;

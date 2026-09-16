@@ -6,6 +6,17 @@ function googleConfig_(){
   const configured=/^[\w.-]+\.apps\.googleusercontent\.com$/.test(clientId)&&secret.length>=10&&/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(redirect);
   return {clientId,secret,redirect,configured,stamp:hash_(clientId+'|'+secret+'|'+redirect)};
 }
+// Only booleans/status labels are returned; credentials never leave Script Properties.
+function getGoogleLoginStatus(){return {configured:googleConfig_().configured};}
+function getGoogleLoginSetup(adminToken){
+  requireAdmin_(adminToken);
+  const c=googleConfig_();
+  return {configured:c.configured,checks:[
+    {name:'GOOGLE_CLIENT_ID',status:!c.clientId?'missing':/^[\w.-]+\.apps\.googleusercontent\.com$/.test(c.clientId)?'ready':'invalid'},
+    {name:'GOOGLE_CLIENT_SECRET',status:!c.secret?'missing':c.secret.length>=10?'ready':'invalid'},
+    {name:'GOOGLE_REDIRECT_URI',status:!c.redirect?'missing':/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(c.redirect)?'ready':'invalid'}
+  ]};
+}
 function memberBinding_(){
   const key=Session.getTemporaryActiveUserKey();
   if(!key)throw Error('請先登入 Google 帳戶，再重新開啟午餐俱樂部。');
