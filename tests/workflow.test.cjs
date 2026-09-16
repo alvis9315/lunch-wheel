@@ -14,7 +14,7 @@ f.makeSheet('原始清單',originals);
 let rows=JSON.parse(f.box.listCandidates('json'));
 assert.deepEqual(rows.map(r=>r.category),types);
 assert.equal(JSON.stringify(f.data),snapshot,'reading legacy types never rewrites RestaurantsFree');
-assert.deepEqual(Catalog.typeOptions(rows).map(t=>t.label),['不限',...types]);
+assert.deepEqual(Catalog.typeOptions(rows).map(t=>[t.label,t.count]),[['不限',4],['咖啡／甜點',2],['冰品',1],['尚未分類',1]]);
 assert.equal(Catalog.typeOptions(rows)[0].count,4);
 assert(Catalog.matchesType(rows[1],'咖啡廳'));assert(!Catalog.matchesType(rows[0],'咖啡廳'));
 // Owner's explicit category always wins, and duplicate legacy IDs are not trusted.

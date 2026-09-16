@@ -89,9 +89,9 @@ function originalTypes_(){
   const idIndex=headers.indexOf('系統店家 ID'),typeIndex=headers.indexOf('店家類型');
   if(idIndex<0||typeIndex<0)return result;
   rows.forEach(row=>{
-    const id=readCell_(row[idIndex]),type=LunchCatalog.normalizeCategory(row[typeIndex]);
+    const id=readCell_(row[idIndex]),classification=LunchCatalog.parseCategories(row[typeIndex]);
     if(seen.has(id)){result.delete(id);return;}seen.add(id);
-    if(LunchCatalog.categories.includes(type)&&type!=='其他')result.set(id,type);
+    if(classification.valid&&classification.values.length&&!classification.values.every(v=>['其他','unknown'].includes(v)))result.set(id,classification.values.join('、'));
   });
   return result;
 }
