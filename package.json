@@ -5,7 +5,8 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "check": "node --check src/core.js && node --check src/catalog.js && node --check src/reviews.js && node --check src/review-ui.js && node --check src/app.js && node --check src/account-ui.js && node --check src/suggestions-ui.js && node --check src/feedback-ui.js",
-    "test": "npm run check && npm run build && node tests/catalog.test.cjs && node tests/reviews.test.cjs && node tests/preferences.test.cjs && node tests/identity.test.cjs && node tests/data-quality.test.cjs && node tests/workflow.test.cjs && node tests/food-types.test.cjs && node tests/review-privacy.test.cjs && node tests/suggestions.test.cjs && node tests/login-setup.test.cjs"
+    "test": "npm run check && npm run build && node tests/catalog.test.cjs && node tests/reviews.test.cjs && node tests/preferences.test.cjs && node tests/identity.test.cjs && node tests/data-quality.test.cjs && node tests/workflow.test.cjs && node tests/food-types.test.cjs && node tests/review-privacy.test.cjs && node tests/suggestions.test.cjs && node tests/login-setup.test.cjs && node tests/local-dev.test.cjs",
+    "dev": "node scripts/local-dev.cjs"
   },
   "engines": {
     "node": ">=18"
