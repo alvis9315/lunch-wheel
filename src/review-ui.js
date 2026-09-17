@@ -12,24 +12,24 @@
       const find=selector=>host.querySelector(selector);
       const draft=drafts.get(restaurantId)||{item:'',feedback:'',score:'60',requestId:null};drafts.set(restaurantId,draft);
       const member=account.current();
-      if(draft.memberToken!==token){draft.memberToken=token;draft.mode=member?.displayMode||'anonymous';draft.nickname=member?.nickname||'';}
       host.innerHTML='<div class="review-heading"><div><p class="eyebrow">NO FILTER. JUST FLAVOR.</p><h3>吃過的人，出來說兩句。</h3></div><span class="review-stamp" aria-hidden="true">食後<br>有感</span></div>'+
         '<div class="review-summary" role="status">正在讀取大家的真心話…</div><p class="field-note">本站食友的品項心得，分數不是 Google 評分。符合條件的每間店，抽中的機會都相同。</p>'+
         '<details class="review-compose"><summary>＋ 我吃過，讓我說</summary><form class="review-form">'+
-        '<div class="review-identity">'+(member?'<fieldset class="display-choice"><legend>這則評論怎麼顯示？</legend><label><input type="radio" name="displayMode" value="anonymous" '+(draft.mode!=='nickname'?'checked':'')+'> 匿名</label><label><input type="radio" name="displayMode" value="nickname" '+(draft.mode==='nickname'?'checked':'')+'> 自訂暱稱</label></fieldset><label class="review-nickname-label">顯示的暱稱<input name="nickname" maxlength="32" placeholder="食友要怎麼稱呼你？" value="'+e(draft.nickname)+'"></label><p class="field-note">匿名時，其他食友只會看到「匿名食友」。團長仍可查看你的 Google 帳號與這則留言填寫的暱稱。</p>':'<p>瀏覽心得不用登入；想分享、按讚或按爛時再登入即可。</p><button type="button" class="secondary review-login">使用 Google 帳戶登入</button>')+'</div>'+
+        '<div class="review-identity">'+(member?'<div class="review-public-identity"><div><span class="field-note">這則評論將顯示為</span><strong class="review-public-name">'+e(member.displayMode==='nickname'?member.nickname:'匿名食友')+'</strong></div><button type="button" class="text-button review-change-name">更改</button></div><p class="field-note">沿用你的帳號設定，不用每次重填。Google 帳號只供團長查閱；匿名時，暱稱也不會公開。</p>':'<p>瀏覽心得不用登入；想分享、按讚或按爛時再登入即可。</p><button type="button" class="secondary review-login">使用 Google 帳戶登入</button>')+'</div>'+
         '<label>01 · 品項<input name="item" required maxlength="100" placeholder="例如：雞腿飯" value="'+e(draft.item)+'"></label>'+
         '<label>02 · 回饋<textarea name="feedback" required maxlength="1500" rows="3" placeholder="便當菜不好吃，雞腿太小隻很盤">'+e(draft.feedback)+'</textarea><small class="review-char-count"></small></label>'+
         '<fieldset class="review-score-editor"><legend>03 · 分數</legend><div class="score-readout"><span class="score-mood" aria-live="polite"></span><label class="score-number-label">直接輸入<input name="score" type="number" min="-100" max="200" step="1" required value="'+e(draft.score)+'" aria-label="直接輸入分數"></label></div>'+
         '<input class="score-slider" type="range" min="-100" max="200" step="1" value="60" aria-label="評分滑桿"><div class="score-ticks"><span>−100 · 退貨</span><span>0 · 難吃</span><span>100 · 頂上人間</span><span>200 · 封神</span></div>'+
         '<details class="score-guide"><summary>看完整嘴砲分級表</summary><ul>'+R.bands.map(b=>'<li><b>'+b.min+(b.max===b.min?'':'～'+b.max)+'</b><span>'+e(b.label)+'</span></li>').join('')+'</ul></details></fieldset>'+
-        '<p class="field-note">品項、回饋與分數必填。選擇自訂暱稱時需填寫名稱；Google 名稱和帳號不會自動顯示給其他食友。</p><button class="primary review-submit" type="submit">送出這口真心話 ↗</button></form></details>'+
+        '<p class="field-note">品項、回饋與分數必填。送出前會再讓你確認一次。</p><button class="primary review-submit" type="submit">送出這口真心話 ↗</button></form></details>'+
         '<p class="review-feedback" role="status" hidden></p><div class="review-list-heading"><h4>食友實話區</h4><button type="button" class="text-button review-refresh">重新整理評論</button></div>'+
         '<p class="field-note">最新評論在前。對這則回饋按讚或爛；同一帳號可改票，再按一次取消。'+'</p><div class="review-list" aria-live="polite"></div><button type="button" class="secondary review-more" hidden>更多真心話 ↓</button>';
       find('.review-login')?.addEventListener('click',()=>account.open());
       find('.review-compose>summary').addEventListener('click',event=>{if(!account.current()){event.preventDefault();draft.wantsCompose=true;account.open();}});
-      if(member&&draft.wantsCompose){find('.review-compose').open=true;draft.wantsCompose=false;}
+      if(member&&(draft.wantsCompose||draft.open)){find('.review-compose').open=true;draft.wantsCompose=false;}
+      find('.review-compose').addEventListener('toggle',()=>{if(alive())draft.open=find('.review-compose').open;});
+      find('.review-change-name')?.addEventListener('click',()=>{draft.open=find('.review-compose').open;account.open();});
       const form=find('.review-form'),number=form.elements.namedItem('score'),slider=find('.score-slider');
-      function syncDisplay(){const input=form.elements.namedItem('nickname');if(!input)return;const named=form.elements.namedItem('displayMode').value==='nickname';input.required=named;input.disabled=!named||posting;find('.review-nickname-label').hidden=!named;}
       function notice(text,error=false){if(!alive())return;const node=find('.review-feedback');node.textContent=text;node.hidden=false;node.classList.toggle('error',error);}
       function syncScore(){
         const value=number.value===''?NaN:Number(number.value),band=Number.isInteger(value)?R.band(value):null;
@@ -38,8 +38,8 @@
         if(band){slider.value=String(value);slider.setAttribute('aria-valuetext',value+' 分，'+band.label);}
         find('.review-char-count').textContent=form.elements.namedItem('feedback').value.length+' / 1500';
       }
-      function saveDraft(){draft.item=form.elements.namedItem('item').value;draft.feedback=form.elements.namedItem('feedback').value;draft.score=number.value;draft.mode=form.elements.namedItem('displayMode')?.value||'anonymous';draft.nickname=form.elements.namedItem('nickname')?.value||'';draft.requestId=null;syncScore();syncDisplay();}
-      form.addEventListener('input',event=>{if(event.target===slider)number.value=slider.value;saveDraft();});syncScore();syncDisplay();
+      function saveDraft(){draft.item=form.elements.namedItem('item').value;draft.feedback=form.elements.namedItem('feedback').value;draft.score=number.value;draft.requestId=null;syncScore();}
+      form.addEventListener('input',event=>{if(event.target===slider)number.value=slider.value;saveDraft();});syncScore();
       function dateText(iso){const date=new Date(iso);return Number.isNaN(date.getTime())?'時間未提供':new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(date);}
       function cards(){
         if(!alive())return;
@@ -80,19 +80,19 @@
       }
       form.addEventListener('submit',async event=>{
         event.preventDefault();if(posting||confirming||loading||voting||!form.reportValidity())return;if(!account.current()){account.open();return;}
-        let input;try{if(number.value==='')throw Error('請輸入分數。');input={...R.validate({restaurantId,item:form.elements.namedItem('item').value,feedback:form.elements.namedItem('feedback').value,score:Number(number.value),requestId:draft.requestId||(draft.requestId=crypto.randomUUID())}),display:{mode:form.elements.namedItem('displayMode').value,nickname:form.elements.namedItem('nickname').value}};}catch(err){notice(err.message,true);return;}
+        let input;try{if(number.value==='')throw Error('請輸入分數。');input={...R.validate({restaurantId,item:form.elements.namedItem('item').value,feedback:form.elements.namedItem('feedback').value,score:Number(number.value),requestId:draft.requestId||(draft.requestId=crypto.randomUUID())}),display:{mode:account.current().displayMode,nickname:account.current().nickname||''}};}catch(err){notice(err.message,true);return;}
         confirming=true;const authorToken=account.current().token;
         const approved=await confirmation.ask(input);confirming=false;
         if(!approved||!alive()||account.current()?.token!==authorToken)return;
         posting=true;form.querySelectorAll('input,textarea,button').forEach(node=>node.disabled=true);find('.review-submit').textContent='正在送出…';
         try{
           const result=await rpc('addReview',input,authorToken);
-          if(draft.requestId===input.requestId){draft.item='';draft.feedback='';draft.score='60';draft.requestId=null;}
+          if(draft.requestId===input.requestId){draft.item='';draft.feedback='';draft.score='60';draft.requestId=null;draft.open=false;}
           if(!alive())return;
           form.elements.namedItem('item').value=draft.item;form.elements.namedItem('feedback').value=draft.feedback;number.value=draft.score;syncScore();find('.review-compose').open=false;
           notice(result.duplicate?'這則已送出，沒有重複新增。':'真心話已收下，謝謝你幫大家探路。');await load();
         }catch(err){if(err.code==='MEMBER_REQUIRED')account.invalidate();notice(err.message,true);}
-        finally{if(alive()){posting=false;form.querySelectorAll('input,textarea,button').forEach(node=>node.disabled=false);syncDisplay();find('.review-submit').textContent='送出這口真心話 ↗';}}
+        finally{if(alive()){posting=false;form.querySelectorAll('input,textarea,button').forEach(node=>node.disabled=false);find('.review-submit').textContent='送出這口真心話 ↗';}}
       });
       find('.review-list').addEventListener('click',async event=>{
         const button=event.target.closest('button[data-vote]');if(!button||button.disabled||loading||voting||posting)return;if(!account.current()){account.open();return;}

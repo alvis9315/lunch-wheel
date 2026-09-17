@@ -6,9 +6,11 @@ const input=extra=>({restaurantId:shop.id,item:'飯',feedback:'測試',score:0,r
 assert.equal(member.displayMode,'anonymous');
 const firstInput=input(),anonymous=b.addReview(firstInput,member.token).review;
 assert.equal(anonymous.authorLabel,'匿名食友');
-b.saveMemberDisplay({mode:'nickname',nickname:'私人的暱稱'},member.token);
+b.saveMemberDisplay({mode:'anonymous',nickname:'不公開的暱稱'},member.token);
 const hidden=b.addReview(input({display:{mode:'anonymous',nickname:'不公開的暱稱'},authorEmail:'forged@example.test'}),member.token).review;
 assert.equal(hidden.authorLabel,'匿名食友');
+assert.throws(()=>b.addReview(input({display:{mode:'nickname',nickname:'偽造暱稱'}}),member.token),/顯示名稱已變更/);
+b.saveMemberDisplay({mode:'nickname',nickname:'  午餐大師  '},member.token);
 const namedInput=input({display:{mode:'nickname',nickname:'  午餐大師  '}}),named=b.addReview(namedInput,member.token).review;
 assert.equal(named.authorLabel,'午餐大師');assert.equal(b.addReview(namedInput,member.token).duplicate,true);
 assert.throws(()=>b.addReview({...namedInput,display:{mode:'anonymous',nickname:'午餐大師'}},member.token),/已送出/);
@@ -23,6 +25,8 @@ for(const value of [b.listReviews(shop.id,null),b.listReviews(shop.id,other.toke
 }
 assert.throws(()=>b.addReview(input(),null),/MEMBER_REQUIRED/);assert.throws(()=>b.setReviewVote(hidden.id,1,null),/MEMBER_REQUIRED/);
 b.saveMemberDisplay({mode:'anonymous',nickname:'私人的暱稱'},member.token);
+assert.equal(b.addReview(namedInput,member.token).duplicate,true,'retry keeps original identity even after profile changes');
+const next=b.addReview(input(),member.token).review;assert.equal(next.authorLabel,'匿名食友','new reviews use current stored profile');
 assert.equal(f.issueMember('private-person','private-person@example.test').displayMode,'anonymous');
 assert.equal(b.listReviews(shop.id).reviews.find(r=>r.id===named.id).authorLabel,'午餐大師','preferences do not rewrite existing reviews');
 assert.equal(f.sheets.get('Reviews').data[0].length,12);assert.equal(f.sheets.get('Members').data[0].length,6);

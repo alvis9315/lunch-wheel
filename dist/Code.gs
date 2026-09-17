@@ -437,7 +437,8 @@ function addReview(input,memberToken){
     }
     const now=Date.now(),mine=records.filter(r=>r.authorKey===author);
     if(mine.filter(r=>now-Date.parse(r.createdAt)<60000).length>=5||mine.filter(r=>now-Date.parse(r.createdAt)<86400000).length>=50)throw Error('評論送出太頻繁，請稍後再試；同一帳號每分鐘最多 5 則、24 小時最多 50 則。');
-    const profile=memberProfile_(member),display=requestedDisplay||{mode:profile.displayMode,nickname:profile.nickname};
+    const profile=memberProfile_(member),display={mode:profile.displayMode,nickname:profile.nickname};
+    if(requestedDisplay&&(requestedDisplay.mode!==display.mode||requestedDisplay.nickname!==display.nickname))throw Error('顯示名稱已變更，請重新開啟帳號設定並按「確認」，再送出評論。');
     const record={...review,id:Utilities.getUuid(),authorKey:author,createdAt:new Date().toISOString(),authorEmail:profile.email,authorName:profile.name,authorNickname:display.nickname,authorDisplayMode:display.mode};
     communitySheet_('Reviews',REVIEW_HEADERS_).appendRow([record.id,record.restaurantId,safeCell_(record.item),safeCell_(record.feedback),record.score,author,record.requestId,record.createdAt,safeCell_(profile.email),safeCell_(profile.name),safeCell_(display.nickname),display.mode]);
     SpreadsheetApp.flush();return {review:publicReview_(record,[],author),duplicate:false};
