@@ -81,7 +81,9 @@
     return [...new Set(out)];
   }
   function randomIndex(n, cryptoSource = root.crypto) {
-    if (!Number.isInteger(n) || n < 2 || n > 20) throw Error('抽選需 2～20 間店家');
+    // A JavaScript array has fewer than 2^32 elements; reject impossible counts
+    // so rejection sampling cannot loop forever. There is no product-level cap.
+    if (!Number.isInteger(n) || n < 2 || n > 4294967295) throw Error('請至少選 2 間店家，並提供有效的店家數量');
     const limit = Math.floor(4294967296/n)*n, bytes = new Uint32Array(1);
     do { cryptoSource.getRandomValues(bytes); } while (bytes[0] >= limit);
     return bytes[0] % n;

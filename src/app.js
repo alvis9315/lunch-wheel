@@ -12,7 +12,7 @@
   let toastTimer, weatherRequest = 0, detailRequest = 0, searchRequest = 0, mapView, markerLayer, originMarker, dateKey = C.taipeiDay();
   const e = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let sourceRequest=0,sourceLoading=false,sourceTimer=null,localSourceRecords=[];
-  let stage='type',lastLunchStage='type',chosenType=null,confirmedIds=null;
+  let stage='type',lastLunchStage='type',chosenTypes=null,draftTypes=new Set(['all']),confirmedIds=null;
   const foodIcon=p=>Catalog.categoryIcon(Catalog.foodCategories.find(type=>Catalog.foodTypesFor(p).includes(type)));
   const TYPE_LAYOUT_STORAGE='lunch-club-type-columns-v1';
   function setTypeColumns(value,persist=false){
@@ -142,12 +142,17 @@
   }
   function context() { return {origin:state.origin,weather:state.weather,lastId:state.lastId,now:new Date()}; }
   function selectedPlaces() { return state.records.filter(p=>state.selected.has(p.id)); }
-  function inType(p){return Catalog.matchesType(p,chosenType||'all');}
+  function inType(p){return Catalog.matchesTypes(p,chosenTypes||['all']);}
   function eligible() { return selectedPlaces().filter(p=>inType(p)&&C.reasons(p,state.filters,context()).length===0); }
   function wheelPlaces(){return eligible().filter(p=>confirmedIds?.has(p.id));}
   function visiblePlaces(){const query=$('pick-search').value.trim().toLowerCase();return state.records.filter(p=>inType(p)&&(p.name+' '+p.address).toLowerCase().includes(query)&&C.reasons(p,state.filters,context()).length===0);}
   function renderTypes(){
-    $('type-options').innerHTML=Catalog.typeOptions(state.records).map(t=>'<button class="type-card" data-type="'+e(t.value)+'"'+(t.value==='all'?'':foodStyle({category:t.value}))+' '+(state.busy||(t.value!=='all'&&!t.count)?'disabled':'')+'><span aria-hidden="true">'+(t.value==='all'?'✳':Catalog.categoryIcon(t.value))+'</span><strong>'+e(t.label)+'</strong><small>'+t.count+' 間店'+(!t.count&&t.value!=='all'?' · 尚無分類資料':'')+'</small>'+(t.count||t.value==='all'?'<b aria-hidden="true">↗</b>':'')+'</button>').join('');
+    const options=Catalog.typeOptions(state.records);
+    for(const value of draftTypes)if(!options.some(t=>t.value===value))options.push({value,label:value==='unclassified'?'尚未分類':value,count:0});
+    $('type-options').innerHTML=options.map(t=>'<button class="type-card" data-type="'+e(t.value)+'" aria-pressed="'+draftTypes.has(t.value)+'"'+(t.value==='all'?'':foodStyle({category:t.value}))+' '+(state.busy?'disabled':'')+'><span aria-hidden="true">'+(t.value==='all'?'✳':Catalog.categoryIcon(t.value))+'</span><strong>'+e(t.label)+'</strong><small>'+t.count+' 間店</small><b aria-hidden="true">'+(draftTypes.has(t.value)?'✓':'＋')+'</b></button>').join('');
+    const count=new Set(state.records.filter(p=>Catalog.matchesTypes(p,draftTypes)).map(p=>p.id)).size;
+    $('type-selection-summary').textContent=(draftTypes.has('all')?'不限餐點類別':'已選 '+draftTypes.size+' 種類別')+' · 共 '+count+' 間店';
+    $('confirm-types').disabled=state.busy||!state.ready||!count;
   }
   function categoryPicker(p){
     const selected=Catalog.foodTypesFor(p);
@@ -180,30 +185,35 @@
     if(state.ready)page(destination);else enterSource('live',section==='library'?'library':'type');
   }
   function chooseType(value){
-    if(state.busy||!Catalog.typeOptions(state.records).some(t=>t.value===value))return;
-    chosenType=value;confirmedIds=null;state.selected=new Set();$('pick-search').value='';
-    resetFilters();page('pick');saveLocal();
+    if(state.busy)return;
+    if(value==='all')draftTypes=new Set(['all']);
+    else{draftTypes.delete('all');if(draftTypes.has(value))draftTypes.delete(value);else draftTypes.add(value);if(!draftTypes.size)draftTypes.add('all');}
+    renderTypes();
+    document.querySelector('[data-type="'+CSS.escape(value)+'"]')?.focus({preventScroll:true});
+  }
+  function confirmTypes(){
+    if(state.busy||!state.records.some(p=>Catalog.matchesTypes(p,draftTypes)))return;
+    chosenTypes=new Set(draftTypes);confirmedIds=null;
+    state.selected=new Set(selectedPlaces().filter(inType).map(p=>p.id));
+    $('pick-search').value='';page('pick');saveLocal();
   }
   function confirmSelection(){
     if(state.busy||!validTime())return;
-    const choices=eligible();if(choices.length<2||choices.length>20){message('請勾選 2–20 間符合條件的店家。');return;}
+    const choices=eligible();if(choices.length<2){message('請至少勾選 2 間符合條件的店家。');return;}
     // Only visible filter matches enter this round; hidden choices cannot reappear on refresh.
     state.selected=new Set(choices.map(p=>p.id));confirmedIds=new Set(state.selected);saveLocal();page('wheel');render();
   }
   function renderPick(){
     const list=visiblePlaces(),count=eligible().length,hidden=state.selected.size-count;
-    const label=chosenType==='all'?'不限':chosenType==='unclassified'?'尚未分類':chosenType||'尚未選擇';
-    $('type-summary').textContent='今天想吃：'+label+' · 先設定偏好，再勾選 2–20 間店。';
+    const label=chosenTypes?Array.from(chosenTypes,t=>t==='all'?'不限':t==='unclassified'?'尚未分類':t).join('、'):'尚未選擇';
+    $('type-summary').textContent='今天想吃：'+label+' · 先設定偏好，再勾選至少 2 間店。';
     $('pick-count').textContent='顯示 '+list.length+' 間 · 已勾選 '+count+' 間'+(hidden?'（另有 '+hidden+' 間不符合條件，確認時會略過）':'');
-    $('confirm-note').textContent=count>20?'已勾選 '+count+' 間，請縮小至 20 間以內再抽選。':count>=2?'這 '+count+' 間進入轉盤，每間機會相同':'再勾選 '+(2-count)+' 間就能抽午餐';
-    $('confirm-selection').disabled=state.busy||!validTime()||count<2||count>20;
+    $('confirm-note').textContent=count>=2?'這 '+count+' 間進入轉盤，每間機會相同':'再勾選 '+(2-count)+' 間就能抽午餐';
+    $('confirm-selection').disabled=state.busy||!validTime()||count<2;
     $('select-all').disabled=state.busy||!list.length;
-    $('select-visible').hidden=list.length<=20;
-    $('select-visible').textContent='只選目前前 20 間';
-    $('select-visible').disabled=state.busy||!list.length;
     $('clear-selection').disabled=state.busy||!state.selected.size;
     $('restaurant-cards').innerHTML=list.map(p=>'<article class="restaurant-card '+(state.selected.has(p.id)?'selected':'')+'"'+foodStyle(p)+'><label class="restaurant-select"><input type="checkbox" data-select="'+e(p.id)+'" aria-label="本次抽選 '+e(p.name)+'" '+(state.selected.has(p.id)?'checked':'')+' '+(state.busy?'disabled':'')+'><span>加入今天名單</span></label><div class="restaurant-art" aria-hidden="true">'+foodIcon(p)+'</div><button class="restaurant-info" data-detail="'+e(p.id)+'"><strong>'+e(p.name)+'</strong>'+foodTags(p)+'<span>'+kmText(p)+' · '+(p.budget==null?'預算未提供':'NT$ '+p.budget)+'</span>'+statusHtml(p)+'<small>店家資訊與食友心得 ↗</small></button></article>').join('')||'<div class="empty-state">沒有符合條件的店家。<br>試著放寬左側條件、清除搜尋，或重新選餐點。<br>資料尚未確認的店，不會視為符合指定條件。</div>';
-    document.querySelectorAll('.nav').forEach(b=>{b.disabled=state.busy||(b.dataset.page==='pick'&&chosenType===null)||(b.dataset.page==='wheel'&&!confirmedIds);});
+    document.querySelectorAll('.nav').forEach(b=>{b.disabled=state.busy||(b.dataset.page==='pick'&&chosenTypes===null)||(b.dataset.page==='wheel'&&!confirmedIds);});
   }
   function validTime() { return /^\d{2}:\d{2}$/.test(state.filters.from) && /^\d{2}:\d{2}$/.test(state.filters.to) && C.minutes(state.filters.to)>C.minutes(state.filters.from); }
   function kmText(p) { const km=C.distance(state.origin,p.location); return km===null?'距離未知':km.toFixed(2)+' km'; }
@@ -229,12 +239,15 @@
     if (n===1) svg+='<circle cx="200" cy="200" r="199" fill="#e0e4d4"/>';
     places.forEach((p,i)=>{
       const a=(i*step-90)*Math.PI/180,b=((i+1)*step-90)*Math.PI/180;
-      if(n>1) svg+='<path d="M200 200 L'+(center+radius*Math.cos(a))+' '+(center+radius*Math.sin(a))+' A199 199 0 '+(step>180?1:0)+' 1 '+(center+radius*Math.cos(b))+' '+(center+radius*Math.sin(b))+' Z" fill="'+COLORS[i%COLORS.length]+'" stroke="#fffefa" stroke-width="1.5"/>';
+      if(n>1) svg+='<path d="M200 200 L'+(center+radius*Math.cos(a))+' '+(center+radius*Math.sin(a))+' A199 199 0 '+(step>180?1:0)+' 1 '+(center+radius*Math.cos(b))+' '+(center+radius*Math.sin(b))+' Z" fill="'+COLORS[i%COLORS.length]+'" stroke="#fffefa" stroke-width="'+(n>80?.2:n>20?.6:1.5)+'"/>';
       const mid=(i+.5)*step-90, label=p.name||'店家資訊待載入', clipped=label.length>8?label.slice(0,7)+'…':label;
-      svg+='<g transform="rotate('+mid+' 200 200)"><text x="380" y="204" text-anchor="end" font-size="'+(n>12?11:13)+'">'+e(clipped)+'</text></g>';
+      if(n<=20||i%Math.ceil(n/40)===0)svg+='<g transform="rotate('+mid+' 200 200)"><text x="380" y="204" text-anchor="end" font-size="'+(n>12?11:13)+'">'+e(n>20?String(i+1):clipped)+'</text></g>';
     });
     if(!places.length) svg+='<text x="200" y="90" text-anchor="middle" font-size="16">等你選好午餐名單</text>';
     $('wheel-disc').innerHTML=svg+'</svg>';
+    $('wheel-list-note').textContent=n>40?'店家較多，轉盤只顯示部分編號；下列每間店都會參加，機會相同。':n>20?'轉盤以編號顯示，下方可對照完整店名。':'以下每間店都會參加，機會相同。';
+    $('wheel-list-count').textContent='本次抽選名單（'+places.length+' 間）';
+    $('wheel-list').innerHTML=places.map(p=>'<li>'+e(p.name)+'</li>').join('');
     $('wheel-disc').style.transition='none';$('wheel-disc').style.transform='rotate(0deg)';state.rotation=0;
     $('wheel-disc').getBoundingClientRect();$('wheel-disc').style.transition='';
   }
@@ -246,15 +259,15 @@
     const choices=stage==='wheel'?wheelPlaces():eligible(), count=state.selected.size;
     $('nav-count').textContent=state.records.length;
     $('filter-summary').innerHTML=validTime()?'已勾選 '+count+' 間，<strong>'+choices.length+'</strong> 間符合今天的條件。<br>至少 2 間符合條件才能抽選。':'用餐結束時間必須晚於開始時間。';
-    $('spin-button').disabled=state.busy||!state.ready||!confirmedIds||choices.length<2||count>20||!validTime();
-    $('chance-label').textContent=choices.length>=2?choices.length+' 間候選 · 每間 '+(100/choices.length).toFixed(1)+'% 機會':'至少選 2 間符合條件的店';
+    $('spin-button').disabled=state.busy||!state.ready||!confirmedIds||choices.length<2||!validTime();
+    $('chance-label').textContent=choices.length>=2?choices.length+' 間候選 · 每間機會都是 1 / '+choices.length:'至少選 2 間符合條件的店';
     if(!state.busy) renderWheel(choices);
     renderSaved();renderTypes();renderPick();renderLibrary();
     document.querySelectorAll('[data-section]').forEach(button=>{const active=state.ready&&(button.dataset.section==='library'?(stage==='library'||stage==='restaurant'&&restaurantReturn.page==='library'):!(stage==='library'||stage==='restaurant'&&restaurantReturn.page==='library'));button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
   }
   function renderSaved() {
     $('saved-count').textContent=state.records.length;
-    $('selection-count').textContent='本次已勾選 '+state.selected.size+' / 20 間 · '+(state.mode==='local'?'記在這台裝置':'現有名單由團長維護');
+    $('selection-count').textContent='本次已勾選 '+state.selected.size+' 間 · '+(state.mode==='local'?'記在這台裝置':'現有名單由團長維護');
     const query=$('list-search').value.trim().toLowerCase();
     const list=state.records.filter(p=>(p.name||'店家資訊待載入').toLowerCase().includes(query));
     $('saved-list').innerHTML=list.map(p=>'<article class="saved-card '+(state.selected.has(p.id)?'selected':'')+'"><input type="checkbox" data-select="'+e(p.id)+'" aria-label="本次抽選 '+e(p.name||p.id)+'" '+(state.selected.has(p.id)?'checked':'')+' '+(state.busy||p.unavailable?'disabled':'')+'><span class="food-icon">'+foodIcon(p)+'</span><button class="card-main" data-detail="'+e(p.id)+'"><strong>'+e(p.name||'店家資訊待載入')+'</strong><small>'+e(categoryName(p.category))+' · '+e(Catalog.diets[p.diet]||Catalog.diets.unknown)+' · '+kmText(p)+' · '+(p.budget==null?'預算未知':'NT$ '+p.budget)+'</small>'+statusHtml(p)+'</button></article>').join('')||'<div class="empty-state">'+(query?'沒有符合搜尋的店家。':'還沒有店家，從右側地圖找一間吧！')+'</div>';
@@ -262,7 +275,7 @@
   function page(name) {
     if(state.busy||!state.ready) return;
     if(!['type','pick','wheel','map','library','restaurant'].includes(name))return;
-    if(name==='pick'&&chosenType===null)return;
+    if(name==='pick'&&chosenTypes===null)return;
     if(name==='wheel'&&!confirmedIds)return;
     if(name==='pick')confirmedIds=null;
     if(stage==='restaurant'&&name!=='restaurant'){detailRequest++;restaurantLoadStop?.();reviewUI.dispose();$('restaurant-content').replaceChildren();state.detail=null;}
@@ -437,9 +450,9 @@
       else {const duplicate=state.records.find(r=>!r.demo&&Catalog.fingerprint(r)===Catalog.fingerprint(record));result={record:duplicate||{...record,...validated},duplicate:Boolean(duplicate)};}
       const saved=p.demo?{...p,...result.record}:Catalog.hydrate(result.record);
       if(!state.records.some(r=>r.id===saved.id)){state.records.push(saved);if(state.mode==='local')localSourceRecords.push(result.record);}
-      if(state.selected.size<20&&inType(saved))state.selected.add(saved.id);
+      if(inType(saved))state.selected.add(saved.id);
       saveLocal();$('detail-dialog').close();drawMarkers(state.records);
-      message(result.duplicate?'這間店已被加入，已同步既有資料。':state.selected.has(saved.id)?'已加入'+(state.mode==='local'?'私人':'共用')+'名單與本次抽選。':'已保存到名單。本次已滿 20 間，可稍後勾選。');
+      message(result.duplicate?'這間店已被加入，已同步既有資料。':state.selected.has(saved.id)?'已加入'+(state.mode==='local'?'私人':'共用')+'名單與本次抽選。':'已保存到名單，可重新選餐點後勾選。');
     } catch(err){if(err.code==='AUTH_REQUIRED')clearAdmin();message(err.message);submit.disabled=false;submit.textContent='再試一次';}
     finally {state.busy=false;render();}
   }
@@ -455,7 +468,7 @@
       if(state.mode==='live')await refreshDetails(selectedPlaces());
       if(state.filters.weather==='auto')await loadWeather();
       const choices=wheelPlaces();
-      if(!validTime()||choices.length<2||choices.length>20)throw Error('更新後不足 2 間符合條件，請調整條件或增加勾選店家。');
+      if(!validTime()||choices.length<2)throw Error('更新後不足 2 間符合條件，請調整條件或增加勾選店家。');
       renderWheel(choices);
       const index=C.randomIndex(choices.length), winner=choices[index], target=C.rotation(index,choices.length,state.rotation);
       setSpinLabel('轉呀轉','好吃的快來了');$('wheel-title').textContent='美味，正在靠近。';
@@ -477,7 +490,7 @@
     if(state.busy)return;
     sourceStop?.();sourceStop=loading.begin('正在打開現有名單…');
     const request=++sourceRequest;sourceLoading=true;lockUI(true);state.ready=false;clearAdmin();
-    const trace=(step,extra={})=>console.info('[Lunch Club 6.10.0] shared entry', {request,step,...extra});
+    const trace=(step,extra={})=>console.info('[Lunch Club 6.11.0] shared entry', {request,step,...extra});
     const current=()=>request===sourceRequest&&sourceLoading;
     $('source-page').setAttribute('aria-busy','true');$('cancel-source').hidden=false;$('cancel-source').disabled=false;
     $('source-status').textContent=mode==='live'?'正在打開現有名單，請稍候…':'正在打開你的名單…';
@@ -517,7 +530,7 @@
         const customOrigin=readOrigin();state.origin=customOrigin||{...defaultOrigin};originCustom=Boolean(customOrigin);
         state.records=records;state.mode=mode;state.filters={...DEFAULT_FILTERS};state.detail=null;resultPlace=null;
         const local=getLocal(mode);state.lastId=typeof local.lastId==='string'?local.lastId:null;
-        chosenType=null;confirmedIds=null;lastLunchStage='type';state.selected=new Set();state.ready=true;
+        chosenTypes=null;draftTypes=new Set(['all']);confirmedIds=null;lastLunchStage='type';state.selected=new Set();state.ready=true;
         $('library-search').value='';$('library-type').value='all';
         $('list-search').value='';$('map-query').value='';$('search-results').hidden=true;searchPlaces=[];
         $('source-status').textContent='正在顯示今天的午餐名單…';
@@ -548,7 +561,7 @@
     document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());reviewUI.dispose();state.detail=null;
     $('source-workspace').hidden=true;$('main-nav').hidden=true;$('source-page').hidden=false;
     $('source-page').removeAttribute('aria-busy');$('cancel-source').hidden=true;
-    chosenType=null;confirmedIds=null;lastLunchStage='type';delete document.body.dataset.stage;
+    chosenTypes=null;draftTypes=new Set(['all']);confirmedIds=null;lastLunchStage='type';delete document.body.dataset.stage;
     $('source-status').textContent='選好類型，開始今天的午餐冒險。';lockUI(false);render();$('choose-shared').focus();
   }
   function boot(){
@@ -563,7 +576,7 @@
     if(b.hasAttribute('data-data-help'))showDataHelp();
     if(b.dataset.section)enterSection(b.dataset.section);
     if(b.dataset.type)chooseType(b.dataset.type);
-    if(b.dataset.page)page(b.dataset.page);
+    if(b.dataset.page){if(b.dataset.page==='pick'&&stage==='type')confirmTypes();else page(b.dataset.page);}
     if(b.hasAttribute('data-close')){const dialog=b.closest('dialog');if(dialog.id==='detail-dialog')reviewUI.dispose();dialog.close();}
     if(b.dataset.walk&&!state.busy){state.filters.walk=b.dataset.walk;setChoice('#walk-choices','walk',state.filters.walk);render();}
     if(b.dataset.weather&&!state.busy){state.filters.weather=b.dataset.weather;setChoice('#weather-choices','weather',state.filters.weather);render();}
@@ -582,12 +595,12 @@
   $('library-search').addEventListener('input',renderLibrary);$('library-type').addEventListener('change',renderLibrary);$('library-refresh').addEventListener('click',refreshCatalog);
   $('choose-library').addEventListener('click',()=>enterSection('library'));
   $('toggle-filters').addEventListener('click',()=>{const button=$('toggle-filters'),expanded=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(expanded));button.textContent='篩選條件 · '+(expanded?'收起':'展開');$('pick-filters').classList.toggle('expanded',expanded);});
+  $('confirm-types').addEventListener('click',confirmTypes);
   $('confirm-selection').addEventListener('click',confirmSelection);
   $('refresh-picks').addEventListener('click',refreshCatalog);
   $('clear-selection').addEventListener('click',()=>{if(state.busy)return;state.selected.clear();saveLocal();render();});
   $('restaurant-back').addEventListener('click',backRestaurant);
   $('select-all').addEventListener('click',()=>{if(state.busy)return;state.selected=new Set(visiblePlaces().map(p=>p.id));saveLocal();render();});
-  $('select-visible').addEventListener('click',()=>{if(state.busy)return;state.selected=new Set(visiblePlaces().slice(0,20).map(p=>p.id));saveLocal();render();});
   $('list-search').addEventListener('input',renderSaved);$('reset-filters').addEventListener('click',resetFilters);$('spin-button').addEventListener('click',spin);$('refresh-list').addEventListener('click',refreshCatalog);
   $('map-query').addEventListener('input',()=>{$('google-search-link').href='https://www.google.com/maps/search/?'+new URLSearchParams({api:'1',query:$('map-query').value||'板橋車站 餐廳'});});
   $('map-search-form').addEventListener('submit',event=>{event.preventDefault();if(!state.busy)searchMap($('map-query').value.trim());});

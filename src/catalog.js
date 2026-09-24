@@ -42,6 +42,7 @@
     return [{value:'all',label:'不限',count:records.length},...present.map(c=>({value:c,label:c,count:counts.get(c)})),...(unknown?[{value:'unclassified',label:'尚未分類',count:unknown}]:[])];
   }
   const matchesType=(record,value)=>value==='all'||(value==='unclassified'?!foodTypesFor(record).length:foodTypesFor(record).includes(normalizeCategory(value)));
+  const matchesTypes=(record,values)=>Array.from(values).some(value=>matchesType(record,value));
   function qualitySummary(records){
     const filters=[['category','餐點類別'],['diet','葷素'],['budget','每人預算'],['hours','營業時間'],['covered','避雨情況'],['coveredOrigin','避雨出發點']];
     const general=[['phone','電話'],['address','地址'],['mapsUrl','地圖連結']];
@@ -133,6 +134,6 @@
     }):[]);
     return {...checked,loaded:!checked.unavailable,manualHours:true,periods,hoursText:checked.weeklyHours.map((day,i)=>'週'+days[i]+'：'+(day.status==='unknown'?'未填寫':day.status==='closed'?'休息':day.spans.map(s=>s.from+'–'+s.to+(s.to<s.from?'（翌日）':'')).join('、')))};
   }
-  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets,typeName,typeOptions,matchesType,normalizeCategory,qualitySummary,foodCategories,categoryIcon,parseCategories,foodTypesFor,foodGroups,categoryGroup,foodAppearance};root.LunchCatalog=api;
+  const api={validate,fingerprint,hydrate,read,collection,blank,number,point,issueLabels,categories,diets,typeName,typeOptions,matchesType,matchesTypes,normalizeCategory,qualitySummary,foodCategories,categoryIcon,parseCategories,foodTypesFor,foodGroups,categoryGroup,foodAppearance};root.LunchCatalog=api;
   if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

@@ -96,3 +96,15 @@ body[data-stage=restaurant] #data-status,body[data-stage=restaurant] #mode-banne
 .review-public-identity>div{min-width:0}
 .review-public-name{display:block;margin-top:6px;overflow-wrap:anywhere}
 .review-change-name{flex-shrink:0;min-height:44px;min-width:44px}
+
+/* Multiple categories stay on step one until the explicit next action. */
+.type-card[aria-pressed=true]{outline:3px solid var(--ink);outline-offset:3px}
+.type-card b{border-radius:50%;min-width:28px;text-align:center}
+.type-card[aria-pressed=true] b{background:var(--ink);color:var(--white)}
+.type-card[data-type=all][aria-pressed=true] b{background:var(--white);color:var(--ink)}
+.type-next-bar{position:sticky;bottom:12px;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 22px;margin:24px 0;background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 24px #253f3214}
+.wheel-candidates{margin:20px auto 0;max-width:760px;text-align:left;border-top:1px solid var(--line);padding:16px 4px}
+.wheel-candidates summary{cursor:pointer;min-height:44px;align-content:center;font-weight:700}
+.wheel-candidates ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:40px;max-height:360px;overflow:auto;padding-left:36px;padding-right:12px}
+.wheel-candidates li{break-inside:avoid;padding:6px;overflow-wrap:anywhere}
+@media(max-width:640px){.type-next-bar{bottom:calc(8px + env(safe-area-inset-bottom));padding:12px;gap:10px;flex-wrap:wrap}.type-next-bar>span{font-size:13px}.type-next-bar>button{width:100%;min-height:48px}.wheel-candidates ol{grid-template-columns:minmax(0,1fr)}}
